@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 23/11/2026 — Chạy kiểm thử tự động trên GitHub (CI)
+
+- Thêm `.github/workflows/backend-tests.yml`: mỗi lần push / PR tự chạy trên GitHub — PostgreSQL 16 tạm, `npm ci`, `tsc --noEmit` + `npm run lint:tests`, `prisma db push`, `npm run seed:all`, `npm test`, rồi bật máy chủ cổng 8080 và `npm run smoke`.
+- `npm run smoke` chạy lại: **19/19 đạt** (đúng con số cũ, không phải sửa script).
+- `tests/docker-compose.test.yml`: thêm healthcheck (để `docker compose up -d --wait` đợi CSDL sẵn sàng). Chưa thử được vì môi trường không có Docker daemon.
+- Không đổi nội dung các kịch bản test. Workflow chưa chạy trên GitHub thật (chỉ chạy từng bước tương đương trên PostgreSQL 16 cục bộ).
+
 ## 23/11/2026 — Bộ kiểm thử đầu-cuối vào kho
 
 - Thêm `1-backend/tests/`: `e2e-360-idp.ts` (134 mục), `e2e-review-succession.ts` (73 mục), `helpers.ts`, `run.ts`, `README.md`, `docker-compose.test.yml`.

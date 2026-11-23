@@ -1,0 +1,87 @@
+# CI cho backend (1-backend): kiểm tra kiểu + 2 kịch bản đầu-cuối (npm test) + smoke.
+# CSDL là PostgreSQL service container, tạo mới mỗi lần chạy, KHÔNG liên quan CSDL thật.
+name: Backend tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 1-backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: competency_test
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # localhost nên qua được kiểm tra "chỉ chạy CSDL cục bộ" của tests/helpers.ts
+      DATABASE_URL: postgresql://postgres:postgres@localhost:54329/competency_test
+      # Khoá chỉ dành cho CI (CSDL tạm, huỷ sau khi chạy) — không phải khoá thật
+      JWT_ACCESS_SECRET: ci-only-jwt-secret-not-for-real-use-0123456789
+      JWT_REFRESH_SECRET: ci-only-refresh-secret-not-for-real-use-0123456789
+      SEED_PASSWORD: Flamingo@2026
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 1-backend/package-lock.json
+
+      - name: Cài thư viện (postinstall tự chạy prisma generate)
+        run: npm ci
+
+      - name: Kiểm tra kiểu (mã nguồn và bộ test)
+        run: |
+          npx tsc --noEmit
+          npm run lint:tests
+
+      - name: Tạo bảng (prisma db push — giai đoạn thí điểm không dùng migrate)
+        run: npx prisma db push
+
+      - name: Nạp dữ liệu chuẩn (quyền, vai trò, đơn vị, năng lực, Job Architecture)
+        run: npm run seed:all
+
+      - name: Kiểm thử đầu-cuối (npm test, máy chủ tự bật ở cổng 8099)
+        run: npm test
+
+      - name: Bật máy chủ cho smoke (cổng 8080)
+        run: |
+          PORT=8080 NODE_ENV=test nohup npx tsx src/index.ts > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -fs http://localhost:8080/health >/dev/null && exit 0
+            sleep 1
+          done
+          echo "Máy chủ không lên được:"; cat "$RUNNER_TEMP/server.log"; exit 1
+
+      - name: Smoke (kỳ vọng ĐẠT 19/19)
+        run: npm run smoke
+
+      - name: Nhật ký máy chủ (khi lỗi)
+        if: failure()
+        run: cat "$RUNNER_TEMP/server.log" || true
