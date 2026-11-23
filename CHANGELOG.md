@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 23/11/2026 — Kiểm thử giao diện / build
+
+- Thêm `2-frontend/tests/` (`serverAdapter.test.ts` 9 mục, `client.test.ts` 15 mục) và `vitest.config.ts`; thêm devDependency `vitest`.
+- Lệnh mới trong `2-frontend`: `npm run test:ui` (chỉ test), `npm run check:ui` (tsc → vite build → test).
+- `tsc --noEmit` và `vite build` đã sạch sẵn — **không phải sửa mã nguồn** nào. Còn cảnh báo chunk > 500 kB (chưa xử lý).
+- Cập nhật `1-backend/tests/README.md` (mục kiểm thử giao diện).
+
 ## 23/11/2026 — Bộ kiểm thử đầu-cuối vào kho
 
 - Thêm `1-backend/tests/`: `e2e-360-idp.ts` (134 mục), `e2e-review-succession.ts` (73 mục), `helpers.ts`, `run.ts`, `README.md`, `docker-compose.test.yml`.
