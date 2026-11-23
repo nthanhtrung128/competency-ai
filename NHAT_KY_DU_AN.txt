@@ -295,3 +295,6 @@ Dữ liệu
   - Sửa: máy chủ sập khi lỗi async; báo nhầm 401 khi mất CSDL; ẩn persona/lộ trình demo
     ở chế độ máy chủ; gán chủ quản chỉ cho HR_LEAD/ADMIN.
   - Kiểm thử: 46/46 + 29/29 trên PostgreSQL thật; giao diện chạy trên trình duyệt.
+[23/11/2026] Đưa toàn bộ dự án lên GitHub (kho riêng tư nthanhtrung128/competency-ai,
+  nhánh main) để làm tiếp bằng Claude Code. Thêm CLAUDE.md (bối cảnh, nguyên tắc dữ liệu,
+  lệnh thường dùng) và .gitignore (không đưa .env, backups/, node_modules lên kho).

@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 23/11/2026 — Đưa dự án lên GitHub
+
+- Tạo kho riêng tư `nthanhtrung128/competency-ai` gồm toàn bộ backend, frontend, dữ liệu, tài liệu, khung tổ chức.
+- Thêm `CLAUDE.md` (bối cảnh cho Claude Code) và `.gitignore` (loại `.env`, `backups/`, `node_modules/`).
+
 ## 14/10/2026 — Nối giao diện với máy chủ, Job Architecture, Sổ quyết định
 
 **Backend (`1-backend`)**
