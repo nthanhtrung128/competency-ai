@@ -22,6 +22,8 @@
     "test": "tsx tests/run.ts",
     "test:360": "tsx tests/e2e-360-idp.ts",
     "test:review": "tsx tests/e2e-review-succession.ts",
+    "test:import-employees": "tsx tests/e2e-import-employees.ts",
+    "test:import-indicators": "tsx tests/e2e-import-indicators.ts",
     "lint:tests": "tsc -p tests/tsconfig.json"
   },
   "dependencies": {

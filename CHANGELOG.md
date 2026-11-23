@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 23/11/2026 — Test đầu-cuối cho nhập nhân sự và nhập chỉ báo Excel
+
+- Thêm `1-backend/tests/e2e-import-employees.ts` (82 mục): nhập nhân sự 2 bước — phân quyền, ca hợp lệ, nhập lại không nhân đôi, cập nhật + lịch sử điều chuyển, lỗi/cảnh báo từng dòng, thiếu cột, tải nhầm .xlsx, huỷ/commit sai trạng thái.
+- Thêm `1-backend/tests/e2e-import-indicators.ts` (54 mục): `npm run import:indicators` — chạy thử không ghi, `--commit` chỉ tạo bản nháp, nhập lại không nhân đôi, gộp vào nháp có sẵn, CSV, vết nguyên văn AI, file lỗi/hỏng không ghi gì; tự trả 3 năng lực thử về trạng thái cũ.
+- `npm test` chạy cả 4 kịch bản; lệnh mới `npm run test:import-employees`, `npm run test:import-indicators`. Cập nhật `tests/README.md`.
+- Đã chạy trên PostgreSQL 16 tạm: 134/134, 73/73, 82/82, 54/54; kiểm tra kiểu `npm run lint:tests` sạch. Không sửa mã nguồn backend. Ghi chú: endpoint nhập nhân sự chỉ nhận CSV, không nhận .xlsx.
+
 ## 23/11/2026 — Bộ kiểm thử đầu-cuối vào kho
 
 - Thêm `1-backend/tests/`: `e2e-360-idp.ts` (134 mục), `e2e-review-succession.ts` (73 mục), `helpers.ts`, `run.ts`, `README.md`, `docker-compose.test.yml`.

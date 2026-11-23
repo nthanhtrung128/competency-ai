@@ -310,3 +310,10 @@ Dữ liệu
     phiên bản năng lực nào.
   - Chưa làm: chạy thử docker-compose.test.yml (máy này không có Docker); nhập nhân sự 2 bước,
     nhập chỉ báo Excel và giao diện chưa có test.
+[23/11/2026] Việc gợi ý còn thiếu của mục 1: test đầu-cuối cho nhập nhân sự 2 bước và nhập chỉ báo Excel
+  (nhánh test/import-excel-e2e).
+  - e2e-import-employees.ts (82 mục) và e2e-import-indicators.ts (54 mục), gắn vào npm test (nay 4 kịch bản).
+  - Phát hiện khi đọc mã: endpoint nhập nhân sự chỉ đọc CSV (không đọc .xlsx); nhập chỉ báo là lệnh CLI
+    (đọc .xlsx hoặc .csv), không có API. Test bám đúng hiện trạng, không sửa mã nguồn backend.
+  - Chạy trên PostgreSQL 16 tạm (Linux): 134/134, 73/73, 82/82, 54/54; dữ liệu thử dọn sạch (kiểm tra CSDL sau chạy).
+  - Chưa làm: test giao diện; thử file > 5 MB; thử bước Ban hành bản nháp sau khi nhập chỉ báo.

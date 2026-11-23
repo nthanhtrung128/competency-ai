@@ -1,19 +1,19 @@
 # Bộ kiểm thử đầu-cuối (tests/)
 
-Hai kịch bản chạy trên **PostgreSQL thật** qua HTTP, đúng như giao diện gọi API:
+Bốn kịch bản chạy trên **PostgreSQL thật** qua HTTP, đúng như giao diện gọi API:
 
 | File | Kiểm tra gì | Số mục |
 |---|---|---|
 | `e2e-360-idp.ts` | Cấp tài khoản + đổi mật khẩu bắt buộc → chiến dịch 360° (nhập phiếu trên app và HR nhập hộ, ẩn danh) → 9-Box → IDP (gap → mục tiêu 70-20-10 → duyệt → hoàn thành) → nhật ký | 134 |
 | `e2e-review-succession.ts` | Bàn duyệt (đối chiếu mã QĐ-02, chủ quản QĐ-03, bản nháp chỉ báo QĐ-04b) → Kế hoạch kế thừa → Bảng điều khiển theo phạm vi | 73 |
 
-Lần chạy gần nhất (23/11/2026, PostgreSQL 18 tạm trên Windows): **134/134 và 73/73**.
+Lần chạy gần nhất: kịch bản 1–2 ngày 23/11/2026 (PostgreSQL 18 tạm trên Windows) **134/134 và 73/73**; cả bốn kịch bản chạy lại ngày 23/11/2026 trên PostgreSQL 16 tạm (Linux): **134/134, 73/73, 82/82, 54/54**.
 Kịch bản cũ 46/46 + 29/29 (14/10/2026) chưa nằm trong kho; hai file này viết lại và mở rộng nó, bám mã nguồn hiện tại.
 
 ## An toàn dữ liệu
 
-- Kịch bản **ghi rồi xoá** dữ liệu thử: nhân sự mã `T360-…` / `TREV-…`, email `…@test.invalid`, chiến dịch, IDP, kế hoạch kế thừa, vai trò `TREV-R1`. Chạy xong (kể cả khi lỗi) tự dọn.
-- **Không ban hành thật** phiên bản năng lực nào. Chỉ thử phần chặn (422), tạo bản nháp rồi trả lại.
+- Kịch bản **ghi rồi xoá** dữ liệu thử: nhân sự mã `T360-…` / `TREV-…` / `TIMP-…`, lô nhập tên file `TIMP-….csv`, email `…@test.invalid`, chiến dịch, IDP, kế hoạch kế thừa, vai trò `TREV-R1`. Chạy xong (kể cả khi lỗi) tự dọn.
+- **Không ban hành thật** phiên bản năng lực nào. Chỉ thử phần chặn (422), tạo bản nháp rồi trả lại. Kịch bản nhập chỉ báo chọn 3 năng lực chưa có bản nháp, ghi lại trạng thái trước khi chạy và trả về đúng như cũ (xoá bản nháp và nhật ký `cli:import-indicators` do chính nó tạo).
 - Công cụ **từ chối chạy** nếu `DATABASE_URL` hoặc `API_URL` không phải máy cục bộ — để không lỡ chạy lên CSDL thật có nhân sự thật. Nếu là CSDL **riêng cho thử nghiệm** (vd nhánh Neon tách riêng), đặt `ALLOW_REMOTE_TEST_DB=1`.
 - Dùng một CSDL **trống** dành cho kiểm thử, không dùng CSDL thí điểm.
 
@@ -46,7 +46,7 @@ Lệnh `$env:DATABASE_URL` chỉ có tác dụng trong cửa sổ terminal đó;
 npm test
 ```
 
-`npm test` tự bật máy chủ thử ở cổng 8099, chạy cả hai kịch bản, rồi tắt máy chủ. Kết quả cuối phải là **TẤT CẢ KỊCH BẢN ĐẠT**.
+`npm test` tự bật máy chủ thử ở cổng 8099, chạy cả bốn kịch bản, rồi tắt máy chủ. Kết quả cuối phải là **TẤT CẢ KỊCH BẢN ĐẠT**.
 
 Chạy riêng từng kịch bản (cần máy chủ đang chạy, đặt `API_URL` trỏ tới nó):
 
@@ -54,6 +54,8 @@ Chạy riêng từng kịch bản (cần máy chủ đang chạy, đặt `API_UR
 $env:API_URL = "http://localhost:8080"
 npm run test:360
 npm run test:review
+npm run test:import-employees
+npm run test:import-indicators
 ```
 
 Kiểm tra kiểu cho chính bộ test: `npm run lint:tests`.
@@ -76,5 +78,6 @@ Giả định của kịch bản (nếu đổi thiết kế thì sửa test cho 
 ## Chưa bao phủ
 
 - Ban hành thật một phiên bản năng lực (không hoàn tác được) — đã có kiểm tra 422 và 409 quanh nó.
-- Nhập nhân sự 2 bước (`src/routes/import.ts`) và nhập chỉ báo từ Excel (`npm run import:indicators`).
+- Nhập nhân sự: endpoint **chỉ nhận CSV** (Excel phải "Lưu thành CSV UTF-8"); test chỉ kiểm tra file .xlsx tải nhầm bị loại, không có đọc .xlsx. Chưa thử file > 5 MB và chưa thử phạm vi dữ liệu của HRBP khi nhập.
+- Nhập chỉ báo: test gọi lệnh CLI trực tiếp trên CSDL (không có API); chưa thử bước "Ban hành" bản nháp sau khi nhập.
 - Giao diện (`2-frontend`).
