@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamingo — Báo cáo Chuỗi giá trị Hoạt động</title>
+<style>
+:root{
+  --ink:#1A2530; --mute:#5B6B76; --line:#D7DEE3; --wash:#F4F6F8; --paper:#fff;
+  --inv:#2E5C9A; --inv-bg:#E7EFF4;
+  --hos:#B8365A; --hos-bg:#FBEAEF;
+  --gold:#B9932B; --gold-bg:#FFF7E2;
+  --sup:#5B6B76; --sup-bg:#EDF0F1;
+  --cap:#5B4B8A; --cap-bg:#EFECF6;
+  --tour:#2E7D6E; --tour-bg:#E6F1EE;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;background:var(--wash);color:var(--ink);padding:24px;font-size:13px}
+.sheet{max-width:1420px;margin:0 auto;background:var(--paper);border:1px solid var(--line);padding:32px 36px}
+
+.hd{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
+.eb{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+h1{font-size:23px;margin-top:6px;letter-spacing:-.01em}
+.sub{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.5;max-width:940px}
+
+/* ---------- TOOLBAR ---------- */
+.toolbar{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--line);
+  padding:10px 0 11px;margin:0 0 4px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tb-group{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.tb-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-right:2px}
+.btn{font-family:inherit;font-size:10.5px;font-weight:600;padding:6px 12px;border:1px solid var(--line);
+  background:var(--paper);color:var(--ink);border-radius:3px;cursor:pointer;transition:.12s;white-space:nowrap}
+.btn:hover{background:var(--wash);border-color:var(--mute)}
+.btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.pri{background:var(--inv);color:#fff;border-color:var(--inv)}
+.btn.pri:hover{background:#24487A}
+.tb-sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.search{position:relative}
+.search input{font-family:inherit;font-size:11px;padding:6px 26px 6px 10px;border:1px solid var(--line);
+  border-radius:3px;width:230px;outline:none;color:var(--ink)}
+.search input:focus{border-color:var(--inv)}
+.search .clr{position:absolute;right:6px;top:50%;transform:translateY(-50%);cursor:pointer;
+  color:var(--mute);font-size:14px;line-height:1;display:none;background:none;border:0;padding:2px}
+.search.has .clr{display:block}
+.counter{font-size:10px;color:var(--mute);font-style:italic;margin-left:auto;white-space:nowrap}
+mark{background:#FFE9A8;color:var(--ink);padding:0 1px;border-radius:2px}
+
+.map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.mapcard{border:1px solid var(--line);padding:9px 12px;background:var(--wash);border-top:3px solid var(--ink);
+  cursor:pointer;transition:.12s}
+.mapcard:hover{background:#EAEEF1;transform:translateY(-1px)}
+.mapcard b{display:block;font-size:10.5px;margin-bottom:3px}
+.mapcard span{font-size:9.5px;color:var(--mute);line-height:1.4}
+.m1{border-top-color:var(--inv)} .m2{border-top-color:var(--gold)}
+.m3{border-top-color:var(--sup)} .m4{border-top-color:var(--cap)}
+
+.section{margin-top:34px}
+.section.hidden{display:none}
+.band{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.band .tag{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:7px 16px;border-radius:2px;white-space:nowrap}
+.band .desc{font-size:11.5px;color:var(--mute);line-height:1.45}
+.inv .tag{background:var(--inv)} .hos .tag{background:var(--hos)} .tour .tag{background:var(--tour)}
+
+/* ---------- COLLAPSIBLE PART ---------- */
+.part{display:flex;align-items:center;gap:10px;margin:22px 0 10px;cursor:pointer;user-select:none;
+  padding:6px 8px 6px 0;border-radius:4px;transition:.12s}
+.part:hover{background:var(--wash)}
+.part .num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex:none}
+.part .lbl{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.part .hint{font-size:10.5px;color:var(--mute);font-style:italic}
+.part .chev{margin-left:auto;font-size:11px;color:var(--mute);font-weight:700;flex:none;
+  transition:transform .18s;padding-right:4px}
+.part.closed .chev{transform:rotate(-90deg)}
+.p1 .num{background:var(--inv)} .p1 .lbl{color:var(--inv)}
+.p2 .num{background:var(--gold)} .p2 .lbl{color:var(--gold)}
+.p3 .num{background:var(--sup)} .p3 .lbl{color:var(--sup)}
+.p4 .num{background:var(--cap)} .p4 .lbl{color:var(--cap)}
+.hos .p1 .num{background:var(--hos)} .hos .p1 .lbl{color:var(--hos)}
+.tour .p1 .num{background:var(--tour)} .tour .p1 .lbl{color:var(--tour)}
+.pbody{overflow:hidden}
+.pbody.closed{display:none}
+
+.chain{display:flex;gap:4px;margin-bottom:4px}
+.step{flex:1;position:relative;padding:9px 14px 9px 18px;color:#fff;font-weight:700;font-size:10.5px;text-align:center;
+  clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 12px 50%);
+  display:flex;align-items:center;justify-content:center;min-height:46px;line-height:1.22;
+  cursor:pointer;transition:filter .12s}
+.step.first{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)}
+.inv .step{background:var(--inv)} .hos .step{background:var(--hos)} .tour .step{background:var(--tour)}
+.step:hover{filter:brightness(1.15)}
+.step.dim{filter:grayscale(.75) opacity(.45)}
+
+.detailrow{display:flex;gap:4px;margin-bottom:14px}
+.detail{flex:1;border:1px solid var(--line);border-top:3px solid var(--inv);padding:8px 9px;background:#fff;min-height:170px;transition:.15s}
+.hos .detail{border-top-color:var(--hos)}
+.tour .detail{border-top-color:var(--tour)}
+.detail.dim{opacity:.35}
+.detail.pick{box-shadow:0 0 0 2px var(--inv);opacity:1}
+.hos .detail.pick{box-shadow:0 0 0 2px var(--hos)}
+.tour .detail.pick{box-shadow:0 0 0 2px var(--tour)}
+.detail ul{list-style:none}
+.detail li{font-size:9.5px;line-height:1.38;padding-left:9px;position:relative;margin-bottom:3px;color:var(--mute)}
+.detail li:before{content:"";position:absolute;left:0;top:5px;width:3px;height:3px;border-radius:50%;background:var(--inv)}
+.hos .detail li:before{background:var(--hos)}
+.tour .detail li:before{background:var(--tour)}
+.detail .owner{margin-top:6px;padding-top:5px;border-top:1px dashed var(--line);font-size:8.5px;font-weight:600;color:var(--inv)}
+.hos .detail .owner{color:var(--hos)}
+.tour .detail .owner{color:var(--tour)}
+
+.outcome{padding:9px 15px;font-size:11px;font-weight:600;border-left:3px solid var(--inv);background:var(--inv-bg);color:var(--inv);margin-bottom:6px}
+.hos .outcome{border-left-color:var(--hos);background:var(--hos-bg);color:var(--hos)}
+.tour .outcome{border-left-color:var(--tour);background:var(--tour-bg);color:var(--tour)}
+
+/* ---------- Halcom-style parallel comparison diagram ---------- */
+.hc-frame{display:grid;grid-template-columns:30px 1fr 64px;gap:6px;align-items:stretch}
+.hc-vband{background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;transform:rotate(180deg);font-size:10.5px;font-weight:700;letter-spacing:.12em;border-radius:3px}
+.hc-core{display:flex;flex-direction:column;gap:6px}
+.hc-chevrow{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.hc-chev{color:#fff;clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 13px 50%);
+  padding:8px 16px 8px 20px;min-height:50px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.hc-chev.first{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)}
+.hc-chev.hc-inv{background:var(--inv)}
+.hc-chev.hc-hos{background:var(--hos)}
+.hc-n{font-size:9.5px;font-weight:700;line-height:1.1}
+.hc-t{font-size:9.5px;font-weight:700;line-height:1.18;text-transform:uppercase}
+.hc-arrows{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;height:20px}
+.hc-arrows i{font-style:normal;text-align:center;line-height:20px;font-weight:900;color:var(--gold);font-size:17px}
+.hc-arrows.hc-down i{font-size:19px}
+.hc-arrows i.hc-gap{color:var(--line);font-size:14px;font-weight:400}
+.hc-boxrow{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;align-items:stretch}
+.hc-box{border:1.5px solid var(--inv);padding:6px 7px;background:#fff;min-height:150px}
+.hc-box.hc-accent{border-color:var(--gold)}
+.hc-box h4{font-size:9.5px;font-weight:700;text-decoration:underline;text-transform:uppercase;margin-bottom:4px;line-height:1.2;color:var(--ink)}
+.hc-box p{font-size:9px;line-height:1.32;margin-bottom:2px;color:var(--mute)}
+.hc-box .hc-sep{border-top:1px dashed var(--line);margin:5px 0 4px;padding-top:4px}
+.hc-tagI{font-size:8px;font-weight:700;color:var(--inv);letter-spacing:.04em}
+.hc-tagH{font-size:8px;font-weight:700;color:var(--hos);letter-spacing:.04em}
+.hc-margin{background:#4E8F3D;color:#fff;border-radius:3px;
+  clip-path:polygon(0 0, calc(100% - 22px) 0, 100% 50%, calc(100% - 22px) 100%, 0 100%);
+  display:flex;align-items:center;justify-content:center}
+.hc-margin span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:18px;font-weight:700;letter-spacing:.14em}
+.hc-legend{margin-top:12px;display:flex;flex-wrap:wrap;gap:18px;font-size:9.5px;color:var(--mute)}
+.hc-legend span{display:flex;align-items:center;gap:6px}
+.hc-legend i{width:11px;height:11px;display:inline-block;flex:none}
+@media(max-width:1150px){.hc-chevrow,.hc-boxrow,.hc-arrows{grid-template-columns:repeat(2,1fr)}.hc-arrows{display:none}.hc-vband{writing-mode:horizontal-tb;transform:none;padding:6px}.hc-frame{grid-template-columns:1fr}.hc-margin{display:none}}
+
+
+.ksfgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.ksf{border:1px solid var(--line);background:var(--gold-bg);padding:10px 12px;border-left:3px solid var(--gold)}
+.ksf b{display:block;font-size:11px;margin-bottom:4px}
+.ksf .full{display:block;font-size:9px;color:var(--gold);font-weight:600;margin-bottom:4px;line-height:1.35}
+.ksf span.txt{font-size:10px;color:var(--mute);line-height:1.4}
+
+.supgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.sup{border:1px solid var(--line);background:var(--sup-bg);padding:8px 10px}
+.sup h5{font-size:10.5px;margin-bottom:3px}
+.sup p{font-size:9.5px;line-height:1.4;color:var(--mute)}
+.sup.diff{background:var(--gold-bg);border-color:#D9C177}
+.sup.diff h5:after{content:" ◆";color:var(--gold)}
+
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+th{background:var(--ink);color:#fff;font-size:9.5px;text-align:left;padding:7px 8px;font-weight:700}
+td{border:1px solid var(--line);padding:6px 8px;font-size:10px;vertical-align:top;line-height:1.35}
+tbody tr:nth-child(even) td{background:var(--wash)}
+tr.hide{display:none}
+td.grp{background:var(--inv)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+.hos td.grp{background:var(--hos)!important}
+.tour td.grp{background:var(--tour)!important}
+td.grpsup{background:var(--sup)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+.catcore{color:var(--gold);font-weight:600}
+.catfunc{color:var(--inv);font-weight:600}
+.catlead{color:var(--hos);font-weight:600}
+.empty{padding:14px;text-align:center;font-size:11px;color:var(--mute);font-style:italic;
+  border:1px dashed var(--line);margin-bottom:10px;display:none}
+.empty.show{display:block}
+
+.note{font-size:10px;color:var(--mute);font-style:italic;margin:6px 0 12px;line-height:1.5;border-left:3px solid var(--gold);padding-left:10px}
+
+.gloss{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 18px;margin-top:10px}
+.gitem{font-size:10px;line-height:1.4;border-bottom:1px dotted var(--line);padding-bottom:4px}
+.gitem.hide{display:none}
+.gitem b{color:var(--ink);font-weight:700}
+.gitem span{color:var(--mute)}
+
+/* abbreviation tooltip */
+.abbr{border-bottom:1px dotted var(--gold);cursor:help;position:relative}
+.abbr:hover{background:var(--gold-bg)}
+#tip{position:fixed;z-index:999;max-width:290px;background:var(--ink);color:#fff;font-size:10.5px;
+  line-height:1.45;padding:8px 11px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .12s;
+  box-shadow:0 4px 14px rgba(0,0,0,.22)}
+#tip.on{opacity:1}
+#tip b{color:#FFDD8A}
+
+.foot{margin-top:26px;border-top:1px solid var(--line);padding-top:10px;font-size:9.5px;color:var(--mute);line-height:1.6}
+
+#top{position:fixed;right:22px;bottom:22px;z-index:60;width:40px;height:40px;border-radius:50%;
+  background:var(--ink);color:#fff;border:0;cursor:pointer;font-size:16px;display:none;
+  box-shadow:0 3px 10px rgba(0,0,0,.25)}
+#top.on{display:block}
+
+@media print{
+  @page{size:A3 landscape;margin:8mm}
+  body{background:#fff;padding:0}
+  .sheet{border:0;padding:0;max-width:none}
+  .toolbar,#top,.part .chev{display:none!important}
+  .pbody,.pbody.closed{display:block!important}
+  .section.hidden{display:block!important}
+  tr.hide,.gitem.hide{display:table-row!important}
+  .gitem.hide{display:block!important}
+  .part{cursor:default;background:none!important}
+}
+@media(max-width:1100px){.chain,.detailrow{flex-wrap:wrap}.ksfgrid,.supgrid,.map{grid-template-columns:1fr 1fr}.gloss{grid-template-columns:1fr}.counter{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="hd">
+  <div class="eb">Flamingo Group — Báo cáo trình Ban Lãnh đạo</div>
+  <h1>Chuỗi giá trị Hoạt động: Đầu tư BĐS · Khách sạn · Lữ hành</h1>
+  <div class="sub">Báo cáo được trình bày theo bốn phần liên tiếp, áp dụng thống nhất cho cả ba mảng kinh doanh. Mỗi phần là đầu vào của phần kế tiếp, tạo thành một mạch lập luận khép kín từ cách Tập đoàn tạo ra giá trị đến năng lực con người cần có.</div>
+
+  <div class="map">
+    <div class="mapcard m1" data-jump="p1"><b>① VALUE STREAM — Chuỗi giá trị</b><span>Các bước tuần tự tạo ra giá trị, kèm chủ sở hữu từng bước và kết quả đầu ra cuối chuỗi.</span></div>
+    <div class="mapcard m2" data-jump="p2"><b>② KSF — Yếu tố thành công then chốt</b><span>Điều kiện bắt buộc để chuỗi giá trị vận hành hiệu quả. Suy ra từ phần ①.</span></div>
+    <div class="mapcard m3" data-jump="p3"><b>③ HOẠT ĐỘNG HỖ TRỢ</b><span>Chức năng nền tảng phục vụ toàn bộ chuỗi. Đánh dấu ◆ là năng lực cần đầu tư vượt chuẩn.</span></div>
+    <div class="mapcard m4" data-jump="p4"><b>④ ĐỊNH HƯỚNG NĂNG LỰC TRỌNG YẾU</b><span>Năng lực từng vị trí cần có để đáp ứng KSF. Suy ra từ phần ② và ③.</span></div>
+  </div>
+</div>
+
+<!-- ================= TOOLBAR ================= -->
+<div class="toolbar">
+  <div class="tb-group">
+    <span class="tb-label">Hiển thị</span>
+    <button class="btn pri" id="expandAll">Mở rộng tất cả</button>
+    <button class="btn" id="collapseAll">Thu gọn tất cả</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Chỉ xem phần</span>
+    <button class="btn" data-only="p1">① Chuỗi giá trị</button>
+    <button class="btn" data-only="p2">② KSF</button>
+    <button class="btn" data-only="p3">③ Hỗ trợ</button>
+    <button class="btn" data-only="p4">④ Năng lực</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Mảng</span>
+    <button class="btn on" data-chain="all">Tất cả</button>
+    <button class="btn" data-chain="inv">Đầu tư</button>
+    <button class="btn" data-chain="hos">Khách sạn</button>
+    <button class="btn" data-chain="tour">Lữ hành</button>
+    <button class="btn" data-chain="sup">Hỗ trợ</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Mức</span>
+    <button class="btn on" data-lv="all">Tất cả</button>
+    <button class="btn" data-lv="3">3</button>
+    <button class="btn" data-lv="4">4</button>
+    <button class="btn" data-lv="5">5</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group search" id="searchWrap">
+    <input type="text" id="q" placeholder="Tìm vị trí, năng lực, thuật ngữ...">
+    <button class="clr" id="qc" title="Xóa">&times;</button>
+  </div>
+  <button class="btn" id="printBtn">In / Lưu PDF</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<!-- ================= SO ĐỒ SO SÁNH SONG SONG (MẪU HALCOM) ================= -->
+<div class="section" data-chain="all" id="compareSection">
+  <div class="band" style="border-bottom-color:var(--ink)">
+    <div class="tag" style="background:var(--ink)">Sơ đồ so sánh song song — Đầu tư &amp; Khách sạn</div>
+    <div class="desc">Hai luồng giá trị đặt chồng lên nhau theo đúng cột để đối chiếu trực quan từng bước một. Nội dung so sánh chi tiết nằm ở các hộp giữa hai dải. Mảng Lữ hành có logic vận hành khác biệt nên được trình bày riêng ở Mảng 3 bên dưới, không gộp vào sơ đồ này.</div>
+  </div>
+
+  <div class="part p1"><div class="num">⇕</div><div class="lbl">Đối chiếu trực quan hai luồng giá trị</div><div class="hint">Dải trên = Đầu tư (8 bước) · Dải dưới = Khách sạn (6 bước, kéo giãn theo cột tương ứng)</div><div class="chev">▼</div></div>
+  <div class="pbody">
+
+  <div class="hc-frame">
+    <div class="hc-vband">HOẠT ĐỘNG CHÍNH</div>
+    <div class="hc-core">
+
+      <!-- DẢI TRÊN: ĐẦU TƯ -->
+      <div class="hc-chevrow">
+        <div class="hc-chev hc-inv first"><div class="hc-n">I1.</div><div class="hc-t">Nghiên cứu,<br>P.triển</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I2.</div><div class="hc-t">Lựa chọn<br>dự án</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I3.</div><div class="hc-t">Marketing<br>&amp; Định vị</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I4.</div><div class="hc-t">Huy động<br>vốn</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I5.</div><div class="hc-t">Thực hiện<br>dự án</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I6.</div><div class="hc-t">Bán hàng &amp;<br>hoàn thành DA</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I7.</div><div class="hc-t">Quản trị<br>tài sản</div></div>
+        <div class="hc-chev hc-inv"><div class="hc-n">I8.</div><div class="hc-t">Quan hệ với<br>các bên liên quan</div></div>
+      </div>
+
+      <!-- MŨI TÊN LÊN: hộp -> dải Đầu tư -->
+      <div class="hc-arrows hc-up"><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i></div>
+
+      <!-- HỘP CHI TIẾT — SO SÁNH GỘP ĐẦU TƯ + KHÁCH SẠN -->
+      <div class="hc-boxrow">
+        <div class="hc-box">
+          <h4>N.cứu, P.triển</h4>
+          <p>1.1 Thu thập &amp; p.tích thông tin thị trường BĐS nghỉ dưỡng, xu hướng du lịch.</p>
+          <p>1.2 Tìm kiếm &amp; đánh giá cơ hội: quỹ đất, điểm đến.</p>
+          <p>1.3 Tìm hiểu về đối thủ, benchmark ngành.</p>
+          <p>1.4 Chỉ rõ thị trường chiến lược &amp; khẩu vị rủi ro.</p>
+        </div>
+        <div class="hc-box">
+          <h4>Lựa chọn dự án &amp; sản phẩm dịch vụ</h4>
+          <p class="hc-tagI">MẢNG ĐẦU TƯ</p>
+          <p>I2.1 Báo cáo tiền khả thi, thẩm định NPV/IRR.</p>
+          <p>I2.2 M&amp;A, sang nhượng dự án.</p>
+          <p>I2.3 Thủ tục chủ trương, quy hoạch, giao đất, GPMB.</p>
+          <div class="hc-sep"></div>
+          <p class="hc-tagH">MẢNG KHÁCH SẠN</p>
+          <p>H2.1 Thiết kế danh mục dịch vụ: lưu trú, F&amp;B, onsen–spa, giải trí, MICE.</p>
+          <p>H2.2 Bộ tiêu chuẩn dịch vụ &amp; SOP.</p>
+          <p>H2.3 Flamingo tự vận hành — không thuê thương hiệu quản lý.</p>
+        </div>
+        <div class="hc-box hc-accent">
+          <h4>Marketing &amp; Định vị</h4>
+          <p>3.1 Định vị thương hiệu Flamingo &amp; concept "Điểm đến".</p>
+          <p>3.2 Thị trường mục tiêu kép: nhà đầu tư BĐS &amp; khách du lịch.</p>
+          <p>3.3 Phát triển khách hàng và đối tác.</p>
+          <p>3.4 Phát triển ý tưởng sản phẩm — đầu vào cho thiết kế.</p>
+        </div>
+        <div class="hc-box hc-accent">
+          <h4>Gọi vốn &amp; Phân phối</h4>
+          <p class="hc-tagI">MẢNG ĐẦU TƯ</p>
+          <p>I4.1 Đối tác, liên doanh.</p>
+          <p>I4.2 Ngân hàng, tín dụng dự án.</p>
+          <p>I4.3 Nhà đầu tư, trái phiếu, quỹ.</p>
+          <p>I4.4 Cấu trúc vốn, dòng tiền dự án.</p>
+          <div class="hc-sep"></div>
+          <p class="hc-tagH">MẢNG KHÁCH SẠN</p>
+          <p>H3.1 Kênh OTA, đại lý lữ hành.</p>
+          <p>H3.2 Khách đoàn, MICE, sự kiện.</p>
+          <p>H3.3 Bán trực tiếp: web, tổng đài, tệp chủ sở hữu BĐS.</p>
+        </div>
+        <div class="hc-box">
+          <h4>Thực hiện</h4>
+          <p class="hc-tagI">MẢNG ĐẦU TƯ</p>
+          <p>I5.1 Quy hoạch 1/500, concept kiến trúc, cảnh quan.</p>
+          <p>I5.2 Cung ứng, đấu thầu, hợp đồng khung.</p>
+          <p>I5.3 Lập BQLDA, triển khai gói thầu, giám sát.</p>
+          <p>I5.4 Kiểm soát chi phí – tiến độ – chất lượng – an toàn.</p>
+          <div class="hc-sep"></div>
+          <p class="hc-tagH">MẢNG KHÁCH SẠN</p>
+          <p>H4.1 Đón tiếp, lưu trú, buồng phòng.</p>
+          <p>H4.2 F&amp;B, banquet, sự kiện.</p>
+          <p>H4.3 Onsen–spa, giải trí.</p>
+          <p>H4.4 Kỹ thuật, an ninh, cảnh quan tại cơ sở.</p>
+        </div>
+        <div class="hc-box">
+          <h4>Kết thúc</h4>
+          <p class="hc-tagI">MẢNG ĐẦU TƯ</p>
+          <p>I6.1 Bán hàng, quản lý đại lý, chính sách giá.</p>
+          <p>I6.2 Thu hồi công nợ, cân đối dư nợ.</p>
+          <p>I6.3 Bàn giao sản phẩm, thủ tục sổ đỏ.</p>
+          <p>I6.4 Nghiệm thu, hoàn công, quyết toán.</p>
+          <div class="hc-sep"></div>
+          <p class="hc-tagH">MẢNG KHÁCH SẠN</p>
+          <p>H5.1 Revenue Management: giá động, ADR, công suất.</p>
+          <p>H5.2 Quản trị danh tiếng OTA, mạng xã hội.</p>
+        </div>
+        <div class="hc-box">
+          <h4>Quản trị Tài sản (giữ tại Tập đoàn)</h4>
+          <p>I7.1 KHÔNG chuyển SPV — tài sản giữ nguyên tại Tập đoàn.</p>
+          <p>I7.2 Bảo trì, bảo dưỡng, CAPEX vận hành.</p>
+          <p>I7.3 Cải tạo, nâng cấp theo chu kỳ.</p>
+          <p>I7.4 Theo dõi hiệu quả khai thác, kiểm toán hàng năm.</p>
+          <div class="hc-sep"></div>
+          <p class="hc-tagH">MẢNG KHÁCH SẠN</p>
+          <p>H5.3 CRM, khách hàng thân thiết toàn hệ sinh thái.</p>
+          <p>H5.4 Đo lường NPS/CSAT, vòng cải tiến dịch vụ.</p>
+        </div>
+        <div class="hc-box hc-accent">
+          <h4>Quan hệ với các bên liên quan</h4>
+          <p>8.1 Chính quyền, vận động chính sách, xúc tiến đầu tư.</p>
+          <p>8.2 Cộng đồng dân cư, trách nhiệm xã hội địa phương.</p>
+          <p>8.3 Nhà đầu tư, ngân hàng, cổ đông (IR).</p>
+          <p>8.4 Đối tác thương hiệu, hãng lữ hành, hàng không.</p>
+          <div class="hc-sep"></div>
+          <p><b>Dùng chung I8 &amp; H6</b></p>
+        </div>
+      </div>
+
+      <!-- MŨI TÊN XUỐNG: hộp -> dải Khách sạn (rõ nét hơn, tô đậm) -->
+      <div class="hc-arrows hc-down">
+        <i>↓</i><i>↓</i><i>↓</i><i class="hc-gap">·</i><i>↓</i><i>↓</i><i>↓</i><i>↓</i>
+      </div>
+
+      <!-- DẢI DƯỚI: KHÁCH SẠN (kéo giãn theo cột) -->
+      <div class="hc-chevrow">
+        <div class="hc-chev hc-hos first"><div class="hc-n">H1.</div><div class="hc-t">Nghiên cứu,<br>P.triển</div></div>
+        <div class="hc-chev hc-hos"><div class="hc-n">H2.</div><div class="hc-t">Thiết kế sản phẩm<br>dịch vụ</div></div>
+        <div class="hc-chev hc-hos"><div class="hc-n">H3.</div><div class="hc-t">Marketing &amp; Phân phối</div></div>
+        <div class="hc-chev hc-hos" style="grid-column:5"><div class="hc-n">H4.</div><div class="hc-t">Cung cấp dịch vụ</div></div>
+        <div class="hc-chev hc-hos" style="grid-column:6 / span 2"><div class="hc-n">H5.</div><div class="hc-t">Quản trị doanh thu &amp; khách hàng</div></div>
+        <div class="hc-chev hc-hos" style="grid-column:8"><div class="hc-n">H6.</div><div class="hc-t">Quan hệ với<br>các bên liên quan</div></div>
+      </div>
+
+    </div>
+    <div class="hc-margin"><span>LỢI NHUẬN</span></div>
+  </div>
+
+  <div class="hc-legend">
+    <span><i style="background:var(--inv)"></i>Dải trên — Mảng Đầu tư (8 bước)</span>
+    <span><i style="background:var(--hos)"></i>Dải dưới — Mảng Khách sạn (6 bước, kéo giãn theo cột)</span>
+    <span><i style="background:var(--gold)"></i>Ô trống dưới cột "Huy động vốn" — Khách sạn không có bước tương đương</span>
+  </div>
+  <div class="note" style="margin-top:8px">Tiểu quy trình không có tiền tố (1.1, 3.1, 8.1) là nội dung <b>dùng chung cả hai mảng</b>; có tiền tố I hoặc H là nội dung riêng của từng mảng. Mảng Lữ hành (T1–T6) có mạng lưới đối tác và logic vận hành khác với Khách sạn nên không gộp vào sơ đồ so sánh này — xem đầy đủ ở Mảng 3 phía dưới.</div>
+  </div>
+</div>
+
+<!-- ================= MẢNG ĐẦU TƯ ================= -->
+<div class="section inv" data-chain="inv">
+  <div class="band">
+    <div class="tag">Mảng 1 — Đầu tư &amp; Phát triển Bất động sản</div>
+    <div class="desc">Giá trị được tạo ra theo trình tự tuyến tính: chuyển hóa quỹ đất thành sản phẩm bất động sản hoàn chỉnh. Kết quả đo bằng doanh thu bán hàng một lần và hiệu quả tài chính dự án.</div>
+  </div>
+
+  <div class="part p1"><div class="num">1</div><div class="lbl">Value Stream — Chuỗi giá trị mảng Đầu tư</div><div class="hint">8 bước tuần tự — bấm vào từng bước để làm nổi bật</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="chain">
+    <div class="step first" data-i="0">I1. Nghiên cứu &amp;<br>Phát triển thị trường</div>
+    <div class="step" data-i="1">I2. Lựa chọn dự án<br>· M&amp;A · Quỹ đất</div>
+    <div class="step" data-i="2">I3. Marketing &amp;<br>Định vị</div>
+    <div class="step" data-i="3">I4. Huy động vốn</div>
+    <div class="step" data-i="4">I5. Thực hiện<br>dự án</div>
+    <div class="step" data-i="5">I6. Bán hàng &amp;<br>Hoàn thành dự án</div>
+    <div class="step" data-i="6">I7. Quản trị<br>tài sản</div>
+    <div class="step" data-i="7">I8. Quan hệ các<br>bên liên quan</div>
+  </div>
+  <div class="detailrow">
+    <div class="detail" data-i="0">
+      <ul><li>Thu thập, phân tích dữ liệu thị trường bất động sản nghỉ dưỡng</li><li>Tìm kiếm, đánh giá cơ hội: quỹ đất, điểm đến</li><li>Phân tích đối thủ cạnh tranh</li><li>Xác định thị trường chiến lược &amp; khẩu vị rủi ro</li></ul>
+      <div class="owner">Ban Đầu tư</div>
+    </div>
+    <div class="detail" data-i="1">
+      <ul><li>Báo cáo tiền khả thi, thẩm định NPV / IRR</li><li>Sàng lọc, định giá, đàm phán M&amp;A / sang nhượng dự án</li><li>Thủ tục chủ trương đầu tư, quy hoạch, giao đất</li><li>Giải phóng mặt bằng (GPMB)</li></ul>
+      <div class="owner">Ban Đầu tư + Ban Pháp chế</div>
+    </div>
+    <div class="detail" data-i="2">
+      <ul><li>Định vị thương hiệu Flamingo &amp; concept "Điểm đến"</li><li>Xác định thị trường mục tiêu: nhà đầu tư bất động sản</li><li>Phát triển ý tưởng sản phẩm — đầu vào cho khâu thiết kế</li><li>Truyền thông thương hiệu Tập đoàn</li></ul>
+      <div class="owner">Ban Truyền thông &amp; Marketing</div>
+    </div>
+    <div class="detail" data-i="3">
+      <ul><li>Đối tác, liên doanh, hợp tác đầu tư</li><li>Ngân hàng, tín dụng dự án</li><li>Nhà đầu tư tổ chức, trái phiếu, quỹ</li><li>Cấu trúc vốn &amp; dòng tiền dự án</li></ul>
+      <div class="owner">Ban Tài chính Kế toán</div>
+    </div>
+    <div class="detail" data-i="4">
+      <ul><li>Quy hoạch chi tiết 1/500, concept kiến trúc, cảnh quan</li><li>Cung ứng, đấu thầu, hợp đồng khung nhà thầu</li><li>Lập Ban Quản lý Dự án, giám sát thi công</li><li>Kiểm soát chi phí – tiến độ – chất lượng – an toàn</li></ul>
+      <div class="owner">FARC + Ban Xây dựng + Ban Cung ứng Đấu thầu</div>
+    </div>
+    <div class="detail" data-i="5">
+      <ul><li>Bán hàng, quản lý đại lý phân phối, chính sách giá</li><li>Thu hồi công nợ, cân đối dư nợ dự án</li><li>Bàn giao sản phẩm, thủ tục Giấy chứng nhận (sổ đỏ)</li><li>Nghiệm thu, hoàn công, quyết toán hợp đồng</li></ul>
+      <div class="owner">FLV + Ban Xây dựng</div>
+    </div>
+    <div class="detail" data-i="6">
+      <ul><li>Tài sản do Tập đoàn trực tiếp nắm giữ và quản lý</li><li>Chi đầu tư nâng cấp (CAPEX), bảo trì, bảo dưỡng</li><li>Cải tạo theo chu kỳ, kiểm toán hiệu quả khai thác</li><li>Quyết định giữ – cho thuê – thoái vốn tài sản</li></ul>
+      <div class="owner">Cơ chế quản trị liên mảng (đề xuất thiết lập)</div>
+    </div>
+    <div class="detail" data-i="7">
+      <ul><li>Quan hệ chính quyền, xúc tiến đầu tư</li><li>Quan hệ cộng đồng dân cư, trách nhiệm xã hội</li><li>Quan hệ nhà đầu tư, ngân hàng, cổ đông (IR)</li><li>Quan hệ đối tác chiến lược</li></ul>
+      <div class="owner">Ban Tổng Giám đốc</div>
+    </div>
+  </div>
+  <div class="outcome">KẾT QUẢ ĐẦU RA → Doanh thu bán hàng một lần · Hiệu quả tài chính dự án (IRR) · Quỹ tài sản chuyển giao cho mảng Khách sạn khai thác</div>
+  </div>
+
+  <div class="part p2"><div class="num">2</div><div class="lbl">KSF — Yếu tố thành công then chốt mảng Đầu tư</div><div class="hint">Điều kiện bắt buộc để chuỗi giá trị ở phần ① tạo ra kết quả</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="ksfgrid">
+    <div class="ksf"><b>IRR &amp; Tốc độ quay vòng vốn</b><span class="full">IRR = Internal Rate of Return — Tỷ suất hoàn vốn nội bộ</span><span class="txt">Ngành bất động sản thâm dụng vốn — tốc độ quay vòng quyết định số dự án có thể triển khai song song.</span></div>
+    <div class="ksf"><b>Tỷ lệ hấp thụ bán hàng</b><span class="full">Absorption Rate — Tỷ lệ sản phẩm bán được trên tổng sản phẩm chào bán trong kỳ</span><span class="txt">Tốc độ bán quyết định thời điểm thu hồi vốn và giải phóng năng lực tài chính cho dự án tiếp theo.</span></div>
+    <div class="ksf"><b>Thời gian hoàn tất pháp lý</b><span class="full">Tính từ khi xin chủ trương đầu tư đến khi được giao đất</span><span class="txt">Đây là rủi ro tiến độ lớn nhất của dự án, ảnh hưởng trực tiếp đến IRR và kế hoạch dòng tiền.</span></div>
+    <div class="ksf"><b>Kiểm soát chi phí xây dựng</b><span class="full">Độ lệch giữa chi phí thực tế và tổng mức đầu tư được duyệt</span><span class="txt">Vượt tổng mức đầu tư ăn trực tiếp vào hiệu quả tài chính dự án — cần kiểm soát chặt tại bước I5.</span></div>
+  </div>
+  </div>
+
+  <div class="part p3"><div class="num">3</div><div class="lbl">Hoạt động hỗ trợ mảng Đầu tư</div><div class="hint">◆ = năng lực trọng yếu, cần giữ nội bộ và đầu tư vượt chuẩn</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="supgrid">
+    <div class="sup diff"><h5>Quản trị vốn &amp; Cấu trúc tài chính</h5><p>Năng lực huy động vốn quyết định số dự án chạy song song — là rào cản gia nhập của ngành.</p></div>
+    <div class="sup"><h5>Pháp chế Dự án</h5><p>An toàn pháp lý đất đai, hợp đồng thương mại, giao dịch M&amp;A.</p></div>
+    <div class="sup"><h5>Cung ứng &amp; Đấu thầu</h5><p>Hợp đồng khung, mua tập trung vật tư xây dựng toàn hệ thống.</p></div>
+    <div class="sup"><h5>Kiểm soát &amp; Liêm chính</h5><p>Giám sát độc lập tại các điểm rủi ro cao: thủ tục đất đai, đấu thầu, quan hệ chính quyền.</p></div>
+  </div>
+  </div>
+
+  <div class="part p4"><div class="num">4</div><div class="lbl">Định hướng năng lực trọng yếu — mảng Đầu tư</div><div class="hint">20 vị trí — dùng ô tìm kiếm và bộ lọc Mức ở thanh công cụ</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr>
+      <th style="width:6%">Bước</th>
+      <th style="width:19%">Vị trí</th>
+      <th style="width:17%">Năng lực cốt lõi (Core)</th>
+      <th style="width:20%">Năng lực chuyên môn (Functional)</th>
+      <th style="width:18%">Năng lực lãnh đạo (Leadership)</th>
+      <th style="width:20%">Mức thuần thục tham chiếu (1–5)</th>
+    </tr></thead>
+    <tbody>
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I1–I2 · NGHIÊN CỨU THỊ TRƯỜNG &amp; LỰA CHỌN DỰ ÁN</td></tr>
+    <tr data-lv="5"><td>I1–I2</td><td><b>Trưởng Ban Đầu tư</b></td><td class="catcore">Tầm nhìn chiến lược</td><td class="catfunc">Thẩm định khả thi tài chính &amp; định giá M&amp;A</td><td class="catlead">Ra quyết định trong điều kiện thông tin chưa đầy đủ</td><td>Mức 5 — thiết lập khẩu vị rủi ro đầu tư cho toàn Tập đoàn</td></tr>
+    <tr data-lv="3"><td>I1</td><td>Chuyên viên Nghiên cứu &amp; Phát triển thị trường</td><td class="catcore">Tư duy phân tích</td><td class="catfunc">Phân tích thị trường &amp; so sánh chuẩn đối thủ</td><td class="catlead">—</td><td>Mức 3 — độc lập lập báo cáo thị trường định kỳ</td></tr>
+    <tr data-lv="3"><td>I2</td><td>Chuyên viên Thẩm định Đầu tư</td><td class="catcore">Tư duy phân tích</td><td class="catfunc">Xây dựng mô hình tài chính (NPV / IRR)</td><td class="catlead">—</td><td>Mức 3 — độc lập lập mô hình cho dự án quy mô vừa</td></tr>
+    <tr data-lv="4"><td>I2</td><td>Chuyên viên Quản lý Đất đai &amp; GPMB</td><td class="catcore">Kiên trì &amp; Chính trực</td><td class="catfunc">Thủ tục đất đai &amp; đàm phán bồi thường</td><td class="catlead">—</td><td>Mức 4 — xử lý được tình huống tranh chấp phức tạp tại hiện trường</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I3 · MARKETING &amp; ĐỊNH VỊ</td></tr>
+    <tr data-lv="4"><td>I3</td><td><b>Trưởng Ban Truyền thông &amp; Marketing</b></td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Định vị thương hiệu &amp; quản trị danh tiếng</td><td class="catlead">Điều phối liên Ban (với FLV và FHR)</td><td>Mức 4 — xây dựng định vị thống nhất cho cả sản phẩm bán và sản phẩm dịch vụ</td></tr>
+    <tr data-lv="3"><td>I3</td><td>Chuyên viên Truyền thông Thương hiệu</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Sản xuất nội dung &amp; quản lý kênh truyền thông</td><td class="catlead">—</td><td>Mức 3 — triển khai độc lập chiến dịch cho một dự án</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I4 · HUY ĐỘNG VỐN</td></tr>
+    <tr data-lv="5"><td>I4</td><td><b>Trưởng Ban Tài chính Kế toán</b></td><td class="catcore">Chính trực</td><td class="catfunc">Cấu trúc vốn &amp; quan hệ định chế tài chính</td><td class="catlead">Cố vấn chiến lược cho Ban Tổng Giám đốc</td><td>Mức 5 — thiết kế cấu trúc vốn tối ưu cho danh mục nhiều dự án song song</td></tr>
+    <tr data-lv="3"><td>I4</td><td>Chuyên viên Thu xếp vốn</td><td class="catcore">Tư duy phân tích</td><td class="catfunc">Lập hồ sơ tín dụng &amp; đàm phán điều khoản vay</td><td class="catlead">—</td><td>Mức 3 — hoàn tất độc lập hồ sơ tín dụng cho một dự án</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I5 · THỰC HIỆN DỰ ÁN</td></tr>
+    <tr data-lv="5"><td>I5</td><td><b>Trưởng Ban Quy hoạch Kiến trúc (FARC)</b></td><td class="catcore">Tư duy sáng tạo</td><td class="catfunc">Quy hoạch tổng thể &amp; định hướng concept sản phẩm</td><td class="catlead">Dẫn dắt đội ngũ thiết kế đa chuyên ngành</td><td>Mức 5 — định hình ngôn ngữ kiến trúc đặc trưng cho thương hiệu Tập đoàn</td></tr>
+    <tr data-lv="4"><td>I5</td><td>Trưởng phòng Quy hoạch</td><td class="catcore">Tư duy hệ thống</td><td class="catfunc">Lập &amp; thẩm định hồ sơ quy hoạch chi tiết 1/500</td><td class="catlead">—</td><td>Mức 4 — chủ trì giải trình quy hoạch với cơ quan quản lý</td></tr>
+    <tr data-lv="4"><td>I5</td><td>Trưởng phòng Concept</td><td class="catcore">Tư duy sáng tạo</td><td class="catfunc">Thiết kế concept &amp; nghiên cứu phát triển mẫu sản phẩm</td><td class="catlead">—</td><td>Mức 4 — phát triển mẫu sản phẩm mới dựa trên phản hồi thị trường</td></tr>
+    <tr data-lv="4"><td>I5</td><td>Trưởng phòng Cảnh quan / TT Cảnh quan</td><td class="catcore">Tinh thần tỉ mỉ</td><td class="catfunc">Thiết kế &amp; quản lý cảnh quan dự án nghỉ dưỡng</td><td class="catlead">—</td><td>Mức 4 — xây dựng bộ tiêu chuẩn cảnh quan áp dụng đa dự án</td></tr>
+    <tr data-lv="5"><td>I5</td><td><b>Trưởng Ban Xây dựng</b></td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Quản trị tiến độ – chi phí – chất lượng thi công</td><td class="catlead">Điều hành nhiều dự án đồng thời</td><td>Mức 5 — thiết lập chuẩn quản lý thi công cho toàn hệ thống</td></tr>
+    <tr data-lv="4"><td>I5</td><td>Giám đốc Ban Quản lý Dự án Xây dựng</td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Điều hành thi công tại hiện trường</td><td class="catlead">Quản lý nhà thầu &amp; đội ngũ hiện trường</td><td>Mức 4 — đưa dự án về đích đúng tiến độ và ngân sách</td></tr>
+    <tr data-lv="4"><td>I5</td><td>Tư vấn Giám sát (FCONS)</td><td class="catcore">Chính trực</td><td class="catfunc">Giám sát chất lượng &amp; nghiệm thu kỹ thuật</td><td class="catlead">—</td><td>Mức 4 — phát hiện sai lệch kỹ thuật trước khi phát sinh chi phí sửa chữa</td></tr>
+    <tr data-lv="4"><td>I5</td><td><b>Trưởng Ban Cung ứng Đấu thầu</b></td><td class="catcore">Chính trực</td><td class="catfunc">Đàm phán hợp đồng &amp; quản trị nhà thầu</td><td class="catlead">Ra quyết định trong môi trường áp lực</td><td>Mức 4 — tối ưu chi phí toàn danh mục hợp đồng khung Tập đoàn</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I6 · BÁN HÀNG &amp; HOÀN THÀNH DỰ ÁN</td></tr>
+    <tr data-lv="5"><td>I6</td><td><b>Trưởng Ban Kinh doanh BĐS (FLV)</b></td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Quản trị kênh phân phối &amp; chính sách giá</td><td class="catlead">Dẫn dắt đội ngũ kinh doanh theo mục tiêu</td><td>Mức 5 — thiết kế mô hình phân phối cho danh mục nhiều dự án</td></tr>
+    <tr data-lv="4"><td>I6</td><td>Trưởng phòng Kinh doanh / Quản lý Đại lý</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Đánh giá &amp; tối ưu mạng lưới đại lý phân phối</td><td class="catlead">Quản lý đội ngũ bán hàng</td><td>Mức 4 — sàng lọc và nâng cấp chất lượng mạng lưới đại lý</td></tr>
+    <tr data-lv="3"><td>I6</td><td>Chuyên viên Dịch vụ Khách hàng (FLV)</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành hệ thống CRM &amp; xử lý khiếu nại</td><td class="catlead">—</td><td>Mức 3 — xử lý độc lập khiếu nại theo quy trình chuẩn</td></tr>
+    <tr data-lv="3"><td>I6</td><td>Chuyên viên Thủ tục &amp; Công nợ</td><td class="catcore">Tinh thần tỉ mỉ</td><td class="catfunc">Quản lý hợp đồng, thu hồi công nợ, thủ tục sổ đỏ</td><td class="catlead">—</td><td>Mức 3 — quản lý độc lập danh mục hợp đồng của một dự án</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC I7–I8 · QUẢN TRỊ TÀI SẢN &amp; QUAN HỆ CÁC BÊN LIÊN QUAN</td></tr>
+    <tr data-lv="4"><td>I7</td><td>Chuyên viên Quản trị Tài sản</td><td class="catcore">Tư duy phân tích</td><td class="catfunc">Đánh giá hiệu quả khai thác tài sản &amp; lập kế hoạch CAPEX</td><td class="catlead">—</td><td>Mức 4 — đo lường và so sánh được hiệu quả từng tài sản riêng lẻ</td></tr>
+    <tr data-lv="5"><td>I8</td><td><b>Ban Tổng Giám đốc</b></td><td class="catcore">Chính trực</td><td class="catfunc">Quan hệ đối ngoại &amp; xúc tiến đầu tư</td><td class="catlead">Đại diện Tập đoàn trước các bên liên quan</td><td>Mức 5 — thiết lập quan hệ chiến lược dài hạn cấp Tập đoàn</td></tr>
+    </tbody>
+  </table>
+  <div class="empty">Không có vị trí nào khớp với điều kiện lọc hiện tại.</div>
+  </div>
+</div>
+
+<!-- ================= MẢNG KHÁCH SẠN ================= -->
+<div class="section hos" data-chain="hos">
+  <div class="band">
+    <div class="tag">Mảng 2 — Kinh doanh Dịch vụ Khách sạn</div>
+    <div class="desc">Giá trị được tạo ra thông qua mạng lưới kênh kết nối khách hàng với hệ thống cơ sở lưu trú và dịch vụ. Kết quả đo bằng doanh thu định kỳ theo công suất khai thác.</div>
+  </div>
+
+  <div class="part p1"><div class="num">1</div><div class="lbl">Value Stream — Chuỗi giá trị mảng Khách sạn</div><div class="hint">6 bước — bấm vào từng bước để làm nổi bật</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="chain">
+    <div class="step first" data-i="0">H1. Nghiên cứu &amp;<br>Phát triển thị trường</div>
+    <div class="step" data-i="1">H2. Thiết kế dịch vụ<br>&amp; Chuẩn vận hành</div>
+    <div class="step" data-i="2">H3. Marketing &amp;<br>Phân phối</div>
+    <div class="step" data-i="3">H4. Cung cấp<br>dịch vụ</div>
+    <div class="step" data-i="4">H5. Quản trị doanh thu<br>&amp; Khách hàng</div>
+    <div class="step" data-i="5">H6. Quan hệ các<br>bên liên quan</div>
+  </div>
+  <div class="detailrow">
+    <div class="detail" data-i="0">
+      <ul><li>Dùng chung kết quả nghiên cứu thị trường với bước I1</li><li>Bổ sung góc nhìn xu hướng du lịch &amp; hành vi khách lưu trú</li><li>Phân tích công suất và giá của đối thủ cùng phân khúc</li></ul>
+      <div class="owner">Ban Đầu tư + FHR</div>
+    </div>
+    <div class="detail" data-i="1">
+      <ul><li>Thiết kế danh mục dịch vụ: lưu trú, F&amp;B, onsen–spa, giải trí, MICE</li><li>Xây dựng bộ tiêu chuẩn dịch vụ và quy trình vận hành chuẩn (SOP)</li><li>Tuyển dụng &amp; đào tạo đội ngũ dịch vụ tuyến đầu</li></ul>
+      <div class="owner">FHR</div>
+    </div>
+    <div class="detail" data-i="2">
+      <ul><li>Kết nối kênh OTA, đại lý lữ hành, đối tác quốc tế</li><li>Khách đoàn, MICE, sự kiện, hợp đồng doanh nghiệp</li><li>Bán trực tiếp: website, tổng đài, tệp khách nội bộ Tập đoàn</li></ul>
+      <div class="owner">FHR + FTV</div>
+    </div>
+    <div class="detail" data-i="3">
+      <ul><li>Đón tiếp, lưu trú, buồng phòng, concierge</li><li>F&amp;B: nhà hàng, bar, tiệc, sự kiện</li><li>Onsen–spa, giải trí, thể thao, hoạt náo</li><li>Kỹ thuật, an ninh, vệ sinh, cảnh quan tại cơ sở</li></ul>
+      <div class="owner">Cơ sở Vận hành KD DV + FRT</div>
+    </div>
+    <div class="detail" data-i="4">
+      <ul><li>Quản trị doanh thu: giá động, phân bổ công suất, ADR / RevPAR</li><li>Quản trị danh tiếng trên kênh OTA và mạng xã hội</li><li>Vận hành CRM &amp; chương trình khách hàng thân thiết</li><li>Đo lường NPS / CSAT và cải tiến chất lượng dịch vụ</li></ul>
+      <div class="owner">FHR</div>
+    </div>
+    <div class="detail" data-i="5">
+      <ul><li>Dùng chung với bước I8: chính quyền, cộng đồng, nhà đầu tư</li><li>Bổ sung: đối tác thương hiệu, hãng lữ hành, hãng hàng không</li><li>Quan hệ với hiệp hội du lịch và cơ quan quản lý ngành</li></ul>
+      <div class="owner">Ban Tổng Giám đốc + FHR</div>
+    </div>
+  </div>
+  <div class="outcome">KẾT QUẢ ĐẦU RA → Doanh thu định kỳ theo công suất (RevPAR) · Thương hiệu dịch vụ do Tập đoàn tự xây dựng · Gia tăng giá trị tài sản bất động sản nắm giữ</div>
+  </div>
+
+  <div class="part p2"><div class="num">2</div><div class="lbl">KSF — Yếu tố thành công then chốt mảng Khách sạn</div><div class="hint">Điều kiện bắt buộc để chuỗi giá trị ở phần ① tạo ra kết quả</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="ksfgrid">
+    <div class="ksf"><b>RevPAR / ADR</b><span class="full">RevPAR = Revenue Per Available Room — Doanh thu bình quân trên mỗi phòng sẵn có<br>ADR = Average Daily Rate — Giá phòng bình quân mỗi ngày</span><span class="txt">Hai chỉ số đo hiệu quả khai thác cốt lõi của ngành lưu trú: ADR đo mức giá bán được, RevPAR đo cả giá lẫn công suất lấp đầy.</span></div>
+    <div class="ksf"><b>NPS / CSAT</b><span class="full">NPS = Net Promoter Score — Chỉ số thiện cảm khách hàng<br>CSAT = Customer Satisfaction Score — Chỉ số hài lòng khách hàng</span><span class="txt">Vì Tập đoàn tự xây dựng bộ tiêu chuẩn dịch vụ, đo lường trải nghiệm khách là cách xác nhận chuẩn dịch vụ có đạt yêu cầu hay không.</span></div>
+    <div class="ksf"><b>Tỷ lệ giữ chân nhân sự tuyến đầu</b><span class="full">Retention Rate — Tỷ lệ nhân sự còn làm việc sau 12 tháng</span><span class="txt">Năng lực dịch vụ nằm ở đội ngũ nội bộ. Nhân sự nghỉ việc cao đồng nghĩa chất lượng dịch vụ suy giảm và chi phí đào tạo lặp lại.</span></div>
+    <div class="ksf"><b>Chi phí phân phối kênh</b><span class="full">Hoa hồng trả cho kênh OTA và đại lý, tính trên tổng doanh thu</span><span class="txt">Phụ thuộc quá mức vào kênh trung gian sẽ bào mòn biên lợi nhuận — cần cân đối với tỷ trọng kênh bán trực tiếp.</span></div>
+  </div>
+  </div>
+
+  <div class="part p3"><div class="num">3</div><div class="lbl">Hoạt động hỗ trợ mảng Khách sạn</div><div class="hint">◆ = năng lực trọng yếu, cần giữ nội bộ và đầu tư vượt chuẩn</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="supgrid">
+    <div class="sup diff"><h5>Đào tạo &amp; Chuẩn hóa Dịch vụ Tuyến đầu</h5><p>Năng lực khác biệt cốt lõi — bộ tiêu chuẩn dịch vụ do Tập đoàn tự xây dựng, không dựa vào chuẩn có sẵn của bên thứ ba.</p></div>
+    <div class="sup"><h5>Hệ thống PMS – POS – CRM</h5><p>Hạ tầng dữ liệu khách hàng dùng chung giữa các cơ sở và giữa ba mảng kinh doanh.</p></div>
+    <div class="sup"><h5>Quản lý Kênh Phân phối</h5><p>Đàm phán hoa hồng kênh OTA, quản trị hợp đồng đại lý lữ hành.</p></div>
+    <div class="sup"><h5>An ninh &amp; An toàn Cơ sở</h5><p>Tiêu chuẩn an toàn khách lưu trú, tách biệt với tiêu chuẩn an toàn công trường xây dựng.</p></div>
+  </div>
+  </div>
+
+  <div class="part p4"><div class="num">4</div><div class="lbl">Định hướng năng lực trọng yếu — mảng Khách sạn</div><div class="hint">15 vị trí — dùng ô tìm kiếm và bộ lọc Mức ở thanh công cụ</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr>
+      <th style="width:6%">Bước</th>
+      <th style="width:19%">Vị trí</th>
+      <th style="width:17%">Năng lực cốt lõi (Core)</th>
+      <th style="width:20%">Năng lực chuyên môn (Functional)</th>
+      <th style="width:18%">Năng lực lãnh đạo (Leadership)</th>
+      <th style="width:20%">Mức thuần thục tham chiếu (1–5)</th>
+    </tr></thead>
+    <tbody>
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC H1–H2 · NGHIÊN CỨU THỊ TRƯỜNG &amp; THIẾT KẾ DỊCH VỤ</td></tr>
+    <tr data-lv="5"><td>H1–H5</td><td><b>Trưởng Ban Kinh doanh Vận hành (FHR)</b></td><td class="catcore">Trách nhiệm &amp; Chuẩn mực dịch vụ</td><td class="catfunc">Xây dựng chuẩn dịch vụ &amp; vận hành nhiều cơ sở</td><td class="catlead">Xây dựng văn hóa dịch vụ &amp; giữ chân nhân sự</td><td>Mức 5 — nhân bản chuẩn dịch vụ sang cơ sở mới không suy giảm chất lượng</td></tr>
+    <tr data-lv="3"><td>H2</td><td>Chuyên viên Thiết kế Sản phẩm Dịch vụ</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Thiết kế danh mục dịch vụ &amp; cơ cấu doanh thu</td><td class="catlead">—</td><td>Mức 3 — thiết kế độc lập gói dịch vụ cho một cơ sở</td></tr>
+    <tr data-lv="4"><td>H2</td><td>Chuyên viên Đào tạo Nghiệp vụ Dịch vụ</td><td class="catcore">Tinh thần chia sẻ</td><td class="catfunc">Biên soạn SOP &amp; tổ chức đào tạo tuyến đầu</td><td class="catlead">Huấn luyện &amp; kèm cặp (coaching)</td><td>Mức 4 — xây dựng chương trình đào tạo chuẩn hóa cho toàn hệ thống</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC H3 · MARKETING &amp; PHÂN PHỐI</td></tr>
+    <tr data-lv="4"><td>H3</td><td>Trưởng phòng Kinh doanh &amp; Phân phối</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Quản trị kênh OTA &amp; đàm phán hợp đồng đại lý</td><td class="catlead">Quản lý đội ngũ kinh doanh</td><td>Mức 4 — cân đối tỷ trọng kênh để tối ưu chi phí phân phối</td></tr>
+    <tr data-lv="3"><td>H3</td><td>Chuyên viên Kinh doanh Khách đoàn &amp; MICE</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Bán hàng khách đoàn &amp; tổ chức sự kiện doanh nghiệp</td><td class="catlead">—</td><td>Mức 3 — chốt độc lập hợp đồng khách đoàn quy mô vừa</td></tr>
+    <tr data-lv="5"><td>H3–H4</td><td><b>Giám đốc Công ty Lữ hành (FTV)</b></td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Thiết kế tour tuyến &amp; kết nối điểm đến</td><td class="catlead">Điều hành đơn vị thành viên độc lập</td><td>Mức 5 — xây dựng hệ sinh thái tour kết nối các cơ sở của Tập đoàn</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC H4 · CUNG CẤP DỊCH VỤ</td></tr>
+    <tr data-lv="5"><td>H4</td><td><b>Giám đốc Cơ sở Vận hành KD DV</b></td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Điều hành vận hành cơ sở lưu trú toàn diện</td><td class="catlead">Dẫn dắt đội ngũ đa bộ phận</td><td>Mức 5 — đạt đồng thời mục tiêu doanh thu, chất lượng và an toàn</td></tr>
+    <tr data-lv="3"><td>H4</td><td>Trưởng bộ phận Lễ tân / Concierge</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành hệ thống PMS &amp; xử lý tình huống khách</td><td class="catlead">Quản lý ca trực</td><td>Mức 3 — xử lý độc lập tình huống khách hàng theo SOP</td></tr>
+    <tr data-lv="3"><td>H4</td><td>Trưởng bộ phận Buồng phòng</td><td class="catcore">Tinh thần tỉ mỉ</td><td class="catfunc">Quản lý tiêu chuẩn vệ sinh &amp; định mức vật tư</td><td class="catlead">Quản lý đội ngũ ca kíp</td><td>Mức 3 — duy trì tiêu chuẩn ổn định trong mùa cao điểm</td></tr>
+    <tr data-lv="4"><td>H4</td><td><b>Trưởng bộ phận F&amp;B</b></td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Quản trị chi phí nguyên liệu &amp; an toàn thực phẩm</td><td class="catlead">Quản lý đội ngũ bếp và phục vụ</td><td>Mức 4 — kiểm soát tỷ lệ chi phí nguyên liệu trong chuẩn ngành</td></tr>
+    <tr data-lv="4"><td>H4</td><td>Trưởng bộ phận Onsen–Spa &amp; Giải trí</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành dịch vụ trải nghiệm &amp; quản lý an toàn thiết bị</td><td class="catlead">Quản lý đội ngũ kỹ thuật viên</td><td>Mức 4 — nâng doanh thu dịch vụ trải nghiệm trên mỗi lượt khách</td></tr>
+    <tr data-lv="4"><td>H4</td><td>Trưởng bộ phận Kỹ thuật Cơ sở</td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Bảo trì hệ thống kỹ thuật &amp; quản lý sự cố</td><td class="catlead">—</td><td>Mức 4 — chuyển từ sửa chữa bị động sang bảo trì phòng ngừa</td></tr>
+    <tr data-lv="5"><td>H4</td><td><b>Giám đốc Đơn vị Dịch vụ Nghỉ dưỡng (FRT)</b></td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành tổ hợp dịch vụ nghỉ dưỡng &amp; giải trí</td><td class="catlead">Điều hành đơn vị thành viên độc lập</td><td>Mức 5 — vận hành đồng bộ nhiều loại hình dịch vụ trong một tổ hợp</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC H5–H6 · QUẢN TRỊ DOANH THU &amp; QUAN HỆ CÁC BÊN LIÊN QUAN</td></tr>
+    <tr data-lv="4"><td>H5</td><td><b>Chuyên gia Quản trị Doanh thu</b></td><td class="catcore">Tư duy phân tích</td><td class="catfunc">Định giá động theo mùa vụ &amp; phân bổ công suất</td><td class="catlead">—</td><td>Mức 4 — tối ưu RevPAR đồng thời cho nhiều cơ sở</td></tr>
+    <tr data-lv="3"><td>H5</td><td>Chuyên viên CRM &amp; Chăm sóc Khách hàng</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành CRM &amp; chương trình khách hàng thân thiết</td><td class="catlead">—</td><td>Mức 3 — vận hành độc lập chương trình khách hàng thân thiết</td></tr>
+    <tr data-lv="3"><td>H5</td><td>Chuyên viên Quản trị Danh tiếng</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Xử lý phản hồi kênh OTA &amp; mạng xã hội</td><td class="catlead">—</td><td>Mức 3 — xử lý độc lập phản hồi tiêu cực trong khung thời gian chuẩn</td></tr>
+    </tbody>
+  </table>
+  <div class="empty">Không có vị trí nào khớp với điều kiện lọc hiện tại.</div>
+  </div>
+</div>
+
+<!-- ================= MẢNG LỮ HÀNH ================= -->
+<div class="section tour" data-chain="tour">
+  <div class="band">
+    <div class="tag">Mảng 3 — Lữ hành &amp; Du lịch</div>
+    <div class="desc">Giá trị được tạo ra bằng cách kết nối khách hàng với mạng lưới điểm đến, phương tiện vận chuyển và trải nghiệm tại chỗ thông qua sản phẩm tour trọn gói. Kết quả đo bằng biên lợi nhuận mỗi đoàn khách và tỷ lệ lấp đầy chỗ.</div>
+  </div>
+
+  <div class="part p1"><div class="num">1</div><div class="lbl">Value Stream — Chuỗi giá trị mảng Lữ hành</div><div class="hint">6 bước; bước T1 và T6 dùng chung nội dung với bước I1 và I8 của mảng Đầu tư</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="chain">
+    <div class="step first" data-i="0">T1. Nghiên cứu &amp;<br>Phát triển thị trường</div>
+    <div class="step" data-i="1">T2. Thiết kế Tour &amp;<br>Sản phẩm Lữ hành</div>
+    <div class="step" data-i="2">T3. Marketing &amp;<br>Phân phối</div>
+    <div class="step" data-i="3">T4. Vận hành<br>Tour</div>
+    <div class="step" data-i="4">T5. Quản trị doanh thu<br>&amp; Khách hàng</div>
+    <div class="step" data-i="5">T6. Quan hệ các<br>bên liên quan</div>
+  </div>
+  <div class="detailrow">
+    <div class="detail" data-i="0">
+      <ul><li>Dùng chung kết quả nghiên cứu thị trường với bước I1</li><li>Bổ sung góc nhìn xu hướng du lịch theo mùa vụ, phân khúc khách đoàn/khách lẻ</li><li>Phân tích tuyến điểm đến và mức giá của đối thủ cùng phân khúc</li></ul>
+      <div class="owner">Ban Đầu tư + FTV</div>
+    </div>
+    <div class="detail" data-i="1">
+      <ul><li>Thiết kế hành trình (itinerary) theo phân khúc: nội địa, quốc tế, khách đoàn, khách lẻ</li><li>Xây dựng sản phẩm tour kết nối các cơ sở lưu trú và dịch vụ sẵn có của Tập đoàn</li><li>Đàm phán với đối tác điểm đến, vận chuyển, hướng dẫn viên</li></ul>
+      <div class="owner">FTV</div>
+    </div>
+    <div class="detail" data-i="2">
+      <ul><li>Kênh đại lý lữ hành, OTA du lịch, hợp đồng B2B doanh nghiệp</li><li>Bán trực tiếp qua website, tổng đài FTV, tệp khách nội bộ Tập đoàn</li><li>Phối hợp quảng bá điểm đến chung với mảng Khách sạn</li></ul>
+      <div class="owner">FTV + Ban Truyền thông &amp; Marketing</div>
+    </div>
+    <div class="detail" data-i="3">
+      <ul><li>Điều phối hướng dẫn viên, phương tiện vận chuyển, lịch trình từng đoàn</li><li>Xử lý phát sinh tại điểm đến: chậm trễ, sự cố, yêu cầu đặc biệt</li><li>Đảm bảo an toàn đoàn khách trong suốt hành trình</li></ul>
+      <div class="owner">FTV — Bộ phận Điều hành Tour</div>
+    </div>
+    <div class="detail" data-i="4">
+      <ul><li>Định giá tour theo mùa vụ, quy mô đoàn, thời gian đặt trước</li><li>Vận hành CRM khách lữ hành, đo lường NPS/CSAT theo từng hành trình</li><li>Upsell dịch vụ tại điểm đến: spa, F&amp;B của mảng Khách sạn</li></ul>
+      <div class="owner">FTV</div>
+    </div>
+    <div class="detail" data-i="5">
+      <ul><li>Dùng chung với bước I8: chính quyền, cộng đồng, nhà đầu tư</li><li>Đối tác hàng không, nhà xe, điểm tham quan, hướng dẫn viên tự do</li><li>Cơ quan quản lý du lịch, hiệp hội lữ hành</li></ul>
+      <div class="owner">Ban Tổng Giám đốc + FTV</div>
+    </div>
+  </div>
+  <div class="outcome">KẾT QUẢ ĐẦU RA → Biên lợi nhuận mỗi đoàn khách · Tỷ lệ lấp đầy chỗ theo chuyến khởi hành · Tăng lưu lượng khách cho hệ sinh thái lưu trú &amp; dịch vụ của Tập đoàn</div>
+  </div>
+
+  <div class="part p2"><div class="num">2</div><div class="lbl">KSF — Yếu tố thành công then chốt mảng Lữ hành</div><div class="hint">Điều kiện bắt buộc để chuỗi giá trị ở phần ① tạo ra kết quả</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="ksfgrid">
+    <div class="ksf"><b>Tỷ lệ lấp đầy đoàn</b><span class="full">Group Fill Rate — Tỷ lệ chỗ bán được trên tổng chỗ của mỗi chuyến khởi hành</span><span class="txt">Tour vẫn phải khởi hành dù chưa đầy chỗ sẽ làm biên lợi nhuận âm — đây là chỉ số sống còn của mô hình theo đoàn.</span></div>
+    <div class="ksf"><b>Biên lợi nhuận tour</b><span class="full">Tour Margin — Chênh lệch giữa giá bán và tổng chi phí đối tác (vận chuyển, lưu trú, hướng dẫn viên, vé tham quan)</span><span class="txt">Chi phí đối tác biến động theo mùa vụ và tỷ giá — cần kiểm soát chặt để không bào mòn biên lợi nhuận đã chào bán trước.</span></div>
+    <div class="ksf"><b>Chất lượng hướng dẫn viên &amp; đối tác vận chuyển</b><span class="full">Đánh giá của khách sau mỗi hành trình</span><span class="txt">Trải nghiệm tour phụ thuộc phần lớn vào con người tại điểm tiếp xúc trực tiếp — một hướng dẫn viên kém có thể phá hỏng toàn bộ hành trình dù thiết kế tour tốt.</span></div>
+    <div class="ksf"><b>Tỷ lệ khách quay lại &amp; giới thiệu</b><span class="full">Repeat &amp; Referral Rate</span><span class="txt">Chi phí thu hút khách mới cho mỗi tour cao — khách quay lại và giới thiệu là nguồn tăng trưởng bền vững nhất của mô hình lữ hành.</span></div>
+  </div>
+  </div>
+
+  <div class="part p3"><div class="num">3</div><div class="lbl">Hoạt động hỗ trợ mảng Lữ hành</div><div class="hint">◆ = năng lực trọng yếu, cần giữ nội bộ và đầu tư vượt chuẩn</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="supgrid">
+    <div class="sup diff"><h5>Mạng lưới Đối tác Điểm đến &amp; Vận chuyển</h5><p>Năng lực khác biệt cốt lõi — quan hệ đối tác tại từng điểm đến quyết định chất lượng và giá thành tour, khó sao chép nhanh.</p></div>
+    <div class="sup"><h5>Đội ngũ Hướng dẫn viên</h5><p>Tuyển dụng, đào tạo và cấp chứng chỉ hướng dẫn viên theo tuyến điểm.</p></div>
+    <div class="sup"><h5>Hệ thống Đặt Tour &amp; Thanh toán</h5><p>Nền tảng quản lý chỗ, đặt cọc, thanh toán và đối soát với đại lý phân phối.</p></div>
+    <div class="sup"><h5>An toàn Hành trình &amp; Bảo hiểm Du lịch</h5><p>Quy trình xử lý sự cố khẩn cấp và bảo hiểm cho khách trong suốt hành trình.</p></div>
+  </div>
+  </div>
+
+  <div class="part p4"><div class="num">4</div><div class="lbl">Định hướng năng lực trọng yếu — mảng Lữ hành</div><div class="hint">6 vị trí — dùng ô tìm kiếm và bộ lọc Mức ở thanh công cụ</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr>
+      <th style="width:6%">Bước</th>
+      <th style="width:19%">Vị trí</th>
+      <th style="width:17%">Năng lực cốt lõi (Core)</th>
+      <th style="width:20%">Năng lực chuyên môn (Functional)</th>
+      <th style="width:18%">Năng lực lãnh đạo (Leadership)</th>
+      <th style="width:20%">Mức thuần thục tham chiếu (1–5)</th>
+    </tr></thead>
+    <tbody>
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC T1–T2 · NGHIÊN CỨU THỊ TRƯỜNG &amp; THIẾT KẾ TOUR</td></tr>
+    <tr data-lv="5"><td>T1–T5</td><td><b>Giám đốc Công ty Lữ hành (FTV)</b></td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Xây dựng hệ sinh thái tour kết nối điểm đến</td><td class="catlead">Điều hành đơn vị thành viên độc lập</td><td>Mức 5 — kết nối sản phẩm tour với toàn bộ hệ sinh thái lưu trú &amp; dịch vụ của Tập đoàn</td></tr>
+    <tr data-lv="4"><td>T2</td><td>Chuyên viên Thiết kế Tour</td><td class="catcore">Tư duy sáng tạo</td><td class="catfunc">Xây dựng hành trình &amp; đàm phán đối tác điểm đến</td><td class="catlead">—</td><td>Mức 4 — thiết kế độc lập sản phẩm tour mới theo xu hướng thị trường</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC T3 · MARKETING &amp; PHÂN PHỐI</td></tr>
+    <tr data-lv="4"><td>T3</td><td>Trưởng phòng Kinh doanh Lữ hành</td><td class="catcore">Giao tiếp thuyết phục</td><td class="catfunc">Quản trị kênh đại lý &amp; hợp đồng B2B</td><td class="catlead">Quản lý đội ngũ kinh doanh</td><td>Mức 4 — mở rộng mạng lưới đại lý phân phối đa kênh</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC T4 · VẬN HÀNH TOUR</td></tr>
+    <tr data-lv="4"><td>T4</td><td><b>Trưởng bộ phận Điều hành Tour</b></td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Điều phối lịch trình, phương tiện, xử lý sự cố hiện trường</td><td class="catlead">Quản lý đội ngũ điều hành</td><td>Mức 4 — xử lý đồng thời nhiều đoàn khách trong mùa cao điểm</td></tr>
+    <tr data-lv="3"><td>T4</td><td>Hướng dẫn viên Trưởng đoàn</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Dẫn đoàn, xử lý tình huống tại điểm đến</td><td class="catlead">—</td><td>Mức 3 — xử lý độc lập tình huống phát sinh trong hành trình chuẩn</td></tr>
+
+    <tr class="grouprow"><td class="grp" colspan="6">BƯỚC T5–T6 · QUẢN TRỊ DOANH THU &amp; QUAN HỆ CÁC BÊN LIÊN QUAN</td></tr>
+    <tr data-lv="3"><td>T5</td><td>Chuyên viên CRM Lữ hành</td><td class="catcore">Tư duy khách hàng</td><td class="catfunc">Vận hành CRM &amp; chương trình khách hàng thân thiết</td><td class="catlead">—</td><td>Mức 3 — vận hành độc lập chương trình khách hàng thân thiết theo tuyến</td></tr>
+    </tbody>
+  </table>
+  <div class="empty">Không có vị trí nào khớp với điều kiện lọc hiện tại.</div>
+  </div>
+</div>
+
+<!-- ================= HỖ TRỢ DÙNG CHUNG ================= -->
+<div class="section" data-chain="sup">
+  <div class="band" style="border-bottom-color:var(--sup)">
+    <div class="tag" style="background:var(--sup)">Hoạt động hỗ trợ dùng chung — Phục vụ cả ba mảng</div>
+    <div class="desc">Các chức năng nền tảng cung cấp dịch vụ chia sẻ cho toàn bộ chuỗi giá trị của cả ba mảng kinh doanh.</div>
+  </div>
+
+  <div class="part p4"><div class="num">4</div><div class="lbl">Định hướng năng lực trọng yếu — Khối hỗ trợ</div><div class="hint">7 vị trí phục vụ chung cả ba mảng</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr>
+      <th style="width:25%">Vị trí</th>
+      <th style="width:17%">Năng lực cốt lõi (Core)</th>
+      <th style="width:20%">Năng lực chuyên môn (Functional)</th>
+      <th style="width:18%">Năng lực lãnh đạo (Leadership)</th>
+      <th style="width:20%">Mức thuần thục tham chiếu (1–5)</th>
+    </tr></thead>
+    <tbody>
+    <tr class="grouprow"><td class="grpsup" colspan="5">KHỐI HỖ TRỢ &amp; QUẢN TRỊ</td></tr>
+    <tr data-lv="5"><td><b>Trưởng Ban Tổ chức Nhân sự</b></td><td class="catcore">Chính trực</td><td class="catfunc">Thiết kế tổ chức, khung năng lực &amp; chính sách đãi ngộ</td><td class="catlead">Cố vấn nhân sự cho lãnh đạo các Khối</td><td>Mức 5 — gắn chiến lược nhân sự với chiến lược kinh doanh cả ba mảng</td></tr>
+    <tr data-lv="5"><td><b>Trưởng Ban Pháp chế</b></td><td class="catcore">Chính trực</td><td class="catfunc">Pháp lý dự án, hợp đồng thương mại &amp; tuân thủ</td><td class="catlead">Cảnh báo rủi ro pháp lý sớm cho Ban Tổng Giám đốc</td><td>Mức 5 — thiết lập chốt chặn pháp lý cho toàn hệ thống</td></tr>
+    <tr data-lv="5"><td><b>Trưởng Ban Công nghệ Thông tin</b></td><td class="catcore">Học hỏi liên tục</td><td class="catfunc">Kiến trúc hệ thống PMS – POS – CRM hợp nhất &amp; bảo mật</td><td class="catlead">Dẫn dắt chuyển đổi số toàn Tập đoàn</td><td>Mức 5 — hợp nhất dữ liệu khách hàng giữa ba mảng kinh doanh</td></tr>
+    <tr data-lv="5"><td><b>Trưởng Ban Thanh tra &amp; Kiểm soát Nội bộ</b></td><td class="catcore">Chính trực &amp; Độc lập</td><td class="catfunc">Kiểm toán nội bộ &amp; quản trị rủi ro liêm chính</td><td class="catlead">Báo cáo độc lập lên Hội đồng Quản trị</td><td>Mức 5 — thiết lập cơ chế kiểm soát tại các điểm rủi ro cao của chuỗi</td></tr>
+    <tr data-lv="4"><td>Trưởng Ban Hành chính Quản trị</td><td class="catcore">Tinh thần phục vụ</td><td class="catfunc">Quản trị hạ tầng văn phòng &amp; dịch vụ hậu cần</td><td class="catlead">Quản lý đội ngũ hành chính nhiều địa điểm</td><td>Mức 4 — chuẩn hóa dịch vụ hành chính toàn hệ thống</td></tr>
+    <tr data-lv="4"><td>Trưởng Ban An ninh</td><td class="catcore">Trách nhiệm &amp; An toàn</td><td class="catfunc">Quản trị an ninh dự án &amp; an toàn khách lưu trú</td><td class="catlead">Quản lý lực lượng an ninh nhiều địa điểm</td><td>Mức 4 — phân tách và áp dụng đúng hai bộ tiêu chuẩn an ninh khác nhau</td></tr>
+    <tr data-lv="4"><td>Chuyên viên Kế toán Quản trị</td><td class="catcore">Tinh thần tỉ mỉ</td><td class="catfunc">Kế toán quản trị &amp; báo cáo hiệu quả theo từng đơn vị</td><td class="catlead">—</td><td>Mức 4 — lập được báo cáo lãi lỗ riêng cho từng dự án và từng cơ sở</td></tr>
+    </tbody>
+  </table>
+  <div class="empty">Không có vị trí nào khớp với điều kiện lọc hiện tại.</div>
+  </div>
+</div>
+
+<!-- ================= CHÚ GIẢI ================= -->
+<div class="section" id="glossSection">
+  <div class="band" style="border-bottom-color:var(--gold)">
+    <div class="tag" style="background:var(--gold)">Chú giải thuật ngữ &amp; ký hiệu viết tắt</div>
+    <div class="desc">Giải thích toàn bộ ký hiệu và chỉ số được sử dụng trong báo cáo. Các từ viết tắt trong nội dung có gạch chân chấm — rê chuột lên để xem nghĩa.</div>
+  </div>
+
+  <div class="part p2"><div class="num">?</div><div class="lbl">Bảng chú giải</div><div class="hint">Gõ vào ô tìm kiếm ở thanh công cụ để lọc</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <div class="note" style="margin-top:0"><b>Ký hiệu bước:</b> Các bước được đánh mã để tiện tham chiếu. <b>I</b> = Investment (mảng Đầu tư), đánh số I1 đến I8. <b>H</b> = Hospitality (mảng Khách sạn), đánh số H1 đến H6. Đây là quy ước đặt tên nội bộ của báo cáo này.</div>
+
+  <div class="gloss" id="glossList"></div>
+
+  <div class="note" style="margin-top:14px"><b>Thang mức thuần thục (1–5):</b> Mức 1 — Nhận biết, cần hướng dẫn sát sao · Mức 2 — Áp dụng cơ bản trong tình huống quen thuộc · Mức 3 — Thành thạo, làm việc độc lập trong tình huống tiêu chuẩn · Mức 4 — Nâng cao, xử lý tình huống phức tạp và tối ưu hóa · Mức 5 — Chuyên gia, thiết kế chuẩn mực và dẫn dắt người khác. Mức ghi trong bảng là <b>mức kỳ vọng của vị trí</b>, dùng làm chuẩn đối chiếu khi đánh giá năng lực và thiết kế lộ trình đào tạo — không phải kết quả đánh giá của một cá nhân cụ thể.</div>
+  </div>
+</div>
+
+<div class="foot">
+  <b>Logic xây dựng báo cáo:</b> Mỗi bước trong chuỗi giá trị (phần ①) được xác định chủ sở hữu rõ ràng, từ đó suy ra Yếu tố thành công then chốt — KSF (phần ②) là điều kiện bắt buộc để bước đó tạo ra giá trị. Từ KSF, suy ngược ra hoạt động hỗ trợ cần thiết (phần ③) và năng lực tổ chức cần có (phần ④), phân theo ba lớp: năng lực cốt lõi áp dụng toàn Tập đoàn, năng lực chuyên môn gắn với từng vị trí, và năng lực lãnh đạo gắn với vai trò quản lý. Cách làm này đảm bảo mọi đề xuất về nhân sự và tổ chức đều bắt nguồn từ cách doanh nghiệp thực sự tạo ra giá trị, không phải từ danh mục năng lực có sẵn.
+  <br><br>
+  <b>Lưu ý khi sử dụng:</b> Danh mục vị trí, năng lực và mức thuần thục trong báo cáo là <b>định hướng tham chiếu</b>, cần được rà soát và xác nhận bởi lãnh đạo từng Khối trước khi sử dụng làm căn cứ chính thức cho công tác tuyển dụng, đánh giá hoặc chính sách đãi ngộ.
+</div>
+
+</div>
+
+<div id="tip"></div>
+<button id="top" title="Về đầu trang">↑</button>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ DỮ LIỆU CHÚ GIẢI ============ */
+  var GLOSS = [
+    ["ADR","Average Daily Rate: Giá phòng bình quân mỗi ngày."],
+    ["B2B","Business to Business: Giao dịch bán hàng giữa doanh nghiệp với doanh nghiệp (ví dụ: hợp đồng tour cho công ty)."],
+    ["CAPEX","Capital Expenditure: Chi đầu tư tài sản cố định, nâng cấp, cải tạo."],
+    ["CRM","Customer Relationship Management: Hệ thống quản trị quan hệ khách hàng."],
+    ["CSAT","Customer Satisfaction Score: Chỉ số hài lòng của khách hàng."],
+    ["F&B","Food and Beverage: Dịch vụ ẩm thực và đồ uống."],
+    ["FARC","Ban Quy hoạch Kiến trúc của Tập đoàn."],
+    ["FCONS","Đơn vị Tư vấn Giám sát xây dựng thuộc Tập đoàn."],
+    ["FHR","Ban Kinh doanh Vận hành (phụ trách mảng khách sạn, dịch vụ)."],
+    ["FLV","Ban Kinh doanh Bất động sản."],
+    ["FRT","Đơn vị thành viên vận hành dịch vụ nghỉ dưỡng, giải trí."],
+    ["FTV","Đơn vị thành viên hoạt động lữ hành, du lịch."],
+    ["GPMB","Giải phóng mặt bằng."],
+    ["IR","Investor Relations: Quan hệ nhà đầu tư và cổ đông."],
+    ["IRR","Internal Rate of Return: Tỷ suất hoàn vốn nội bộ, đo hiệu quả tài chính dự án."],
+    ["KD DV","Kinh doanh Dịch vụ (tên gọi các cơ sở vận hành trực tiếp)."],
+    ["KSF","Key Success Factor: Yếu tố thành công then chốt của ngành hoặc hoạt động."],
+    ["M&A","Mergers and Acquisitions: Mua bán và sáp nhập doanh nghiệp hoặc dự án."],
+    ["MICE","Meetings, Incentives, Conferences, Exhibitions: Du lịch kết hợp hội nghị, sự kiện."],
+    ["NPS","Net Promoter Score: Chỉ số đo mức độ khách sẵn sàng giới thiệu dịch vụ cho người khác."],
+    ["NPV","Net Present Value: Giá trị hiện tại thuần của dòng tiền dự án."],
+    ["OTA","Online Travel Agency: Kênh đại lý du lịch trực tuyến (Booking, Agoda, Traveloka...)."],
+    ["PMS","Property Management System: Phần mềm quản lý vận hành cơ sở lưu trú."],
+    ["POS","Point of Sale: Hệ thống bán hàng và thanh toán tại điểm dịch vụ."],
+    ["RevPAR","Revenue Per Available Room: Doanh thu bình quân trên mỗi phòng sẵn có, đo cả giá bán lẫn công suất lấp đầy."],
+    ["SOP","Standard Operating Procedure: Quy trình vận hành chuẩn."],
+    ["Concierge","Bộ phận hỗ trợ khách lưu trú về thông tin, đặt dịch vụ, hành lý, di chuyển."],
+    ["Core / Functional / Leadership","Ba nhóm năng lực: cốt lõi (áp dụng toàn Tập đoàn) / chuyên môn (gắn với nghiệp vụ vị trí) / lãnh đạo (gắn với vai trò quản lý)."],
+    ["Value Stream","Chuỗi giá trị: trình tự các bước hoạt động tạo ra giá trị cho khách hàng."]
+  ];
+
+  var $  = function(s,c){return (c||document).querySelector(s);};
+  var $$ = function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
+
+  /* ============ DỰNG BẢNG CHÚ GIẢI ============ */
+  var list = $("#glossList");
+  GLOSS.forEach(function(g){
+    var d = document.createElement("div");
+    d.className = "gitem";
+    d.innerHTML = "<b>"+g[0].replace(/&/g,"&amp;")+"</b> — <span>"+g[1].replace(/&/g,"&amp;")+"</span>";
+    list.appendChild(d);
+  });
+
+  /* ============ TOOLTIP CHO TỪ VIẾT TẮT ============ */
+  var DICT = {};
+  GLOSS.forEach(function(g){ DICT[g[0]] = g[1]; });
+  var TERMS = ["RevPAR","CAPEX","FCONS","MICE","CSAT","FARC","GPMB","ADR","CRM","FHR","FLV","FRT","FTV","IRR","KSF","NPS","NPV","OTA","PMS","POS","SOP","F&B","M&A","IR","B2B"];
+  var rx = new RegExp("(?<![\\w])(" + TERMS.map(function(t){return t.replace(/&/g,"&").replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&");}).join("|") + ")(?![\\w])","g");
+
+  function annotate(root){
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(n){
+        var p = n.parentNode;
+        if(!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if(tag==="SCRIPT"||tag==="STYLE"||p.classList.contains("abbr")) return NodeFilter.FILTER_REJECT;
+        if(p.closest("#glossList")||p.closest(".toolbar")||p.closest("#tip")) return NodeFilter.FILTER_REJECT;
+        return rx.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var nodes = [], n;
+    while((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach(function(node){
+      var frag = document.createDocumentFragment();
+      var txt = node.nodeValue, last = 0, m;
+      rx.lastIndex = 0;
+      while((m = rx.exec(txt))){
+        if(m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var sp = document.createElement("span");
+        sp.className = "abbr";
+        sp.textContent = m[0];
+        sp.setAttribute("data-def", DICT[m[0]] || "");
+        frag.appendChild(sp);
+        last = m.index + m[0].length;
+      }
+      if(last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+  try { annotate($(".sheet")); } catch(e){ /* trình duyệt cũ: bỏ qua tooltip */ }
+
+  var tip = $("#tip");
+  document.addEventListener("mouseover", function(e){
+    var t = e.target.closest ? e.target.closest(".abbr") : null;
+    if(!t) return;
+    tip.innerHTML = "<b>"+t.textContent+"</b><br>"+t.getAttribute("data-def");
+    tip.classList.add("on");
+  });
+  document.addEventListener("mousemove", function(e){
+    if(!tip.classList.contains("on")) return;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if(x + 300 > window.innerWidth) x = e.clientX - 300;
+    if(y + 90 > window.innerHeight) y = e.clientY - 90;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  });
+  document.addEventListener("mouseout", function(e){
+    if(e.target.closest && e.target.closest(".abbr")) tip.classList.remove("on");
+  });
+
+  /* ============ GẬP / MỞ TỪNG PHẦN ============ */
+  $$(".part").forEach(function(p){
+    p.addEventListener("click", function(){
+      var body = p.nextElementSibling;
+      if(!body || !body.classList.contains("pbody")) return;
+      p.classList.toggle("closed");
+      body.classList.toggle("closed");
+    });
+  });
+  function setAll(open){
+    $$(".part").forEach(function(p){
+      var b = p.nextElementSibling;
+      if(!b || !b.classList.contains("pbody")) return;
+      p.classList.toggle("closed", !open);
+      b.classList.toggle("closed", !open);
+    });
+  }
+  $("#expandAll").addEventListener("click", function(){ setAll(true); clearOnly(); });
+  $("#collapseAll").addEventListener("click", function(){ setAll(false); clearOnly(); });
+
+  /* ============ CHỈ XEM MỘT PHẦN ============ */
+  function clearOnly(){ $$("[data-only]").forEach(function(b){ b.classList.remove("on"); }); }
+  $$("[data-only]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var key = btn.getAttribute("data-only");
+      var already = btn.classList.contains("on");
+      clearOnly();
+      if(already){ setAll(true); return; }
+      btn.classList.add("on");
+      $$(".part").forEach(function(p){
+        var b = p.nextElementSibling;
+        if(!b || !b.classList.contains("pbody")) return;
+        var match = p.classList.contains(key);
+        p.classList.toggle("closed", !match);
+        b.classList.toggle("closed", !match);
+      });
+    });
+  });
+
+  /* ============ LỌC THEO MẢNG ============ */
+  $$("[data-chain]").filter(function(el){return el.tagName==="BUTTON";}).forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var v = btn.getAttribute("data-chain");
+      $$("[data-chain]").forEach(function(b){ if(b.tagName==="BUTTON") b.classList.remove("on"); });
+      btn.classList.add("on");
+      $$(".section[data-chain]").forEach(function(s){
+        s.classList.toggle("hidden", v!=="all" && s.getAttribute("data-chain")!==v);
+      });
+      refresh();
+    });
+  });
+
+  /* ============ LỌC THEO MỨC + TÌM KIẾM ============ */
+  var lvFilter = "all", qStr = "";
+
+  $$("[data-lv]").filter(function(el){return el.tagName==="BUTTON";}).forEach(function(btn){
+    btn.addEventListener("click", function(){
+      lvFilter = btn.getAttribute("data-lv");
+      $$("[data-lv]").forEach(function(b){ if(b.tagName==="BUTTON") b.classList.remove("on"); });
+      btn.classList.add("on");
+      refresh();
+    });
+  });
+
+  var qEl = $("#q"), wrap = $("#searchWrap");
+  qEl.addEventListener("input", function(){
+    qStr = qEl.value.trim().toLowerCase();
+    wrap.classList.toggle("has", qStr.length > 0);
+    refresh();
+  });
+  $("#qc").addEventListener("click", function(){
+    qEl.value = ""; qStr = ""; wrap.classList.remove("has"); refresh(); qEl.focus();
+  });
+
+  function stripMarks(el){
+    $$("mark", el).forEach(function(m){
+      m.replaceWith(document.createTextNode(m.textContent));
+    });
+    el.normalize();
+  }
+  function highlight(el, term){
+    if(!term) return;
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n;
+    while((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(function(node){
+      var i = node.nodeValue.toLowerCase().indexOf(term);
+      if(i < 0) return;
+      var mk = document.createElement("mark");
+      mk.textContent = node.nodeValue.substr(i, term.length);
+      var after = node.splitText(i);
+      after.nodeValue = after.nodeValue.substr(term.length);
+      node.parentNode.insertBefore(mk, after);
+    });
+  }
+
+  function refresh(){
+    var shown = 0, total = 0;
+
+    $$("tbody").forEach(function(tb){
+      var sec = tb.closest(".section");
+      var secHidden = sec && sec.classList.contains("hidden");
+      var visibleInTable = 0;
+
+      $$("tr", tb).forEach(function(tr){
+        stripMarks(tr);
+        if(tr.classList.contains("grouprow")) return;
+        total++;
+        var okLv = (lvFilter === "all") || (tr.getAttribute("data-lv") === lvFilter);
+        var text = tr.textContent.toLowerCase();
+        var okQ  = !qStr || text.indexOf(qStr) >= 0;
+        var show = okLv && okQ;
+        tr.classList.toggle("hide", !show);
+        if(show){
+          visibleInTable++;
+          if(!secHidden) shown++;
+          if(qStr) highlight(tr, qStr);
+        }
+      });
+
+      /* ẩn dòng tiêu đề nhóm nếu nhóm không còn dòng nào */
+      var cur = null, cnt = 0;
+      $$("tr", tb).forEach(function(tr){
+        if(tr.classList.contains("grouprow")){
+          if(cur) cur.classList.toggle("hide", cnt === 0);
+          cur = tr; cnt = 0;
+        } else if(!tr.classList.contains("hide")) cnt++;
+      });
+      if(cur) cur.classList.toggle("hide", cnt === 0);
+
+      var emp = tb.closest("table") ? tb.closest("table").nextElementSibling : null;
+      if(emp && emp.classList.contains("empty")) emp.classList.toggle("show", visibleInTable === 0);
+    });
+
+    /* lọc bảng chú giải theo cùng từ khóa */
+    $$(".gitem").forEach(function(g){
+      stripMarks(g);
+      var ok = !qStr || g.textContent.toLowerCase().indexOf(qStr) >= 0;
+      g.classList.toggle("hide", !ok);
+      if(ok && qStr) highlight(g, qStr);
+    });
+
+    $("#counter").textContent = "Hiển thị " + shown + " / " + total + " vị trí";
+  }
+
+  /* ============ LÀM NỔI BẬT BƯỚC TRONG CHUỖI ============ */
+  $$(".chain").forEach(function(chain){
+    var row = chain.parentNode.querySelector(".detailrow");
+    if(!row) return;
+    chain.addEventListener("click", function(e){
+      var st = e.target.closest(".step");
+      if(!st) return;
+      var i = st.getAttribute("data-i");
+      var already = st.classList.contains("act");
+      $$(".step", chain).forEach(function(s){ s.classList.remove("act","dim"); });
+      $$(".detail", row).forEach(function(d){ d.classList.remove("pick","dim"); });
+      if(already) return;
+      st.classList.add("act");
+      $$(".step", chain).forEach(function(s){ if(s!==st) s.classList.add("dim"); });
+      $$(".detail", row).forEach(function(d){
+        if(d.getAttribute("data-i") === i) d.classList.add("pick"); else d.classList.add("dim");
+      });
+    });
+  });
+
+
+  /* ============ NHẢY TỚI PHẦN TỪ THẺ BẢN ĐỒ ============ */
+  $$("[data-jump]").forEach(function(card){
+    card.addEventListener("click", function(){
+      var key = card.getAttribute("data-jump");
+      var btn = $("[data-only='"+key+"']");
+      if(btn) btn.click();
+      var first = $(".part."+key);
+      if(first) first.scrollIntoView({behavior:"smooth", block:"center"});
+    });
+  });
+
+  /* ============ IN & VỀ ĐẦU TRANG ============ */
+  $("#printBtn").addEventListener("click", function(){ window.print(); });
+  var topBtn = $("#top");
+  window.addEventListener("scroll", function(){
+    topBtn.classList.toggle("on", window.scrollY > 500);
+  });
+  topBtn.addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

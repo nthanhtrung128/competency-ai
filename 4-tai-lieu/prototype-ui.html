@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CompetencyAI — Bản mẫu giao diện (GĐ0)</title>
+<style>
+:root{
+  --brand:#2563eb; --brand-600:#1d4ed8; --brand-50:#eff6ff; --brand-100:#dbeafe;
+  --bg:#f6f9fe; --surface:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+  --ok:#16a34a; --ok-bg:#dcfce7; --warn:#d97706; --warn-bg:#fef3c7;
+  --danger:#dc2626; --danger-bg:#fee2e2; --violet:#7c3aed; --violet-bg:#ede9fe;
+  --radius:10px;
+}
+[data-theme="dark"]{
+  --bg:#0b1220; --surface:#111a2e; --ink:#e6edf7; --muted:#93a4bd; --line:#1e2b45;
+  --brand-50:#132039; --brand-100:#17284a;
+  --ok-bg:#0f2e1c; --warn-bg:#33270a; --danger-bg:#3a1414; --violet-bg:#241a44;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+
+/* ---------- TOPBAR ---------- */
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;padding:0 20px;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--violet));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px}
+.logo-text b{display:block;font-size:14.5px;letter-spacing:-.2px}
+.logo-text span{display:block;font-size:10.5px;color:var(--muted)}
+.spacer{margin-left:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--brand-50);color:var(--brand);
+  border:1px solid var(--brand-100);padding:5px 11px;border-radius:99px;font-size:11.5px;font-weight:600}
+.btn{font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:8px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:.12s}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-primary:hover{background:var(--brand-600);color:#fff}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font-family:inherit;font-size:11.5px;font-weight:600;padding:6px 11px;border:0;
+  background:var(--surface);color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--brand);color:#fff}
+
+/* ---------- LAYOUT ---------- */
+.shell{display:grid;grid-template-columns:238px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:16px 12px;overflow-y:auto}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:14px 10px 6px}
+.navitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
+  font-size:13px;color:var(--ink);cursor:pointer;transition:.12s;margin-bottom:1px}
+.navitem:hover{background:var(--brand-50)}
+.navitem.on{background:var(--brand-50);color:var(--brand);font-weight:600}
+.navitem .ic{width:18px;text-align:center;font-size:14px;opacity:.8}
+.navitem .badge{margin-left:auto;font-size:9.5px;background:var(--warn-bg);color:var(--warn);
+  padding:1px 6px;border-radius:99px;font-weight:700}
+.main{padding:22px 26px;overflow-y:auto}
+
+.page-head{margin-bottom:18px}
+.page-head h1{font-size:21px;letter-spacing:-.3px;margin-bottom:4px}
+.page-head p{font-size:12.5px;color:var(--muted);max-width:760px}
+
+/* ---------- CARDS ---------- */
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1.4fr 1fr}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.card h3{font-size:13px;margin-bottom:3px}
+.card .sub{font-size:11.5px;color:var(--muted)}
+.kpi{font-size:28px;font-weight:800;letter-spacing:-1px;margin:8px 0 2px}
+.kpi.ok{color:var(--ok)} .kpi.warn{color:var(--warn)} .kpi.danger{color:var(--danger)}
+.trend{font-size:11px;color:var(--muted)}
+
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.b-core{background:var(--warn-bg);color:var(--warn)}
+.b-lead{background:var(--danger-bg);color:var(--danger)}
+.b-func{background:var(--brand-100);color:var(--brand)}
+.b-active{background:var(--ok-bg);color:var(--ok)}
+.b-draft{background:var(--violet-bg);color:var(--violet)}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;font-size:12.5px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--brand-50)}
+
+/* org tree */
+.tree{font-size:12.5px}
+.node{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
+.node:hover{background:var(--brand-50)}
+.tier{font-size:9.5px;font-weight:800;background:var(--brand-100);color:var(--brand);
+  padding:1px 6px;border-radius:5px}
+.nohead{font-size:10.5px;color:var(--warn);font-style:italic}
+
+/* gauge */
+.bar{height:7px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar span{display:block;height:100%;background:var(--brand);border-radius:99px}
+.bar span.warn{background:var(--warn)} .bar span.danger{background:var(--danger)}
+
+.note{font-size:11.5px;color:var(--muted);background:var(--brand-50);border-left:3px solid var(--brand);
+  padding:10px 12px;border-radius:6px;margin-top:14px;line-height:1.55}
+.hidden{display:none}
+[data-en]{display:none}
+[data-lang="en"] [data-vi]{display:none}
+[data-lang="en"] [data-en]{display:inline}
+</style>
+</head>
+<body data-theme="light" data-lang="vi">
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">CA</div>
+    <div class="logo-text">
+      <b>CompetencyAI</b>
+      <span data-vi>Trí tuệ Quản trị Nhân tài AI</span><span data-en>AI Talent Management Intelligence</span>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <span class="chip" id="persona">● HR Business Partner</span>
+  <div class="seg">
+    <button class="on" onclick="setLang('vi',this)">VI</button>
+    <button onclick="setLang('en',this)">EN</button>
+  </div>
+  <button class="btn" onclick="toggleTheme()" id="themeBtn">◐ <span data-vi>Tối</span><span data-en>Dark</span></button>
+  <button class="btn btn-primary">✦ <span data-vi>Trợ lý AI</span><span data-en>AI Assistant</span></button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="eyebrow" data-vi>Tổng quan</div><div class="eyebrow" data-en>Overview</div>
+    <div class="navitem on"><span class="ic">◧</span><span data-vi>Bảng điều khiển</span><span data-en>Dashboard</span></div>
+
+    <div class="eyebrow" data-vi>Nền tảng</div><div class="eyebrow" data-en>Foundation</div>
+    <div class="navitem"><span class="ic">⌗</span><span data-vi>Cơ cấu tổ chức</span><span data-en>Organization</span></div>
+    <div class="navitem"><span class="ic">◆</span><span data-vi>Từ điển năng lực</span><span data-en>Competency Dictionary</span><span class="badge">v2</span></div>
+    <div class="navitem"><span class="ic">⑂</span><span data-vi>Skill Taxonomy</span><span data-en>Skill Taxonomy</span></div>
+
+    <div class="eyebrow" data-vi>Kiến trúc nghề</div><div class="eyebrow" data-en>Job Architecture</div>
+    <div class="navitem"><span class="ic">▤</span><span data-vi>Họ nghề & Cấp bậc</span><span data-en>Family & Level</span></div>
+    <div class="navitem"><span class="ic">◈</span><span data-vi>Hồ sơ năng lực</span><span data-en>Success Profile</span></div>
+    <div class="navitem"><span class="ic">▦</span><span data-vi>Bản mô tả công việc</span><span data-en>Job Description</span></div>
+
+    <div class="eyebrow" data-vi>Đánh giá</div><div class="eyebrow" data-en>Assessment</div>
+    <div class="navitem"><span class="ic">◉</span><span data-vi>Chiến dịch 360°</span><span data-en>360 Campaign</span></div>
+    <div class="navitem"><span class="ic">◐</span><span data-vi>Khoảng cách năng lực</span><span data-en>Competency Gap</span></div>
+
+    <div class="eyebrow" data-vi>Nhân tài</div><div class="eyebrow" data-en>Talent</div>
+    <div class="navitem"><span class="ic">▩</span><span data-vi>Hiệu chuẩn 9-box</span><span data-en>9-box Calibration</span></div>
+    <div class="navitem"><span class="ic">↟</span><span data-vi>Kế thừa & IDP</span><span data-en>Succession & IDP</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><span data-vi>Bảng điều khiển</span><span data-en>Dashboard</span></h1>
+      <p>
+        <span data-vi>Bản mẫu giao diện GĐ0 — dùng để nghiệm thu chuẩn UI B.8 trước khi viết code thật. Dữ liệu hiển thị là dữ liệu mẫu tĩnh.</span>
+        <span data-en>Phase-0 UI prototype — used to sign off the B.8 design standard before writing real code. All data shown is static sample data.</span>
+      </p>
+    </div>
+
+    <div class="grid g4">
+      <div class="card">
+        <h3 data-vi>Độ bao phủ hồ sơ</h3><h3 data-en>Profile Coverage</h3>
+        <div class="kpi warn">68%</div>
+        <div class="trend" data-vi>142 / 209 vị trí có hồ sơ</div>
+        <div class="trend" data-en>142 / 209 positions profiled</div>
+        <div class="bar"><span class="warn" style="width:68%"></span></div>
+      </div>
+      <div class="card">
+        <h3 data-vi>Năng lực đang hiệu lực</h3><h3 data-en>Active Competencies</h3>
+        <div class="kpi">40</div>
+        <div class="trend" data-vi>6 cốt lõi · 6 lãnh đạo · 28 chuyên môn</div>
+        <div class="trend" data-en>6 core · 6 leadership · 28 functional</div>
+      </div>
+      <div class="card">
+        <h3 data-vi>Đơn vị chưa bổ nhiệm trưởng</h3><h3 data-en>Units Without Head</h3>
+        <div class="kpi danger">7</div>
+        <div class="trend" data-vi>trên tổng 46 đơn vị</div>
+        <div class="trend" data-en>out of 46 units</div>
+      </div>
+      <div class="card">
+        <h3 data-vi>Kỳ đánh giá đang mở</h3><h3 data-en>Open Campaign</h3>
+        <div class="kpi ok">2026-H1</div>
+        <div class="trend" data-vi>318 / 500 phiếu đã nộp</div>
+        <div class="trend" data-en>318 / 500 forms submitted</div>
+        <div class="bar"><span style="width:64%"></span></div>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card">
+        <h3 data-vi>Từ điển năng lực — phiên bản gần nhất</h3><h3 data-en>Competency Dictionary — Recent Versions</h3>
+        <div class="sub" style="margin-bottom:12px" data-vi>Chỉ báo hành vi gắn theo phiên bản, không ghi đè lịch sử</div>
+        <div class="sub" style="margin-bottom:12px" data-en>Behavioral indicators are version-scoped; history is never overwritten</div>
+        <table>
+          <tr>
+            <th data-vi>Mã</th><th data-en>Code</th>
+            <th data-vi>Năng lực</th><th data-en>Competency</th>
+            <th data-vi>Vai trò</th><th data-en>Role</th>
+            <th>Ver</th>
+            <th data-vi>Trạng thái</th><th data-en>Status</th>
+          </tr>
+          <tr><td>CO1</td><td data-vi>Chính trực &amp; Tuân thủ</td><td data-en>Integrity &amp; Compliance</td>
+              <td><span class="badge b-core">CORE</span></td><td>v2</td><td><span class="badge b-active">ACTIVE</span></td></tr>
+          <tr><td>CO4</td><td data-vi>Trách nhiệm An toàn</td><td data-en>Safety Accountability</td>
+              <td><span class="badge b-core">CORE</span></td><td>v1</td><td><span class="badge b-active">ACTIVE</span></td></tr>
+          <tr><td>LE2</td><td data-vi>Ra quyết định khi không chắc chắn</td><td data-en>Decision under Uncertainty</td>
+              <td><span class="badge b-lead">MGMT</span></td><td>v3</td><td><span class="badge b-draft">DRAFT</span></td></tr>
+          <tr><td>FU23</td><td data-vi>Quản trị Doanh thu</td><td data-en>Revenue Management</td>
+              <td><span class="badge b-func">FUNC</span></td><td>v1</td><td><span class="badge b-active">ACTIVE</span></td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3 data-vi>Cây tổ chức</h3><h3 data-en>Organization Tree</h3>
+        <div class="sub" style="margin-bottom:10px" data-vi>tier linh hoạt · trưởng đơn vị tuỳ chọn</div>
+        <div class="sub" style="margin-bottom:10px" data-en>flexible tier · optional unit head</div>
+        <div class="tree">
+          <div class="node"><span class="tier">T0</span><b>Flamingo Group</b></div>
+          <div class="node" style="padding-left:22px"><span class="tier">T1</span><span data-vi>Khối Đầu tư – Xây dựng</span><span data-en>Investment &amp; Construction</span></div>
+          <div class="node" style="padding-left:44px"><span class="tier">T2</span><span data-vi>Ban Đầu tư</span><span data-en>Investment Dept</span></div>
+          <div class="node" style="padding-left:44px"><span class="tier">T2</span><span data-vi>Ban Quy hoạch Kiến trúc</span><span data-en>Planning &amp; Architecture</span>
+            <span class="nohead" data-vi>· Chưa bổ nhiệm</span><span class="nohead" data-en>· Not appointed</span></div>
+          <div class="node" style="padding-left:22px"><span class="tier">T1</span><span data-vi>Khối Kinh doanh</span><span data-en>Commercial Block</span></div>
+          <div class="node" style="padding-left:44px"><span class="tier">T2</span><span data-vi>Ban Kinh doanh Vận hành</span><span data-en>Operations Dept</span></div>
+          <div class="node" style="padding-left:66px"><span class="tier">T3</span><span data-vi>Phòng Quản trị Doanh thu</span><span data-en>Revenue Mgmt Team</span>
+            <span class="badge b-draft" style="margin-left:6px">NEW</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b data-vi>Ghi chú nghiệm thu GĐ0:</b><b data-en>Phase-0 acceptance note:</b>
+      <span data-vi> Bản mẫu này chỉ chứng minh chuẩn giao diện B.8 — xanh dương #2563eb trên nền tint nhạt, sidebar có nhãn eyebrow viết hoa, topbar có chip persona và nút Trợ lý AI, chuyển ngữ VI/EN, chế độ sáng/tối, badge màu theo loại. Chưa có backend, chưa có dữ liệu thật. Sau khi bạn duyệt bố cục này mới nên viết code Next.js thật ở GĐ1.</span>
+      <span data-en> This prototype only demonstrates the B.8 UI standard — #2563eb blue on light tint, uppercase eyebrow sidebar groups, persona chip and AI Assistant button in the topbar, VI/EN switch, light/dark mode, type-coded badges. No backend, no real data. Approve this layout before writing actual Next.js code in Phase 1.</span>
+    </div>
+  </main>
+</div>
+
+<script>
+function setLang(l,btn){
+  document.body.setAttribute('data-lang',l);
+  document.documentElement.lang=l;
+  btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function toggleTheme(){
+  const b=document.body, cur=b.getAttribute('data-theme');
+  b.setAttribute('data-theme', cur==='light'?'dark':'light');
+}
+document.querySelectorAll('.navitem').forEach(n=>{
+  n.addEventListener('click',()=>{
+    document.querySelectorAll('.navitem').forEach(x=>x.classList.remove('on'));
+    n.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Competency Management System (WIP and Sample Data by TrungNT)",
+  "description": "Enterprise Competency Management & Organizational Architecture System with Prisma ORM data modeling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

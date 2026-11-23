@@ -1,0 +1,11 @@
+employee_code,full_name,email,phone,org_unit_code,job_title,job_role_code,job_level_code,grade_code,manager_code,hire_date,status
+FLA0001,Nguyễn Văn An,an.nv@flamingo.vn,0901234567,B01,Trưởng Ban Đầu tư,R01,L4,Ngạch 3,,15/03/2019,Đang làm việc
+FLA0002,Trần Thị Bình,binh.tt@flamingo.vn,0902345678,B01,Chuyên viên Thẩm định Đầu tư,R02,L2,Ngạch 5,FLA0001,02/06/2021,Đang làm việc
+FLA0003,Lê Hoàng Cường,cuong.lh@flamingo.vn,0903456789,B01,Chuyên viên Phát triển Quỹ đất,R03,L2,Ngạch 5,FLA0001,10/01/2022,Đang làm việc
+FLA0004,Phạm Thị Dung,dung.pt@flamingo.vn,0904567890,B06,Trưởng Ban Kinh doanh Vận hành,R16,L4,Ngạch 3,,08/09/2018,Đang làm việc
+FLA0005,Hoàng Minh Đức,duc.hm@flamingo.vn,0905678901,B06,Giám đốc Cơ sở Vận hành,R17,L3,Ngạch 4,FLA0004,20/04/2020,Đang làm việc
+FLA0006,Vũ Thị Hoa,,0906789012,B06,Nhân viên Lễ tân,R19,L1,Ngạch 6,FLA0005,05/11/2023,Đang làm việc
+FLA0007,Đặng Quốc Hùng,hung.dq@flamingo.vn,0907890123,B12,Trưởng Ban Pháp chế & Kiểm soát Nội bộ,R24,L4,Ngạch 3,,12/02/2020,Đang làm việc
+FLA0008,Bùi Thị Lan,lan.bt@flamingo.vn,0908901234,B11,Trưởng Ban Nhân sự và QTHC,R23,L4,Ngạch 3,,01/07/2017,Đang làm việc
+FLA0009,Ngô Văn Minh,minh.nv@flamingo.vn,0909012345,B13,Trưởng Ban Công nghệ Thông tin,R25,L4,Ngạch 3,,18/05/2021,Đang làm việc
+FLA0010,Trịnh Thị Nga,nga.tt@flamingo.vn,0910123456,B10,Trưởng Ban Tài chính Kế toán,R22,L4,Ngạch 3,,03/08/2019,Nghỉ phép

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamingo — Chuỗi giá trị (bản hiệu chỉnh theo logic Halcom)</title>
+<style>
+:root{
+  --ink:#101B24;--ink2:#425663;--line:#CFD9E0;--paper:#fff;--bg:#EEF2F4;
+  --inv:#0E4C63;--inv-bg:#E4EEF3;
+  --hos:#8E2F4C;--hos-bg:#F8E9EE;
+  --shared:#6B5A17;--shared-bg:#F6F1DF;
+  --sup:#4E5B63;--sup-bg:#E9EDEF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding:22px;font-size:12px}
+.sheet{max-width:1560px;margin:0 auto;background:var(--paper);border:1px solid var(--line);padding:30px 34px}
+
+.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:6px}
+.eb{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+h1{font-size:22px;margin-top:5px;letter-spacing:-.01em}
+.hd .meta{font-size:9.5px;color:var(--ink2);text-align:right;line-height:1.7}
+
+.basis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 20px}
+.basis div{border:1px solid var(--line);padding:8px 10px;background:#FAFBFC}
+.basis b{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:3px}
+.basis p{font-size:10.5px;line-height:1.45;color:var(--ink)}
+
+/* ---- row scaffolding ---- */
+.rowlabel{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;letter-spacing:.16em;color:#fff;padding:0 7px;
+}
+.grid{display:grid;grid-template-columns:34px repeat(8,1fr);gap:4px;align-items:stretch}
+.grid + .grid{margin-top:4px}
+
+.cell{border:1px solid var(--line);padding:8px 9px;background:var(--paper);min-width:0}
+.code{font-size:9px;font-weight:800;letter-spacing:.08em}
+.cell h3{font-size:11px;font-weight:700;line-height:1.25;margin:2px 0 6px}
+.cell ul{list-style:none}
+.cell li{font-size:9.5px;line-height:1.4;color:var(--ink2);padding-left:14px;text-indent:-14px;margin-bottom:2px}
+.cell li b{font-weight:700;color:var(--ink)}
+
+/* colour variants */
+.inv .rowlabel{background:var(--inv)} .inv .cell{border-top:3px solid var(--inv)} .inv .code{color:var(--inv)}
+.hos .rowlabel{background:var(--hos)} .hos .cell{border-top:3px solid var(--hos)} .hos .code{color:var(--hos)}
+.sh  .rowlabel{background:var(--shared)} .sh .cell{border-top:3px solid var(--shared);background:var(--shared-bg)} .sh .code{color:var(--shared)}
+
+.phasebar{display:grid;grid-template-columns:34px repeat(8,1fr);gap:4px;margin-bottom:5px}
+.phasebar div{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);text-align:center;padding:4px 2px;background:var(--bg);border:1px solid var(--line)}
+.phasebar .sp{background:transparent;border:none}
+
+.marker{display:grid;grid-template-columns:34px repeat(8,1fr);gap:4px;margin:5px 0}
+.marker .sp{grid-column:1}
+.mv{font-size:9.5px;font-weight:700;text-align:center;padding:4px;letter-spacing:.04em}
+.mv.i{background:var(--inv-bg);color:var(--inv)}
+.mv.h{background:var(--hos-bg);color:var(--hos)}
+
+.note{font-size:10px;color:var(--ink2);font-style:italic;margin:5px 0 0;line-height:1.5}
+
+/* feedback loop banner */
+.loop{
+  margin:14px 0;border:1px dashed var(--inv);background:#F7FAFB;padding:9px 14px;
+  font-size:10.5px;line-height:1.5;color:var(--inv);font-weight:600;
+}
+.loop span{color:var(--hos)}
+
+/* support */
+.suphead{display:flex;align-items:center;gap:10px;margin:22px 0 8px}
+.suphead .tag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--sup);padding:5px 11px}
+.suphead .d{font-size:10.5px;color:var(--ink2)}
+.supgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sb{border:1px solid var(--line);background:var(--sup-bg);padding:8px 10px}
+.sb h5{font-size:10.5px;margin-bottom:3px}
+.sb p{font-size:9.5px;line-height:1.4;color:var(--ink2)}
+.sb.diff{background:#FFF6DA;border-color:#D9C177}
+.sb.diff h5:after{content:" ◆";color:#B9932B}
+
+.gov{margin-top:8px;border-left:3px solid #8E2F4C;background:#FBF3F5;padding:8px 12px;font-size:10px;line-height:1.5;color:var(--ink)}
+
+.ft{margin-top:20px;border-top:1px solid var(--line);padding-top:9px;display:flex;justify-content:space-between;gap:24px;font-size:9px;color:var(--ink2);line-height:1.6}
+.lg{display:flex;gap:14px;flex-wrap:wrap}
+.lg i{width:9px;height:9px;display:inline-block;margin-right:4px;vertical-align:-1px}
+
+@media print{@page{size:A3 landscape;margin:7mm}body{background:#fff;padding:0;font-size:10px}.sheet{border:0;padding:0;max-width:none}}
+@media(max-width:1200px){.grid,.phasebar,.marker{grid-template-columns:1fr 1fr}.rowlabel{writing-mode:horizontal-tb;transform:none;padding:6px}.basis,.supgrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="hd">
+  <div>
+    <div class="eb">Flamingo Group · Value Configuration Analysis · Bản hiệu chỉnh v2</div>
+    <h1>Chuỗi giá trị Tập đoàn — 2 cấu hình giá trị song song</h1>
+  </div>
+  <div class="meta">
+    Cấu trúc mã hóa theo mô hình Halcom<br>
+    Nền lý thuyết: Porter (1985) · Stabell &amp; Fjeldstad (1998) · Mercer OD · SHRM BASK<br>
+    Bản làm việc nội bộ — 2026
+  </div>
+</div>
+
+<div class="basis">
+  <div><b>Nguyên lý 1 — Porter (1985)</b><p>Value chain được vẽ ở cấp <b>Business Unit</b>. Doanh nghiệp đa ngành có nhiều chuỗi song song; Tập đoàn tạo giá trị qua <i>linkages</i> giữa các chuỗi.</p></div>
+  <div><b>Nguyên lý 2 — Stabell &amp; Fjeldstad (1998)</b><p>Mảng Đầu tư = <b>Value Chain</b> (chuyển hóa tuần tự, biên lợi nhuận một lần). Mảng Khách sạn = <b>Value Network</b> (trung gian kết nối, dựa trên công suất, doanh thu định kỳ). Hai logic kinh tế khác nhau.</p></div>
+  <div><b>Nguyên lý 3 — Mercer OD</b><p>Phân loại năng lực: <b>Differentiating ◆</b> (tạo lợi thế) / Enabling / Essential. Chỉ năng lực Differentiating mới được đặt trong chuỗi chính hoặc giữ in-house.</p></div>
+  <div><b>Nguyên lý 4 — Halcom</b><p>Mã hóa bước (I1–I8 / H1–H8) và tiểu quy trình (1.1, 1.2…) để chuỗi trở thành <b>process architecture</b> dùng được cho RACI, định biên và đo lường.</p></div>
+</div>
+
+<!-- ============ PHASE HEADER ============ -->
+<div class="phasebar">
+  <div class="sp"></div>
+  <div>Giai đoạn 1<br>Định hướng thị trường</div>
+  <div>Giai đoạn 2<br>Định vị</div>
+  <div>Giai đoạn 3<br>Tạo lập cơ hội</div>
+  <div>Giai đoạn 4<br>Nguồn lực</div>
+  <div>Giai đoạn 5<br>Kiến tạo / Cung cấp</div>
+  <div>Giai đoạn 6<br>Thương mại hóa</div>
+  <div>Giai đoạn 7<br>Khai thác &amp; Tài sản</div>
+  <div>Giai đoạn 8<br>Xuyên suốt</div>
+</div>
+
+<!-- ============ SHARED TOP: 2 bước hội tụ đầu chuỗi ============ -->
+<div class="grid sh">
+  <div class="rowlabel">DÙNG CHUNG</div>
+  <div class="cell">
+    <div class="code">I1 &amp; H1</div>
+    <h3>Nghiên cứu &amp; Phát triển thị trường</h3>
+    <ul>
+      <li><b>1.1</b> Thu thập, phân tích dữ liệu thị trường BĐS nghỉ dưỡng &amp; xu hướng du lịch</li>
+      <li><b>1.2</b> Tìm kiếm &amp; đánh giá cơ hội: quỹ đất, điểm đến, phân khúc mới</li>
+      <li><b>1.3</b> Phân tích đối thủ &amp; benchmark chỉ số ngành</li>
+      <li><b>1.4</b> Xác định thị trường chiến lược &amp; khẩu vị rủi ro</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">I2 &amp; H2</div>
+    <h3>Định vị thương hiệu &amp; Marketing</h3>
+    <ul>
+      <li><b>2.1</b> Định vị thương hiệu Flamingo &amp; concept "Điểm đến"</li>
+      <li><b>2.2</b> Xác định thị trường mục tiêu kép: nhà đầu tư BĐS &amp; khách du lịch</li>
+      <li><b>2.3</b> Phát triển khách hàng &amp; hệ đối tác</li>
+      <li><b>2.4</b> Phát triển ý tưởng sản phẩm (BĐS + dịch vụ) làm đầu vào cho thiết kế</li>
+    </ul>
+  </div>
+  <div class="cell" style="grid-column:4 / span 5;background:#FBFAF4;border-top-color:#D6CDA8">
+    <div class="code">GHI CHÚ THIẾT KẾ</div>
+    <h3>Vì sao 2 bước đầu phải dùng chung — và phải đứng trước Thiết kế</h3>
+    <ul>
+      <li>Trong BĐS nghỉ dưỡng, <b>sản phẩm bán</b> (căn hộ/villa) và <b>sản phẩm dịch vụ</b> (lưu trú, F&amp;B, giải trí) được bán cho hai nhóm khách khác nhau nhưng dựa trên <b>cùng một concept điểm đến</b>. Tách rời hai chuỗi ngay từ đầu sẽ tạo ra hai định vị mâu thuẫn.</li>
+      <li>Đây là điểm hiệu chỉnh quan trọng nhất so với bản cũ: bản cũ đặt <b>Tiếp thị ở bước 5</b>, tức sau khi đã Thiết kế và Xây dựng xong. Marketing khi đó chỉ còn vai trò bán cái đã làm, không còn vai trò định hình cái sẽ làm.</li>
+      <li>Nguyên lý Halcom: <b>I2 Marketing đứng trước I3 Đề xuất dự án</b> — thị trường quyết định dự án, không phải ngược lại.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ ROW: ĐẦU TƯ ============ -->
+<div class="grid inv" style="margin-top:10px">
+  <div class="rowlabel">MẢNG ĐẦU TƯ · VALUE CHAIN</div>
+  <div class="cell" style="background:#F4F8FA;opacity:.55">
+    <div class="code">↑ I1</div>
+    <h3 style="font-size:10px">Dùng chung ở trên</h3>
+  </div>
+  <div class="cell" style="background:#F4F8FA;opacity:.55">
+    <div class="code">↑ I2</div>
+    <h3 style="font-size:10px">Dùng chung ở trên</h3>
+  </div>
+  <div class="cell">
+    <div class="code">I3</div>
+    <h3>Đề xuất dự án · M&amp;A · Quỹ đất</h3>
+    <ul>
+      <li><b>I3.1</b> Lập báo cáo tiền khả thi, thẩm định NPV/IRR</li>
+      <li><b>I3.2</b> Sàng lọc, định giá, đàm phán M&amp;A / sang nhượng dự án</li>
+      <li><b>I3.3</b> Thủ tục chủ trương đầu tư, quy hoạch, giao đất</li>
+      <li><b>I3.4</b> Giải phóng mặt bằng &amp; quản lý tài nguyên đất</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">I4</div>
+    <h3>Huy động vốn &amp; Cấu trúc tài chính</h3>
+    <ul>
+      <li><b>I4.1</b> Đối tác / liên doanh / hợp tác đầu tư</li>
+      <li><b>I4.2</b> Ngân hàng &amp; tín dụng dự án</li>
+      <li><b>I4.3</b> Nhà đầu tư tổ chức, trái phiếu, quỹ</li>
+      <li><b>I4.4</b> Thiết kế cấu trúc vốn, dòng tiền dự án, mô hình SPV</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">I5</div>
+    <h3>Thực hiện dự án</h3>
+    <ul>
+      <li><b>I5.1</b> Quy hoạch 1/500, concept kiến trúc, thiết kế cảnh quan</li>
+      <li><b>I5.2</b> Cung ứng: đấu thầu, hợp đồng khung, chuỗi cung ứng vật tư</li>
+      <li><b>I5.3</b> Lập BQLDA, triển khai gói thầu, giám sát thi công</li>
+      <li><b>I5.4</b> Kiểm soát chi phí – tiến độ – chất lượng – an toàn</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">I6</div>
+    <h3>Kinh doanh &amp; Hoàn thành dự án</h3>
+    <ul>
+      <li><b>I6.1</b> Bán hàng, quản lý đại lý, chính sách giá</li>
+      <li><b>I6.2</b> Thu hồi công nợ, cân đối dư nợ dự án</li>
+      <li><b>I6.3</b> Bàn giao sản phẩm, thủ tục Giấy chứng nhận</li>
+      <li><b>I6.4</b> Nghiệm thu, hoàn công, quyết toán hợp đồng</li>
+    </ul>
+  </div>
+  <div class="cell" style="background:#F4F8FA;opacity:.55">
+    <div class="code">↓ I7</div>
+    <h3 style="font-size:10px">Dùng chung ở dưới</h3>
+  </div>
+  <div class="cell" style="background:#F4F8FA;opacity:.55">
+    <div class="code">↓ I8</div>
+    <h3 style="font-size:10px">Dùng chung ở dưới</h3>
+  </div>
+</div>
+
+<div class="marker">
+  <div class="sp"></div>
+  <div style="grid-column:4 / span 4" class="mv i">ĐIỂM BẮT GIÁ TRỊ (MARGIN) — Doanh thu bán hàng một lần · Chênh lệch giá trị đất &amp; giá trị phát triển · Logic: thời gian quay vòng vốn &amp; IRR dự án</div>
+</div>
+
+<!-- ============ ROW: KHÁCH SẠN ============ -->
+<div class="grid hos" style="margin-top:14px">
+  <div class="rowlabel">MẢNG KHÁCH SẠN · VALUE NETWORK</div>
+  <div class="cell" style="background:#FBF5F7;opacity:.55">
+    <div class="code">↑ H1</div>
+    <h3 style="font-size:10px">Dùng chung ở trên</h3>
+  </div>
+  <div class="cell" style="background:#FBF5F7;opacity:.55">
+    <div class="code">↑ H2</div>
+    <h3 style="font-size:10px">Dùng chung ở trên</h3>
+  </div>
+  <div class="cell">
+    <div class="code">H3</div>
+    <h3>Thiết kế dịch vụ &amp; Chuẩn vận hành</h3>
+    <ul>
+      <li><b>H3.1</b> Thiết kế danh mục dịch vụ: lưu trú, F&amp;B, onsen–spa, giải trí, MICE</li>
+      <li><b>H3.2</b> Bộ tiêu chuẩn dịch vụ &amp; SOP theo hạng sao</li>
+      <li><b>H3.3</b> Quyết định mô hình khai thác: tự vận hành / thuê thương hiệu quản lý / nhượng quyền</li>
+      <li><b>H3.4</b> Tuyển dụng &amp; đào tạo đội ngũ dịch vụ (năng lực khác biệt hóa ◆)</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">H4</div>
+    <h3>Xây dựng &amp; Vận hành mạng lưới kênh</h3>
+    <ul>
+      <li><b>H4.1</b> Kết nối OTA, đại lý lữ hành, đối tác quốc tế</li>
+      <li><b>H4.2</b> Khách đoàn, MICE, sự kiện, hợp đồng doanh nghiệp</li>
+      <li><b>H4.3</b> Bán trực tiếp: website, tổng đài, ứng dụng, khách nội bộ hệ sinh thái</li>
+      <li><b>H4.4</b> Quản trị hợp đồng &amp; hoa hồng kênh phân phối</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">H5</div>
+    <h3>Cung cấp dịch vụ (Service Delivery)</h3>
+    <ul>
+      <li><b>H5.1</b> Đón tiếp, lưu trú, buồng phòng, concierge</li>
+      <li><b>H5.2</b> F&amp;B: nhà hàng, bar, banquet, tiệc sự kiện</li>
+      <li><b>H5.3</b> Onsen–spa, công viên giải trí, thể thao, hoạt náo</li>
+      <li><b>H5.4</b> Tour tuyến &amp; dịch vụ lữ hành kết nối (FTV)</li>
+      <li><b>H5.5</b> Kỹ thuật, an ninh, vệ sinh, cảnh quan tại cơ sở</li>
+    </ul>
+  </div>
+  <div class="cell">
+    <div class="code">H6</div>
+    <h3>Quản trị doanh thu &amp; Lòng trung thành</h3>
+    <ul>
+      <li><b>H6.1</b> Revenue Management: giá động, phân bổ công suất, ADR/RevPAR</li>
+      <li><b>H6.2</b> Quản trị danh tiếng: đánh giá OTA, mạng xã hội, phản hồi</li>
+      <li><b>H6.3</b> CRM &amp; chương trình khách hàng thân thiết toàn hệ sinh thái</li>
+      <li><b>H6.4</b> Đo lường NPS/CSAT → vòng cải tiến chất lượng dịch vụ</li>
+    </ul>
+  </div>
+  <div class="cell" style="background:#FBF5F7;opacity:.55">
+    <div class="code">↓ H7</div>
+    <h3 style="font-size:10px">Dùng chung ở dưới</h3>
+  </div>
+  <div class="cell" style="background:#FBF5F7;opacity:.55">
+    <div class="code">↓ H8</div>
+    <h3 style="font-size:10px">Dùng chung ở dưới</h3>
+  </div>
+</div>
+
+<div class="marker">
+  <div class="sp"></div>
+  <div style="grid-column:4 / span 4" class="mv h">ĐIỂM BẮT GIÁ TRỊ (MARGIN) — Doanh thu định kỳ theo công suất · Logic value network: giá trị tăng theo quy mô mạng lưới kênh &amp; tệp khách, không theo khối lượng đầu vào</div>
+</div>
+
+<!-- ============ SHARED BOTTOM ============ -->
+<div class="grid sh" style="margin-top:14px">
+  <div class="rowlabel">DÙNG CHUNG</div>
+  <div class="cell" style="grid-column:2 / span 4;background:#FBFAF4;border-top-color:#D6CDA8">
+    <div class="code">GHI CHÚ THIẾT KẾ</div>
+    <h3>Vì sao 2 bước cuối phải dùng chung</h3>
+    <ul>
+      <li><b>I7/H7 — Quản trị tài sản</b> là nơi hai chuỗi giao nhau về mặt sở hữu: tài sản do mảng Đầu tư tạo ra, do mảng Khách sạn khai thác, nhưng quyết định CAPEX cải tạo lại thuộc về Tập đoàn. Nếu tách rời, sẽ phát sinh tranh chấp trách nhiệm về xuống cấp tài sản.</li>
+      <li><b>I8/H8 — Quan hệ các bên liên quan</b> là hoạt động tạo giá trị, không phải hỗ trợ: một mối quan hệ chính quyền phục vụ đồng thời cả cấp phép dự án lẫn giấy phép vận hành cơ sở. Halcom đặt bước này ở cuối, xuyên suốt cả hai dải.</li>
+    </ul>
+  </div>
+  <div class="cell" style="grid-column:6 / span 2">
+    <div class="code">I7 &amp; H7</div>
+    <h3>Quản trị tài sản &amp; Tái đầu tư</h3>
+    <ul>
+      <li><b>7.1</b> Chuyển giao tài sản cho đơn vị/SPV vận hành</li>
+      <li><b>7.2</b> Bảo trì, bảo dưỡng, CAPEX vận hành</li>
+      <li><b>7.3</b> Cải tạo, nâng cấp (renovation) theo chu kỳ</li>
+      <li><b>7.4</b> Theo dõi hiệu quả khai thác, kiểm toán hàng năm</li>
+      <li><b>7.5</b> Quyết định giữ – cho thuê – thoái vốn tài sản</li>
+    </ul>
+  </div>
+  <div class="cell" style="grid-column:8 / span 2">
+    <div class="code">I8 &amp; H8</div>
+    <h3>Quan hệ với các bên liên quan</h3>
+    <ul>
+      <li><b>8.1</b> Quan hệ chính quyền, vận động chính sách, xúc tiến đầu tư</li>
+      <li><b>8.2</b> Quan hệ cộng đồng dân cư &amp; trách nhiệm xã hội tại địa phương</li>
+      <li><b>8.3</b> Quan hệ nhà đầu tư, ngân hàng, cổ đông (IR)</li>
+      <li><b>8.4</b> Quan hệ đối tác thương hiệu quản lý, hãng lữ hành, hàng không</li>
+    </ul>
+  </div>
+</div>
+
+<div class="loop">
+  ⟲ VÒNG PHẢN HỒI (Porter — Linkages): Dữ liệu vận hành từ <span>H6 (NPS, ADR, hành vi khách)</span> và <span>H7 (chi phí vận hành thực tế/m²)</span> phải quay ngược về <b>I1 Nghiên cứu thị trường</b> và <b>I5.1 Thiết kế</b> — đây là cơ chế "design-for-operations". Bản chuỗi giá trị cũ là mũi tên một chiều nên không tồn tại vòng lặp này, dẫn tới tình trạng thiết kế xong mới phát hiện không vận hành được.
+</div>
+
+<!-- ============ SUPPORT ============ -->
+<div class="suphead">
+  <div class="tag">Hoạt động Hỗ trợ</div>
+  <div class="d">Phân loại theo Mercer: <b>◆ Differentiating</b> = năng lực tạo lợi thế cạnh tranh, phải giữ in-house và đầu tư vượt chuẩn · các mục còn lại = Enabling/Essential, ưu tiên chuẩn hóa và tối ưu chi phí (shared service).</div>
+</div>
+<div class="supgrid">
+  <div class="sb diff"><h5>Quản trị nguồn nhân lực dịch vụ</h5><p>Với mảng khách sạn, chất lượng nhân sự tuyến đầu <b>chính là sản phẩm</b> (Service-Profit Chain, Heskett et al. 1994). Đây là năng lực tạo giá trị trực tiếp, không phải back-office.</p></div>
+  <div class="sb diff"><h5>Quản trị vốn &amp; Cấu trúc tài chính</h5><p>Năng lực huy động và cấu trúc vốn quyết định số dự án Flamingo có thể chạy song song — là rào cản gia nhập ngành.</p></div>
+  <div class="sb diff"><h5>Dữ liệu &amp; Công nghệ vận hành</h5><p>PMS/POS/CRM hợp nhất là hạ tầng của value network: giá trị mạng lưới chỉ hiện thực hóa khi dữ liệu khách được dùng chung giữa hai mảng.</p></div>
+  <div class="sb"><h5>Pháp chế &amp; Tuân thủ</h5><p>An toàn pháp lý dự án, hợp đồng thương mại, giấy phép vận hành cơ sở lưu trú.</p></div>
+  <div class="sb"><h5>Tài chính Kế toán vận hành</h5><p>Ngân sách, kế toán quản trị, báo cáo hợp nhất, điều phối dòng tiền tập trung.</p></div>
+  <div class="sb"><h5>Mua sắm &amp; Cung ứng hệ thống</h5><p>Hợp đồng khung, mua tập trung vật tư vận hành, tối ưu chi phí quy mô Tập đoàn.</p></div>
+  <div class="sb"><h5>Hành chính Quản trị</h5><p>Hạ tầng văn phòng, hậu cần, tiện ích hỗ trợ nội bộ.</p></div>
+  <div class="sb"><h5>An ninh &amp; An toàn</h5><p>An ninh dự án, cơ sở lưu trú, an toàn khách hàng và tài sản.</p></div>
+</div>
+
+<div class="gov">
+  <b>QUẢN TRỊ ĐỘC LẬP (báo cáo thẳng Hội đồng Quản trị — theo mô hình Halcom):</b>
+  Ban Kiểm soát Nội bộ (kiểm soát tuân thủ, tài chính, chống gian lận) · Chức năng Liêm chính &amp; Phòng chống tham nhũng (CCP) — đặc biệt trọng yếu với các bước <b>I3 (đất đai, M&amp;A)</b>, <b>I5.2 (đấu thầu)</b> và <b>I8.1 (quan hệ chính quyền)</b> là ba điểm rủi ro liêm chính cao nhất trong chuỗi.
+</div>
+
+<div class="ft">
+  <div class="lg">
+    <span><i style="background:var(--inv)"></i>Mảng Đầu tư — cấu hình Value Chain</span>
+    <span><i style="background:var(--hos)"></i>Mảng Khách sạn — cấu hình Value Network</span>
+    <span><i style="background:var(--shared)"></i>Bước hội tụ dùng chung hai mảng</span>
+    <span><i style="background:#B9932B"></i>◆ Năng lực khác biệt hóa (Mercer)</span>
+  </div>
+  <div style="max-width:520px">Quy tắc đọc sơ đồ: mỗi bước có <b>một chủ sở hữu duy nhất</b>; các bước dùng chung phải có cơ chế quản trị liên mảng (hội đồng/SOP), không được giao cho một mảng tự quyết.</div>
+</div>
+
+</div>
+</body>
+</html>

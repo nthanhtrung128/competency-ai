@@ -1,0 +1,771 @@
+// ============================================================================
+// CompetencyAI API — Prisma schema (GĐ1)
+// Mở rộng từ schema 13 model của bản AI Studio, bổ sung:
+//   - Employee  : tách khỏi User (User = tài khoản đăng nhập, Employee = hồ sơ nhân sự)
+//   - EmployeeAssignment : lịch sử điều chuyển, không ghi đè
+//   - ImportBatch / ImportRow : vùng đệm nhập liệu, cho phép chạy thử trước khi ghi thật
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- ENUM
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum OrgUnitType {
+  GROUP
+  BLOCK
+  DEPARTMENT
+  DIVISION
+  TEAM
+  SUBSIDIARY
+  GOVERNANCE
+  EXECUTIVE
+  SUPPORT
+}
+
+enum VersionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ScopeAccessLevel {
+  READ
+  WRITE
+  APPROVE
+  ADMIN
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  PUBLISH
+  ARCHIVE
+  IMPORT
+  EXPORT
+}
+
+enum CampaignStatus {
+  DRAFT   // đang chuẩn bị: chọn người được đánh giá, người đánh giá
+  OPEN    // đang thu phiếu
+  CLOSED  // đã khoá, dùng kết quả cho 9-Box / IDP
+}
+
+enum RaterRelation {
+  SELF
+  MANAGER
+  PEER
+  DIRECT_REPORT
+  OTHER
+}
+
+enum RaterStatus {
+  PENDING
+  SUBMITTED
+  DECLINED
+}
+
+enum IdpStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum IdpActionType {
+  EXPERIENCE_70 // học qua công việc
+  EXPOSURE_20   // học qua người khác: kèm cặp, shadowing
+  EDUCATION_10  // học chính quy: khoá học, chứng chỉ
+}
+
+enum ActionStatus {
+  PLANNED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum ImportStatus {
+  DRAFT       // đã tải lên, chưa kiểm tra
+  VALIDATED   // đã kiểm tra, có kết quả chạy thử
+  COMMITTED   // đã ghi vào dữ liệu thật
+  CANCELLED
+}
+
+enum ImportRowStatus {
+  OK
+  WARNING
+  ERROR
+  SKIPPED
+}
+
+// ---------------------------------------------------------------- RBAC
+
+model Permission {
+  id     String @id @default(uuid())
+  code   String @unique
+  name   String
+  module String
+  action String
+
+  rolePermissions RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model Role {
+  id          String  @id @default(uuid())
+  code        String  @unique
+  name        String
+  description String?
+  isSystem    Boolean @default(false) @map("is_system")
+
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@map("roles")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId String @map("user_id")
+  roleId String @map("role_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+/// Phạm vi dữ liệu — quyết định user nhìn thấy nhân sự của đơn vị nào
+model UserScope {
+  id             String           @id @default(uuid())
+  userId         String           @map("user_id")
+  orgUnitId      String           @map("org_unit_id")
+  accessLevel    ScopeAccessLevel @default(READ) @map("access_level")
+  includeSubtree Boolean          @default(true) @map("include_subtree")
+  expiresAt      DateTime?        @map("expires_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgUnit OrgUnit @relation(fields: [orgUnitId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgUnitId, accessLevel])
+  @@index([userId])
+  @@map("user_scopes")
+}
+
+/// Tài khoản đăng nhập. KHÁC Employee — không phải nhân sự nào cũng có tài khoản.
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  name         String
+  status       UserStatus @default(ACTIVE)
+  /// QĐ-07: tài khoản cấp mới / đặt lại → bắt buộc đổi mật khẩu ở lần đăng nhập đầu
+  mustChangePassword Boolean @default(false) @map("must_change_password")
+
+  /// Liên kết tuỳ chọn tới hồ sơ nhân sự
+  employeeId String?   @unique @map("employee_id")
+  employee   Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  userRoles     UserRole[]
+  scopes        UserScope[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]     @relation("AuditActor")
+  importBatches ImportBatch[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ---------------------------------------------------------------- TỔ CHỨC
+
+model OrgUnit {
+  id       String      @id @default(uuid())
+  code     String      @unique
+  name     String
+  nameEn   String?     @map("name_en")
+  type     OrgUnitType @default(DEPARTMENT)
+  tier     Int         @default(0)
+  parentId String?     @map("parent_id")
+  path     String?
+  note     String?
+
+  parent   OrgUnit?  @relation("OrgTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children OrgUnit[] @relation("OrgTree")
+
+  /// Trưởng đơn vị — TÙY CHỌN, khuyết thì hiển thị "Chưa bổ nhiệm"
+  headEmployeeId String?   @map("head_employee_id")
+  headEmployee   Employee? @relation("UnitHead", fields: [headEmployeeId], references: [id], onDelete: SetNull)
+
+  employees   Employee[]           @relation("EmployeeHomeUnit")
+  scopes      UserScope[]
+  assignments EmployeeAssignment[]
+  successionPlans SuccessionPlan[]
+
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@index([tier])
+  @@map("org_units")
+}
+
+// ---------------------------------------------------------------- NHÂN SỰ
+
+model Employee {
+  id           String           @id @default(uuid())
+  employeeCode String           @unique @map("employee_code")
+  fullName     String           @map("full_name")
+  email        String?          @unique
+  phone        String?
+  status       EmploymentStatus @default(ACTIVE)
+  hireDate     DateTime?        @map("hire_date")
+  jobTitle     String?          @map("job_title")
+
+  orgUnitId String?  @map("org_unit_id")
+  orgUnit   OrgUnit? @relation("EmployeeHomeUnit", fields: [orgUnitId], references: [id], onDelete: SetNull)
+
+  jobRoleCode  String? @map("job_role_code")
+  jobLevelCode String? @map("job_level_code")
+  gradeCode    String? @map("grade_code")
+
+  managerId String?    @map("manager_id")
+  manager   Employee?  @relation("ReportsTo", fields: [managerId], references: [id], onDelete: SetNull)
+  reports   Employee[] @relation("ReportsTo")
+
+  headOfUnits OrgUnit[]            @relation("UnitHead")
+  user        User?
+  assignments EmployeeAssignment[]
+  importRows  ImportRow[]
+
+  assessmentParticipations AssessmentParticipant[]
+  raterAssignments         AssessmentRater[]
+  talentReviews            TalentReview[]
+  idpPlans                 IdpPlan[]
+  successionHeld           SuccessionPlan[]      @relation("SuccessionIncumbent")
+  successionCandidacies    SuccessionCandidate[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([orgUnitId])
+  @@index([managerId])
+  @@index([status])
+  @@map("employees")
+}
+
+/// Lịch sử điều chuyển — mỗi lần đổi đơn vị/chức danh tạo bản ghi mới, KHÔNG ghi đè
+model EmployeeAssignment {
+  id            String    @id @default(uuid())
+  employeeId    String    @map("employee_id")
+  orgUnitId     String    @map("org_unit_id")
+  jobTitle      String?   @map("job_title")
+  jobRoleCode   String?   @map("job_role_code")
+  effectiveFrom DateTime  @map("effective_from")
+  effectiveTo   DateTime? @map("effective_to")
+  source        String? // MANUAL | IMPORT:<batchId>
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  orgUnit  OrgUnit  @relation(fields: [orgUnitId], references: [id], onDelete: Restrict)
+
+  @@index([employeeId, effectiveFrom])
+  @@map("employee_assignments")
+}
+
+// ---------------------------------------------------------------- NHẬP LIỆU
+
+/// Một lần tải file lên. Dữ liệu nằm ở vùng đệm cho tới khi bấm ghi thật.
+model ImportBatch {
+  id           String       @id @default(uuid())
+  fileName     String       @map("file_name")
+  entityType   String       @map("entity_type") // EMPLOYEE | ORG_UNIT
+  status       ImportStatus @default(DRAFT)
+  totalRows    Int          @default(0) @map("total_rows")
+  okRows       Int          @default(0) @map("ok_rows")
+  warningRows  Int          @default(0) @map("warning_rows")
+  errorRows    Int          @default(0) @map("error_rows")
+  createdRows  Int          @default(0) @map("created_rows")
+  updatedRows  Int          @default(0) @map("updated_rows")
+  validatedAt  DateTime?    @map("validated_at")
+  committedAt  DateTime?    @map("committed_at")
+
+  uploadedById String? @map("uploaded_by_id")
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  rows ImportRow[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([status])
+  @@map("import_batches")
+}
+
+model ImportRow {
+  id          String          @id @default(uuid())
+  batchId     String          @map("batch_id")
+  rowNumber   Int             @map("row_number")
+  raw         Json // nguyên văn dòng CSV
+  normalized  Json? // sau khi chuẩn hoá
+  status      ImportRowStatus @default(OK)
+  messages    Json? // danh sách cảnh báo / lỗi
+  action      String? // CREATE | UPDATE | SKIP
+  employeeId  String?         @map("employee_id")
+
+  batch    ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  employee Employee?   @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@index([batchId, status])
+  @@map("import_rows")
+}
+
+// ---------------------------------------------------------------- NĂNG LỰC
+
+model CompetencyCategory {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  name         String
+  scored       Boolean      @default(true)
+  note         String?
+  displayOrder Int          @default(0) @map("display_order")
+  competencies Competency[]
+
+  @@map("competency_categories")
+}
+
+model ProficiencyScale {
+  id         String  @id @default(uuid())
+  code       String  @unique
+  name       String
+  levelCount Int     @default(5) @map("level_count")
+  isDefault  Boolean @default(false) @map("is_default")
+
+  levels       ProficiencyLevel[]
+  competencies Competency[]
+
+  @@map("proficiency_scales")
+}
+
+model ProficiencyLevel {
+  id          String @id @default(uuid())
+  scaleId     String @map("scale_id")
+  levelNumber Int    @map("level_number")
+  label       String
+  description String?
+
+  scale ProficiencyScale @relation(fields: [scaleId], references: [id], onDelete: Cascade)
+
+  @@unique([scaleId, levelNumber])
+  @@map("proficiency_levels")
+}
+
+model Competency {
+  id          String  @id @default(uuid())
+  code        String  @unique
+  name        String
+  nameEn      String? @map("name_en")
+  definition  String?
+  derivedFrom String? @map("derived_from")
+  domainName  String? @map("domain_name")
+  owningUnit  String? @map("owning_unit")
+  hasOwner    Boolean @default(true) @map("has_owner")
+  dataGap     String? @map("data_gap")
+
+  categoryId String             @map("category_id")
+  category   CompetencyCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  scaleId String?           @map("scale_id")
+  scale   ProficiencyScale? @relation(fields: [scaleId], references: [id], onDelete: SetNull)
+
+  currentVersionId String?             @unique @map("current_version_id")
+  versions         CompetencyVersion[]
+  roleRequirements JobRoleRequirement[]
+  assessmentScores AssessmentScore[]
+  idpGoals         IdpGoal[]
+
+  isActive Boolean @default(true) @map("is_active")
+
+  @@index([categoryId])
+  @@map("competencies")
+}
+
+model CompetencyVersion {
+  id           String        @id @default(uuid())
+  competencyId String        @map("competency_id")
+  version      Int           @default(1)
+  status       VersionStatus @default(DRAFT)
+  title        String
+  definition   String
+  levels       Json
+  publishedAt  DateTime?     @map("published_at")
+  archivedAt   DateTime?     @map("archived_at")
+
+  competency Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([competencyId, version])
+  @@index([status])
+  @@map("competency_versions")
+}
+
+// ---------------------------------------------------------------- JOB ARCHITECTURE
+// Function → Job Family → Job Role × Job Level → yêu cầu năng lực.
+// Nguồn: Sổ tay Khung năng lực, sheet 04_Job Architecture & 05_Ma trận Vai trò×NL.
+
+model JobFamily {
+  id           String  @id @default(uuid())
+  code         String  @unique
+  name         String
+  jobFunction  String? @map("job_function")
+  careerStream String? @map("career_stream")
+  description  String?
+  valueStages  String? @map("value_stages")
+  isActive     Boolean @default(true) @map("is_active")
+
+  roles JobRole[]
+
+  @@map("job_families")
+}
+
+model JobLevel {
+  id           String  @id @default(uuid())
+  code         String  @unique // L1..L6
+  name         String
+  grade        String? // Ngạch
+  careerLevel  String? @map("career_level")
+  contribution String?
+  scope        String?
+  requiredBand Json?   @map("required_band")
+  displayOrder Int     @default(0) @map("display_order")
+
+  roles JobRole[]
+
+  @@map("job_levels")
+}
+
+model JobRole {
+  id           String  @id @default(uuid())
+  code         String  @unique // R01..R26
+  title        String
+  titleEn      String? @map("title_en")
+  careerStream String? @map("career_stream")
+  isActive     Boolean @default(true) @map("is_active")
+
+  jobFamilyId String?    @map("job_family_id")
+  jobFamily   JobFamily? @relation(fields: [jobFamilyId], references: [id], onDelete: SetNull)
+  jobLevelId  String?    @map("job_level_id")
+  jobLevel    JobLevel?  @relation(fields: [jobLevelId], references: [id], onDelete: SetNull)
+
+  requirements JobRoleRequirement[]
+
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("job_roles")
+}
+
+/// Yêu cầu năng lực của một vai trò.
+/// sourceLabel = mã/tên gốc trong Sổ tay (VAL01, COR02, "Thẩm định đầu tư"...).
+/// competencyId = năng lực tương ứng trong Từ điển 57 NL — có thể NULL nếu chưa đối chiếu được.
+/// mappingStatus: PROPOSED (máy đối chiếu theo tên, chờ duyệt) | APPROVED | UNMAPPED
+model JobRoleRequirement {
+  id                String  @id @default(uuid())
+  jobRoleId         String  @map("job_role_id")
+  sourceLabel       String  @map("source_label")
+  competencyId      String? @map("competency_id")
+  requiredLevel     Int     @map("required_level")
+  mappingStatus     String  @default("PROPOSED") @map("mapping_status")
+  mappingConfidence String? @map("mapping_confidence")
+  note              String?
+
+  jobRole    JobRole     @relation(fields: [jobRoleId], references: [id], onDelete: Cascade)
+  competency Competency? @relation(fields: [competencyId], references: [id], onDelete: SetNull)
+
+  @@unique([jobRoleId, sourceLabel])
+  @@index([competencyId])
+  @@map("job_role_requirements")
+}
+
+// ---------------------------------------------------------------- ĐÁNH GIÁ 360° (QĐ-06)
+
+model AssessmentCampaign {
+  id          String         @id @default(uuid())
+  code        String         @unique
+  name        String
+  description String?
+  status      CampaignStatus @default(DRAFT)
+  startDate   DateTime?      @map("start_date")
+  endDate     DateTime?      @map("end_date")
+  /// Danh sách mã năng lực được đánh giá, vd ["CO1",..,"LE6"]
+  competencyCodes Json @map("competency_codes")
+  /// Khi mở chiến dịch: chốt phiên bản năng lực đang hiệu lực [{code, competencyId, versionId}]
+  snapshot        Json?
+  /// Nhóm Đồng nghiệp / Cấp dưới chỉ hiện điểm khi có ít nhất N người trả lời (bảo vệ ẩn danh)
+  minRatersForAnonymity Int @default(3) @map("min_raters_for_anonymity")
+
+  createdByEmail String? @map("created_by_email")
+  participants   AssessmentParticipant[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("assessment_campaigns")
+}
+
+model AssessmentParticipant {
+  id         String @id @default(uuid())
+  campaignId String @map("campaign_id")
+  employeeId String @map("employee_id")
+
+  campaign AssessmentCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  employee Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  raters   AssessmentRater[]
+
+  @@unique([campaignId, employeeId])
+  @@map("assessment_participants")
+}
+
+model AssessmentRater {
+  id              String        @id @default(uuid())
+  participantId   String        @map("participant_id")
+  raterEmployeeId String?       @map("rater_employee_id")
+  /// Nhãn khi phiếu nhập hộ không gắn được hồ sơ (vd "Phiếu cấp dưới #3")
+  raterLabel      String?       @map("rater_label")
+  relation        RaterRelation
+  status          RaterStatus   @default(PENDING)
+  submittedAt     DateTime?     @map("submitted_at")
+  /// APP = người đánh giá tự nhập · IMPORT = HR nhập hộ từ file
+  source          String        @default("APP")
+  enteredByEmail  String?       @map("entered_by_email")
+
+  participant   AssessmentParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  raterEmployee Employee?             @relation(fields: [raterEmployeeId], references: [id], onDelete: SetNull)
+  scores        AssessmentScore[]
+
+  @@index([raterEmployeeId])
+  @@index([participantId])
+  @@map("assessment_raters")
+}
+
+model AssessmentScore {
+  id           String  @id @default(uuid())
+  raterId      String  @map("rater_id")
+  competencyId String  @map("competency_id")
+  versionId    String? @map("version_id")
+  /// 1..5; NULL = "không đủ cơ sở quan sát"
+  level        Int?
+  evidence     String?
+
+  rater      AssessmentRater @relation(fields: [raterId], references: [id], onDelete: Cascade)
+  competency Competency      @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  @@unique([raterId, competencyId])
+  @@map("assessment_scores")
+}
+
+// ---------------------------------------------------------------- 9-BOX (QĐ-06)
+
+model TalentReview {
+  id          String  @id @default(uuid())
+  cycle       String // vd "2026"
+  employeeId  String  @map("employee_id")
+  performance Int // 1 Thấp · 2 Đạt · 3 Cao
+  potential   Int // 1 Thấp · 2 Trung bình · 3 Cao
+  box         Int // 1..9 = (potential-1)*3 + performance
+  /// Gợi ý tiềm năng từ điểm 360° nhóm Lãnh đạo (tham khảo, không tự áp)
+  suggestedPotential Int?    @map("suggested_potential")
+  sourceCampaignId   String? @map("source_campaign_id")
+  notes              String?
+  calibrated         Boolean @default(false)
+  reviewedByEmail    String? @map("reviewed_by_email")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([cycle, employeeId])
+  @@map("talent_reviews")
+}
+
+// ---------------------------------------------------------------- IDP (QĐ-06)
+
+model IdpPlan {
+  id               String    @id @default(uuid())
+  employeeId       String    @map("employee_id")
+  cycle            String
+  status           IdpStatus @default(DRAFT)
+  targetRoleCode   String?   @map("target_role_code")
+  sourceCampaignId String?   @map("source_campaign_id")
+  notes            String?
+  createdByEmail   String?   @map("created_by_email")
+  approvedByEmail  String?   @map("approved_by_email")
+  approvedAt       DateTime? @map("approved_at")
+
+  employee Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  goals    IdpGoal[]
+  checkIns IdpCheckIn[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([employeeId, cycle])
+  @@map("idp_plans")
+}
+
+model IdpGoal {
+  id           String  @id @default(uuid())
+  planId       String  @map("plan_id")
+  competencyId String  @map("competency_id")
+  currentLevel Float?  @map("current_level")
+  targetLevel  Int     @map("target_level")
+  /// GAP_360 = sinh từ khoảng cách kết quả 360° · MANUAL = nhập tay
+  source       String  @default("MANUAL")
+
+  plan       IdpPlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  competency Competency  @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  actions    IdpAction[]
+
+  @@unique([planId, competencyId])
+  @@map("idp_goals")
+}
+
+model IdpAction {
+  id       String        @id @default(uuid())
+  goalId   String        @map("goal_id")
+  type     IdpActionType
+  title    String
+  dueDate  DateTime?     @map("due_date")
+  status   ActionStatus  @default(PLANNED)
+  evidence String?
+
+  goal IdpGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@map("idp_actions")
+}
+
+model IdpCheckIn {
+  id          String   @id @default(uuid())
+  planId      String   @map("plan_id")
+  authorEmail String   @map("author_email")
+  content     String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  plan IdpPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@map("idp_check_ins")
+}
+
+// ---------------------------------------------------------------- KẾ THỪA (QĐ-21)
+
+/// Vị trí then chốt cần kế hoạch kế thừa
+model SuccessionPlan {
+  id                  String  @id @default(uuid())
+  positionTitle       String  @map("position_title")
+  orgUnitId           String? @map("org_unit_id")
+  jobRoleCode         String? @map("job_role_code")
+  incumbentEmployeeId String? @map("incumbent_employee_id")
+  /// CRITICAL | HIGH | MEDIUM — mức trọng yếu của vị trí
+  criticality         String  @default("HIGH")
+  /// LOW | MEDIUM | HIGH — rủi ro vị trí bị trống trong 12 tháng
+  vacancyRisk         String? @map("vacancy_risk")
+  notes               String?
+  createdByEmail      String? @map("created_by_email")
+
+  orgUnit    OrgUnit?              @relation(fields: [orgUnitId], references: [id], onDelete: SetNull)
+  incumbent  Employee?             @relation("SuccessionIncumbent", fields: [incumbentEmployeeId], references: [id], onDelete: SetNull)
+  candidates SuccessionCandidate[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("succession_plans")
+}
+
+model SuccessionCandidate {
+  id         String  @id @default(uuid())
+  planId     String  @map("plan_id")
+  employeeId String  @map("employee_id")
+  /// READY_NOW | READY_1_2Y | READY_3Y
+  readiness  String
+  /// LOW | MEDIUM | HIGH — rủi ro mất ứng viên
+  riskOfLoss String  @default("MEDIUM") @map("risk_of_loss")
+  notes      String?
+
+  plan     SuccessionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  employee Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([planId, employeeId])
+  @@map("succession_candidates")
+}
+
+// ---------------------------------------------------------------- AUDIT
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  action     AuditAction
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id")
+  entityName String?     @map("entity_name")
+  actorId    String?     @map("actor_id")
+  actorEmail String?     @map("actor_email")
+  oldValues  Json?       @map("old_values")
+  newValues  Json?       @map("new_values")
+  timestamp  DateTime    @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}

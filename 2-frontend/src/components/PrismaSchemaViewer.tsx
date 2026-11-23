@@ -1,0 +1,524 @@
+import React, { useState } from 'react';
+import { Copy, Check, FileCode, KeyRound, ArrowRightLeft, ShieldCheck, History, Lock, Sliders } from 'lucide-react';
+
+const SCHEMA_TEXT = `// packages/db/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum OrgUnitType {
+  COMPANY
+  DIVISION
+  DEPARTMENT
+  TEAM
+  UNIT
+}
+
+enum VersionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DEPRECATED
+}
+
+enum ScopeAccessLevel {
+  READ      // Read-only access to records within the OrgUnit scope
+  WRITE     // Create and modify operational data within the OrgUnit scope
+  APPROVE   // Ability to evaluate, assess, and sign-off on competency and staff reviews
+  ADMIN     // Full administrative control over unit configuration and subordinates
+}
+
+enum ScaleType {
+  STANDARD      // Standard enterprise framework (e.g. FLA-5 5-Level Standard)
+  CUSTOM        // Specialized or tailored variant scale
+  LEVEL         // Individual proficiency level node within scale hierarchy
+  BENCHMARK     // Benchmark reference scale for talent calibration
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  ROLE_ASSIGNED
+  ROLE_REVOKED
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+  SCOPE_GRANTED
+  SCOPE_REVOKED
+  SCALE_CREATED
+  SCALE_UPDATED
+  STATUS_CHANGE
+  PUBLISH
+  ARCHIVE
+}
+
+enum LogStatus {
+  SUCCESS
+  FAILURE
+  WARNING
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  code            String           @unique // e.g. "users:create", "org:manage", "competency:publish"
+  name            String
+  description     String?
+  module          String           // e.g. "USERS", "ROLES", "ORG_UNITS", "COMPETENCIES", "AUDIT"
+  action          String           // e.g. "CREATE", "READ", "UPDATE", "DELETE", "PUBLISH", "MANAGE"
+  
+  // Many-to-Many via RolePermission join table
+  rolePermissions RolePermission[]
+  
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([module])
+  @@index([code])
+  @@map("permissions")
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  code            String           @unique // e.g. "SUPER_ADMIN", "ORG_ADMIN", "HR_SPECIALIST", "EMPLOYEE"
+  name            String
+  description     String?
+  isSystem        Boolean          @default(false) @map("is_system") // Prevents deletion of core system roles
+  
+  // Relations to Permissions (RBAC)
+  rolePermissions RolePermission[]
+
+  // Relations to Users (Supports Multi-Role via UserRole and primary role fallback)
+  userRoles       UserRole[]
+  primaryUsers    User[]           @relation("UserPrimaryRole")
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@map("roles")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String     @map("role_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String     @map("permission_id")
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  grantedAt    DateTime   @default(now()) @map("granted_at")
+  grantedById  String?    @map("granted_by_id")
+
+  @@unique([roleId, permissionId], name: "role_permission_unique")
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId       String    @map("role_id")
+  role         Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  isPrimary    Boolean   @default(false) @map("is_primary")
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  assignedById String?   @map("assigned_by_id")
+
+  @@unique([userId, roleId], name: "user_role_unique")
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model UserScope {
+  id             String           @id @default(uuid())
+  
+  // User Foreign Key Constraint
+  userId         String           @map("user_id")
+  user           User             @relation("UserOrgScopes", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Target OrgUnit Scope Foreign Key Constraint
+  orgUnitId      String           @map("org_unit_id")
+  orgUnit        OrgUnit          @relation("OrgUnitUserScopes", fields: [orgUnitId], references: [id], onDelete: Cascade)
+
+  // Row-Level Security (RLS) Access Level
+  accessLevel    ScopeAccessLevel @default(READ) @map("access_level")
+
+  // Subtree inheritance: When true, applies RLS permissions recursively down the OrgUnit hierarchy tree
+  includeSubtree Boolean          @default(true) @map("include_subtree")
+
+  // Temporary delegation / expiry control
+  grantedAt      DateTime         @default(now()) @map("granted_at")
+  grantedById    String?          @map("granted_by_id")
+  expiresAt      DateTime?        @map("expires_at")
+
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  @@unique([userId, orgUnitId, accessLevel], name: "user_org_unit_scope_unique")
+  @@index([userId])
+  @@index([orgUnitId])
+  @@index([accessLevel])
+  @@map("user_scopes")
+}
+
+model User {
+  id                 String       @id @default(uuid())
+  email              String       @unique
+  name               String
+  avatarUrl          String?      @map("avatar_url")
+  status             UserStatus   @default(ACTIVE)
+
+  // Primary Role foreign key (Fast RBAC lookup)
+  primaryRoleId      String?      @map("primary_role_id")
+  primaryRole        Role?        @relation("UserPrimaryRole", fields: [primaryRoleId], references: [id], onDelete: SetNull)
+
+  // Multi-Role assignment
+  userRoles          UserRole[]
+
+  // Row-Level Security OrgUnit Scopes
+  scopes             UserScope[]  @relation("UserOrgScopes")
+
+  // Primary Home OrgUnit membership foreign key constraint
+  orgUnitId          String?      @map("org_unit_id")
+  orgUnit            OrgUnit?     @relation("OrgUnitMembers", fields: [orgUnitId], references: [id], onDelete: SetNull)
+
+  // OrgUnits managed by this user
+  managedOrgUnits    OrgUnit[]    @relation("OrgUnitManager")
+
+  // Job Family foreign key constraint
+  jobFamilyId        String?      @map("job_family_id")
+  jobFamily          JobFamily?   @relation(fields: [jobFamilyId], references: [id], onDelete: SetNull)
+
+  // Audit Logs initiated by this user (Actor)
+  auditLogsInitiated AuditLog[]   @relation("AuditLogActor")
+
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  @@index([primaryRoleId])
+  @@index([orgUnitId])
+  @@index([jobFamilyId])
+  @@index([email])
+  @@map("users")
+}
+
+model OrgUnit {
+  id          String      @id @default(uuid())
+  code        String      @unique
+  name        String
+  description String?
+  type        OrgUnitType @default(DEPARTMENT)
+  
+  // Self-referencing tree relationship for Organizational Hierarchy
+  parentId    String?     @map("parent_id")
+  parent      OrgUnit?    @relation("OrgUnitHierarchy", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  children    OrgUnit[]   @relation("OrgUnitHierarchy")
+
+  // Unit Manager foreign key constraint
+  managerId   String?     @map("manager_id")
+  manager     User?       @relation("OrgUnitManager", fields: [managerId], references: [id], onDelete: SetNull)
+
+  // Members belonging to this OrgUnit (Direct Home Unit)
+  members     User[]      @relation("OrgUnitMembers")
+
+  // Row-Level Security (RLS) scopes referencing this unit
+  userScopes  UserScope[] @relation("OrgUnitUserScopes")
+
+  level       Int         @default(1)
+  path        String?     // Materialized path for fast recursive tree queries e.g. "/root/div-1/dept-2"
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@index([managerId])
+  @@index([code])
+  @@map("org_units")
+}
+
+model JobFamily {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  name         String
+  description  String?
+  users        User[]
+  competencies Competency[] @relation("JobFamilyCompetencies")
+  isActive     Boolean      @default(true) @map("is_active")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@map("job_families")
+}
+
+model CompetencyCategory {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  name         String
+  description  String?
+  displayOrder Int          @default(0) @map("display_order")
+  competencies Competency[]
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@map("competency_categories")
+}
+
+model Competency {
+  id               String              @id @default(uuid())
+  code             String              @unique
+  name             String
+  description      String?
+  
+  // Category foreign key constraint
+  categoryId       String              @map("category_id")
+  category         CompetencyCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  // Default / Associated Proficiency Scale (e.g. FLA-5 5-Level Standard)
+  scaleId          String?             @map("scale_id")
+  scale            ProficiencyScale?   @relation(fields: [scaleId], references: [id], onDelete: SetNull)
+
+  // Associated Job Families
+  jobFamilies      JobFamily[]         @relation("JobFamilyCompetencies")
+
+  // Versioning relationship
+  versions         CompetencyVersion[]
+  currentVersionId String?             @map("current_version_id")
+
+  isActive         Boolean             @default(true) @map("is_active")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@index([scaleId])
+  @@index([code])
+  @@map("competencies")
+}
+
+model ProficiencyScale {
+  id               String             @id @default(uuid())
+  code             String             @unique // e.g. "KF_4LEVEL_STD", "KF_L1_BASIC", "KF_L2_PROFICIENT", "KF_L3_ADVANCED", "KF_L4_EXPERT"
+  name             String             // e.g. "FLA-5 5-Level Standard Framework", "Level 1: Basic / Developing"
+  description      String?
+  type             ScaleType          @default(STANDARD)
+
+  // Level specific metrics & FLA-5 labels
+  level            Int?               // 1, 2, 3, 4 (null for root scale definitions)
+  label            String?            // e.g. "Basic / Developing", "Proficient / Skilled", "Advanced / Mastery", "Expert / Benchmark"
+  scoreMin         Float?             @map("score_min") // Minimum rating threshold e.g. 1.00
+  scoreMax         Float?             @map("score_max") // Maximum rating threshold e.g. 1.99
+  behavioralAnchor String?            @map("behavioral_anchor") @db.Text // Observable standard behavioral definition
+
+  // Self-referencing tree relationship for custom scale variants, sub-levels, and FLA-5 level standards
+  parentId         String?            @map("parent_id")
+  parent           ProficiencyScale?  @relation("ProficiencyScaleHierarchy", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  children         ProficiencyScale[] @relation("ProficiencyScaleHierarchy")
+
+  // Relational links to competencies and version snapshots
+  competencies       Competency[]
+  competencyVersions CompetencyVersion[]
+
+  isDefault        Boolean            @default(false) @map("is_default")
+  isActive         Boolean            @default(true) @map("is_active")
+  displayOrder     Int                @default(0) @map("display_order")
+
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@index([code])
+  @@index([type])
+  @@map("proficiency_scales")
+}
+
+model CompetencyVersion {
+  id             String            @id @default(uuid())
+  
+  // Competency foreign key constraint (Cascade delete when competency is removed)
+  competencyId   String            @map("competency_id")
+  competency     Competency        @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  // Explicit scale association per version (allows custom scale evolution across versions)
+  scaleId        String?           @map("scale_id")
+  scale          ProficiencyScale? @relation(fields: [scaleId], references: [id], onDelete: SetNull)
+
+  version        Int               @default(1)
+  status         VersionStatus     @default(DRAFT)
+  title          String
+  definition     String            @db.Text
+  levels         Json              // Array of competency levels (1 to 4/5) with behavioral indicators
+  changeLog      String?           @map("change_log") @db.Text
+  effectiveDate  DateTime?         @map("effective_date")
+  publishedAt    DateTime?         @map("published_at")
+  createdById    String?           @map("created_by_id")
+
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  @@unique([competencyId, version], name: "competency_version_unique")
+  @@index([competencyId])
+  @@index([scaleId])
+  @@index([status])
+  @@map("competency_versions")
+}
+
+model AuditLog {
+  id            String      @id @default(uuid())
+  action        AuditAction
+  entityType    String      @map("entity_type") // e.g. "USER", "ROLE", "PERMISSION", "ORG_UNIT", "USER_SCOPE", "COMPETENCY", "PROFICIENCY_SCALE"
+  entityId      String      @map("entity_id")   // ID of target entity
+  entityName    String?     @map("entity_name") // Optional descriptive title/name for rapid auditing
+  
+  // Actor relationship (User who performed the action)
+  actorId       String?     @map("actor_id")
+  actor         User?       @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actorEmail    String?     @map("actor_email") // Preserves actor email even if user record is removed
+  actorIp       String?     @map("actor_ip")
+  userAgent     String?     @map("user_agent")
+
+  // State Change Snapshots & Diff
+  oldValues     Json?       @map("old_values")
+  newValues     Json?       @map("new_values")
+  diff          Json?       // Structured changes delta: { field: { old: val, new: val } }
+  metadata      Json?       // Additional runtime context (session, route, tenant)
+
+  // Status & Execution tracking
+  status        LogStatus   @default(SUCCESS)
+  failureReason String?     @map("failure_reason") @db.Text
+
+  timestamp     DateTime    @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([action])
+  @@index([status])
+  @@index([timestamp])
+  @@map("audit_logs")
+}`;
+
+export const PrismaSchemaViewer: React.FC = () => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(SCHEMA_TEXT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const fkHighlights = [
+    {
+      source: 'ProficiencyScale (Self-Referencing)',
+      fields: 'parentId ➔ ProficiencyScale.id',
+      relation: 'ProficiencyScaleHierarchy',
+      rule: 'onDelete: Restrict + FLA-5 5-Level standard levels & custom scale derivations',
+      icon: Sliders,
+    },
+    {
+      source: 'UserScope (Row-Level Security RLS)',
+      fields: 'userId ➔ User.id | orgUnitId ➔ OrgUnit.id',
+      relation: '@@unique([userId, orgUnitId, accessLevel])',
+      rule: 'onDelete: Cascade + includeSubtree flag (Enforces scoped data access boundaries with recursive tree evaluation)',
+      icon: Lock,
+    },
+    {
+      source: 'RolePermission (RBAC Join)',
+      fields: 'roleId ➔ Role.id | permissionId ➔ Permission.id',
+      relation: '@@unique([roleId, permissionId])',
+      rule: 'onDelete: Cascade (Pruning a role automatically cleans all its permission bindings)',
+      icon: ShieldCheck,
+    },
+    {
+      source: 'UserRole (Multi-Role Join)',
+      fields: 'userId ➔ User.id | roleId ➔ Role.id',
+      relation: '@@unique([userId, roleId])',
+      rule: 'onDelete: Cascade (Supports multi-role assignments per user with primary flag)',
+      icon: ArrowRightLeft,
+    },
+    {
+      source: 'AuditLog ➔ Actor',
+      fields: 'actorId ➔ User.id',
+      relation: 'AuditLogActor',
+      rule: 'onDelete: SetNull + actorEmail backup (Maintains immutable audit records even if user is deleted)',
+      icon: History,
+    },
+    {
+      source: 'OrgUnit (Self-Referencing)',
+      fields: 'parentId ➔ OrgUnit.id',
+      relation: 'OrgUnitHierarchy',
+      rule: 'onDelete: Restrict (Protects child hierarchy branches from orphaned cascades)',
+      icon: KeyRound,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Foreign Key Constraints Card */}
+      <div id="fk-constraints-card" className="bg-slate-900/40 rounded-xl border border-slate-800 p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <KeyRound className="w-4 h-4 text-amber-400" />
+          <h3 className="text-sm font-semibold text-white">Foreign Key Integrity, RBAC, RLS &amp; Audit Trail Architecture</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+          {fkHighlights.map((fk, idx) => {
+            const Icon = fk.icon;
+            return (
+              <div key={idx} className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-indigo-300 flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                    {fk.source}
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                    {fk.relation}
+                  </span>
+                </div>
+                <p className="text-xs font-mono text-slate-300 bg-slate-900/60 px-2 py-1 rounded">
+                  {fk.fields}
+                </p>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  {fk.rule}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Raw Prisma Schema Box */}
+      <div id="prisma-raw-box" className="rounded-xl border border-slate-800 bg-slate-950 overflow-hidden shadow-lg">
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-900/90 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <FileCode className="w-4 h-4 text-indigo-400" />
+            <span className="text-xs font-mono text-slate-200">packages/db/prisma/schema.prisma</span>
+          </div>
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copied ? 'Copied' : 'Copy Schema'}</span>
+          </button>
+        </div>
+
+        <pre className="p-5 text-xs font-mono text-slate-300 overflow-x-auto max-h-[520px] leading-relaxed selection:bg-indigo-500 selection:text-white">
+          {SCHEMA_TEXT}
+        </pre>
+      </div>
+    </div>
+  );
+};

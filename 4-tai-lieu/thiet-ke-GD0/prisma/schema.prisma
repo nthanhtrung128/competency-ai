@@ -1,0 +1,836 @@
+// ============================================================================
+// CompetencyAI — Trí tuệ Quản trị Nhân tài AI
+// GĐ0 · Lược đồ dữ liệu (Prisma schema là NGUỒN CHÂN LÝ)
+// ============================================================================
+// Tuân thủ 8 Nguyên tắc bất di bất dịch (B.5):
+//  1. Quan hệ bằng khoá ngoại ID thật — không liên kết bằng tên hiển thị
+//  2. Cây tổ chức tự tham chiếu linh hoạt, child.tier > parent.tier
+//  3. Thang thành thục cấu hình được
+//  4. Từ điển năng lực quản trị phiên bản, chỉ báo gắn theo VERSION
+//  5. Điểm số theo lịch sử/kỳ — KHÔNG ghi đè
+//  6. RBAC + data scope + AuditLog
+//  7. Trưởng đơn vị là Employee TÙY CHỌN
+//  8. Hỗ trợ nhiều khung song song (Korn Ferry + KSAO)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum FrameworkType {
+  KORN_FERRY // KFLA: 4 Factor / 12 Cluster / 38 Competency
+  KSAO       // Knowledge / Skill / Ability / Other
+}
+
+/// Vai trò của năng lực khi dựng Success Profile
+enum CompetencyRole {
+  CORE_VALUES // Giá trị cốt lõi — auto gán mọi hồ sơ
+  CORE        // Năng lực cốt lõi — auto gán mọi hồ sơ
+  MANAGEMENT  // Chỉ gán khi vị trí là quản lý
+  FUNCTIONAL  // Gợi ý theo Họ nghề
+  META        // Tuỳ vị trí
+}
+
+/// Vòng đời phiên bản — Nguyên tắc 4
+enum VersionStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+/// Career Level theo Korn Ferry
+enum CareerLevel {
+  ELIC   // Entry Level Individual Contributor
+  MID_SR_IC // Mid to Senior Individual Contributor
+  FLL    // First Line Leader
+  MLL    // Mid Level Leader
+  BUL    // Business Unit Leader
+  SE     // Senior Executive
+}
+
+enum KsaoType {
+  KNOWLEDGE
+  SKILL
+  ABILITY
+  OTHER
+}
+
+/// KF4D — hai chiều được dùng ở GĐ3
+enum Kf4dDimension {
+  TRAIT
+  DRIVER
+}
+
+enum RaterRelation {
+  SELF
+  MANAGER
+  PEER
+  DIRECT_REPORT
+  OTHER
+}
+
+enum CampaignStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  CALIBRATED
+}
+
+enum SubmissionStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  DECLINED
+}
+
+enum ReadinessLevel {
+  READY_NOW
+  READY_1_2Y
+  READY_3_5Y
+  NOT_READY
+}
+
+enum FlightRisk {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  ARCHIVE
+  LOGIN
+  EXPORT
+}
+
+enum AiJobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+// ============================================================================
+// MIỀN 1 — XÁC THỰC & PHÂN QUYỀN
+// ============================================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  employeeId   String?  @unique
+  employee     Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  roles        UserRole[]
+  scopes       UserScope[]
+  refreshTokens RefreshToken[]
+  auditLogs    AuditLog[]
+  aiJobs       AiJob[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, expiresAt])
+}
+
+model Role {
+  id          String @id @default(cuid())
+  code        String @unique // ADMIN | HRBP | LINE_MANAGER | COMP_SPECIALIST | EMPLOYEE
+  name        Json   // LocalizedText { vi, en }
+  description Json?
+  isSystem    Boolean @default(false)
+
+  users       UserRole[]
+  permissions RolePermission[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Permission {
+  id       String @id @default(cuid())
+  code     String @unique // vd: competency.publish, employee.read
+  resource String
+  action   String
+  name     Json
+
+  roles    RolePermission[]
+
+  @@unique([resource, action])
+  @@index([resource])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+/// Phạm vi dữ liệu — Nguyên tắc 6. Người dùng chỉ thấy dữ liệu trong các OrgUnit được cấp.
+model UserScope {
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgUnitId  String
+  orgUnit    OrgUnit @relation(fields: [orgUnitId], references: [id], onDelete: Cascade)
+  includeDescendants Boolean @default(true)
+
+  @@unique([userId, orgUnitId])
+  @@index([orgUnitId])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     AuditAction
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  ipAddress  String?
+  createdAt  DateTime    @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId, createdAt])
+}
+
+// ============================================================================
+// MIỀN 2 — TỔ CHỨC & NHÂN SỰ
+// ============================================================================
+
+/// Nguyên tắc 2: cây tự tham chiếu LINH HOẠT. tier là số nguyên, KHÔNG cố định số tầng.
+/// Ràng buộc child.tier > parent.tier được kiểm tại service layer + DB trigger (migration).
+model OrgUnit {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  name      Json      // LocalizedText
+  tier      Int       // 0 = gốc; con luôn lớn hơn cha
+  unitType  String?   // gợi ý: COMPANY | BLOCK | DEPARTMENT | SECTION — chỉ là nhãn
+  parentId  String?
+  parent    OrgUnit?  @relation("OrgTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children  OrgUnit[] @relation("OrgTree")
+
+  /// Nguyên tắc 7: trưởng đơn vị TÙY CHỌN. Khuyết → hiển thị "Chưa bổ nhiệm".
+  headEmployeeId String?
+  headEmployee   Employee? @relation("UnitHead", fields: [headEmployeeId], references: [id], onDelete: SetNull)
+
+  employees       Employee[]        @relation("EmployeeUnit")
+  scopes          UserScope[]
+  successProfiles SuccessProfile[]
+  calibrations    CalibrationSession[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+  @@index([tier])
+}
+
+model Employee {
+  id           String  @id @default(cuid())
+  employeeCode String  @unique
+  fullName     String
+  email        String? @unique
+  status       EmploymentStatus @default(ACTIVE)
+  hireDate     DateTime?
+
+  orgUnitId    String?
+  orgUnit      OrgUnit? @relation("EmployeeUnit", fields: [orgUnitId], references: [id], onDelete: SetNull)
+
+  /// Vị trí hiện tại — trỏ tới hồ sơ năng lực (Success Profile)
+  successProfileId String?
+  successProfile   SuccessProfile? @relation(fields: [successProfileId], references: [id], onDelete: SetNull)
+
+  managerId    String?
+  manager      Employee?  @relation("ReportsTo", fields: [managerId], references: [id], onDelete: SetNull)
+  reports      Employee[] @relation("ReportsTo")
+
+  headOfUnits  OrgUnit[]  @relation("UnitHead")
+  user         User?
+
+  assignments      EmployeeAssignment[]
+  scoreSnapshots   CompetencyScoreSnapshot[]
+  ratersGiven      RaterAssignment[] @relation("RaterIsEmployee")
+  ratedAs          RaterAssignment[] @relation("SubjectIsEmployee")
+  calibrationRatings CalibrationRating[]
+  successionCandidates SuccessionCandidate[]
+  idps             IdpPlan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgUnitId])
+  @@index([managerId])
+  @@index([status])
+}
+
+/// Lịch sử điều chuyển — không ghi đè vị trí cũ
+model EmployeeAssignment {
+  id               String   @id @default(cuid())
+  employeeId       String
+  employee         Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  orgUnitId        String
+  successProfileId String?
+  effectiveFrom    DateTime
+  effectiveTo      DateTime?
+  note             String?
+  createdAt        DateTime @default(now())
+
+  @@index([employeeId, effectiveFrom])
+}
+
+// ============================================================================
+// MIỀN 3 — TỪ ĐIỂN NĂNG LỰC (Nguyên tắc 4 & 8)
+// ============================================================================
+
+/// Thang thành thục cấu hình được — Nguyên tắc 3
+model ProficiencyScale {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        Json
+  levelCount  Int     // mặc định 4 theo Korn Ferry
+  isDefault   Boolean @default(false)
+
+  levels      ProficiencyLevel[]
+  competencies Competency[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProficiencyLevel {
+  id          String @id @default(cuid())
+  scaleId     String
+  scale       ProficiencyScale @relation(fields: [scaleId], references: [id], onDelete: Cascade)
+  levelNumber Int
+  label       Json   // nhãn tuỳ biến
+  description Json?
+
+  indicators  BehavioralIndicator[]
+  profileComps ProfileCompetency[]
+  targetOf    CompetencyScoreSnapshot[] @relation("TargetLevel")
+  actualOf    CompetencyScoreSnapshot[] @relation("ActualLevel")
+
+  @@unique([scaleId, levelNumber])
+}
+
+/// Factor (KF) hoặc nhóm KSAO — Nguyên tắc 8: nhiều khung song song
+model CompetencyCategory {
+  id          String        @id @default(cuid())
+  code        String        @unique
+  name        Json
+  framework   FrameworkType
+  parentId    String?
+  parent      CompetencyCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children    CompetencyCategory[] @relation("CategoryTree")
+  displayOrder Int          @default(0)
+
+  competencies Competency[]
+
+  @@index([framework])
+  @@index([parentId])
+}
+
+/// Thực thể ổn định. Nội dung thay đổi nằm ở CompetencyVersion.
+model Competency {
+  id          String @id @default(cuid())
+  code        String @unique
+  categoryId  String
+  category    CompetencyCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  framework   FrameworkType
+  role        CompetencyRole
+  scaleId     String
+  scale       ProficiencyScale @relation(fields: [scaleId], references: [id], onDelete: Restrict)
+
+  /// Con trỏ tới phiên bản đang hiệu lực — Nguyên tắc 4
+  currentVersionId String? @unique
+  currentVersion   CompetencyVersion? @relation("CurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+
+  versions    CompetencyVersion[] @relation("AllVersions")
+  profileComps ProfileCompetency[]
+  snapshots   CompetencyScoreSnapshot[]
+  skillNodes  SkillNode[]
+  idpItems    IdpItem[]
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([framework, role])
+  @@index([categoryId])
+}
+
+/// Nguyên tắc 4: chỉ báo hành vi gắn theo VERSION → có lịch sử, KHÔNG ghi đè
+model CompetencyVersion {
+  id            String        @id @default(cuid())
+  competencyId  String
+  competency    Competency    @relation("AllVersions", fields: [competencyId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  status        VersionStatus @default(DRAFT)
+  effectiveDate DateTime?
+  archivedAt    DateTime?
+
+  name          Json          // LocalizedText
+  definition    Json
+  whyItMatters  Json?
+  overuseNote   Json?         // cảnh báo lạm dụng
+
+  indicators    BehavioralIndicator[]
+  interviewQs   InterviewQuestion[]
+  currentOf     Competency?   @relation("CurrentVersion")
+
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([competencyId, versionNumber])
+  @@index([status])
+}
+
+model BehavioralIndicator {
+  id        String @id @default(cuid())
+  versionId String
+  version   CompetencyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  levelId   String
+  level     ProficiencyLevel  @relation(fields: [levelId], references: [id], onDelete: Restrict)
+  isNegative Boolean @default(false) // false = chỉ báo tích cực
+  text      Json
+  displayOrder Int @default(0)
+
+  @@index([versionId, levelId])
+}
+
+model InterviewQuestion {
+  id        String @id @default(cuid())
+  versionId String
+  version   CompetencyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  text      Json
+  isCounterEvidence Boolean @default(false) // câu hỏi phản chứng
+  probeHints Json?
+  displayOrder Int @default(0)
+
+  @@index([versionId])
+}
+
+// ---------- Skill Taxonomy (GĐ2) ----------
+
+/// Giải mã năng lực thành phần tử K/S/A/O — dựng dendrogram
+model SkillNode {
+  id           String  @id @default(cuid())
+  competencyId String
+  competency   Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  ksaoType     KsaoType
+  name         Json
+  parentId     String?
+  parent       SkillNode?  @relation("SkillTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children     SkillNode[] @relation("SkillTree")
+  depth        Int      @default(0)
+
+  profileKsaos ProfileKsao[]
+
+  createdAt DateTime @default(now())
+
+  @@index([competencyId, ksaoType])
+  @@index([parentId])
+}
+
+/// KF4D — Traits & Drivers
+model Kf4dAttribute {
+  id        String        @id @default(cuid())
+  code      String        @unique
+  dimension Kf4dDimension
+  name      Json
+  definition Json?
+
+  profileAttrs ProfileKf4d[]
+
+  @@index([dimension])
+}
+
+// ============================================================================
+// MIỀN 4 — KIẾN TRÚC NGHỀ
+// ============================================================================
+
+model JobFamily {
+  id           String @id @default(cuid())
+  code         String @unique
+  name         Json
+  careerStream String? // vd: Professional | Management | Technical
+  orgUnitHint  String?
+
+  profiles     SuccessProfile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JobLevel {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        Json
+  careerLevel CareerLevel
+  /// Stage of Contribution 1–4
+  stageOfContribution Int
+  /// Nguyên tắc: isManagerial TỰ SUY từ careerLevel (FLL/MLL/BUL/SE = true)
+  isManagerial Boolean
+
+  salaryGradeId String?
+  salaryGrade   SalaryGrade? @relation(fields: [salaryGradeId], references: [id], onDelete: SetNull)
+
+  profiles    SuccessProfile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([careerLevel])
+}
+
+model SalaryGrade {
+  id        String @id @default(cuid())
+  code      String @unique
+  name      Json
+  minPoint  Int?
+  maxPoint  Int?
+
+  jobLevels JobLevel[]
+  mappings  GradeMapping[]
+}
+
+model GradeMapping {
+  id            String @id @default(cuid())
+  salaryGradeId String
+  salaryGrade   SalaryGrade @relation(fields: [salaryGradeId], references: [id], onDelete: Cascade)
+  externalSystem String // vd: KornFerryHay | MercerIPE
+  externalGrade  String
+
+  @@unique([salaryGradeId, externalSystem])
+}
+
+// ============================================================================
+// MIỀN 5 — HỒ SƠ NĂNG LỰC (SUCCESS PROFILE)
+// ============================================================================
+
+model SuccessProfile {
+  id          String @id @default(cuid())
+  code        String @unique
+  title       Json
+
+  jobFamilyId String
+  jobFamily   JobFamily @relation(fields: [jobFamilyId], references: [id], onDelete: Restrict)
+  jobLevelId  String
+  jobLevel    JobLevel  @relation(fields: [jobLevelId], references: [id], onDelete: Restrict)
+  orgUnitId   String?
+  orgUnit     OrgUnit?  @relation(fields: [orgUnitId], references: [id], onDelete: SetNull)
+
+  status      VersionStatus @default(DRAFT)
+
+  competencies ProfileCompetency[]
+  ksaos        ProfileKsao[]
+  kf4d         ProfileKf4d[]
+  jobDescriptions JobDescriptionVersion[]
+  employees    Employee[]
+  snapshots    CompetencyScoreSnapshot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([jobFamilyId, jobLevelId, orgUnitId])
+  @@index([status])
+}
+
+model ProfileCompetency {
+  id            String @id @default(cuid())
+  profileId     String
+  profile       SuccessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  competencyId  String
+  competency    Competency @relation(fields: [competencyId], references: [id], onDelete: Restrict)
+  /// Mức mục tiêu của vị trí
+  targetLevelId String
+  targetLevel   ProficiencyLevel @relation(fields: [targetLevelId], references: [id], onDelete: Restrict)
+  role          CompetencyRole
+  weight        Int @default(1)
+  isCritical    Boolean @default(false)
+
+  @@unique([profileId, competencyId])
+  @@index([competencyId])
+}
+
+model ProfileKsao {
+  id          String @id @default(cuid())
+  profileId   String
+  profile     SuccessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skillNodeId String
+  skillNode   SkillNode @relation(fields: [skillNodeId], references: [id], onDelete: Restrict)
+  requiredLevel Int?
+
+  @@unique([profileId, skillNodeId])
+}
+
+model ProfileKf4d {
+  id          String @id @default(cuid())
+  profileId   String
+  profile     SuccessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  attributeId String
+  attribute   Kf4dAttribute @relation(fields: [attributeId], references: [id], onDelete: Restrict)
+  targetScore Int?
+
+  @@unique([profileId, attributeId])
+}
+
+/// JD sinh tự động từ hồ sơ, lưu theo phiên bản
+model JobDescriptionVersion {
+  id            String @id @default(cuid())
+  profileId     String
+  profile       SuccessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  status        VersionStatus @default(DRAFT)
+  content       Json   // { vi, en } — nội dung JD đã render
+  generatedByAi Boolean @default(false)
+  createdAt     DateTime @default(now())
+
+  @@unique([profileId, versionNumber])
+}
+
+// ============================================================================
+// MIỀN 6 — ĐÁNH GIÁ (Nguyên tắc 5: KHÔNG ghi đè điểm)
+// ============================================================================
+
+model AssessmentCampaign {
+  id        String @id @default(cuid())
+  code      String @unique
+  name      Json
+  cycleLabel String // vd: 2026-H1
+  status    CampaignStatus @default(DRAFT)
+  startDate DateTime
+  endDate   DateTime
+
+  raterAssignments RaterAssignment[]
+  snapshots        CompetencyScoreSnapshot[]
+  calibrations     CalibrationSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model RaterAssignment {
+  id         String @id @default(cuid())
+  campaignId String
+  campaign   AssessmentCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subjectId  String
+  subject    Employee @relation("SubjectIsEmployee", fields: [subjectId], references: [id], onDelete: Cascade)
+  raterId    String
+  rater      Employee @relation("RaterIsEmployee", fields: [raterId], references: [id], onDelete: Cascade)
+  relation   RaterRelation
+  status     SubmissionStatus @default(PENDING)
+  submittedAt DateTime?
+
+  responses  AssessmentResponse[]
+
+  @@unique([campaignId, subjectId, raterId])
+  @@index([raterId, status])
+}
+
+model AssessmentResponse {
+  id                 String @id @default(cuid())
+  raterAssignmentId  String
+  raterAssignment    RaterAssignment @relation(fields: [raterAssignmentId], references: [id], onDelete: Cascade)
+  competencyId       String
+  ratedLevelNumber   Int
+  comment            String?
+  evidence           String?
+  createdAt          DateTime @default(now())
+
+  @@unique([raterAssignmentId, competencyId])
+}
+
+/// Nguyên tắc 5: mỗi kỳ một bản chụp, KHÔNG cập nhật đè bản cũ
+model CompetencyScoreSnapshot {
+  id            String @id @default(cuid())
+  campaignId    String
+  campaign      AssessmentCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  competencyId  String
+  competency    Competency @relation(fields: [competencyId], references: [id], onDelete: Restrict)
+  profileId     String?
+  profile       SuccessProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  targetLevelId String?
+  targetLevel   ProficiencyLevel? @relation("TargetLevel", fields: [targetLevelId], references: [id], onDelete: SetNull)
+  actualLevelId String?
+  actualLevel   ProficiencyLevel? @relation("ActualLevel", fields: [actualLevelId], references: [id], onDelete: SetNull)
+
+  selfScore     Float?
+  managerScore  Float?
+  peerAvgScore  Float?
+  reportAvgScore Float?
+  finalScore    Float?
+  gap           Float? // finalScore - target
+
+  snapshotAt    DateTime @default(now())
+
+  @@unique([campaignId, employeeId, competencyId])
+  @@index([employeeId, snapshotAt])
+  @@index([competencyId])
+}
+
+// ============================================================================
+// MIỀN 7 — NHÂN TÀI & PHÁT TRIỂN
+// ============================================================================
+
+model CalibrationSession {
+  id         String @id @default(cuid())
+  campaignId String
+  campaign   AssessmentCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  orgUnitId  String?
+  orgUnit    OrgUnit? @relation(fields: [orgUnitId], references: [id], onDelete: SetNull)
+  name       Json
+  heldAt     DateTime?
+  isFinalized Boolean @default(false)
+
+  ratings    CalibrationRating[]
+
+  createdAt DateTime @default(now())
+}
+
+/// 9-box: performance × potential
+model CalibrationRating {
+  id          String @id @default(cuid())
+  sessionId   String
+  session     CalibrationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  performance Int // 1..3
+  potential   Int // 1..3
+  boxLabel    String?
+  rationale   String?
+  createdAt   DateTime @default(now())
+
+  @@unique([sessionId, employeeId])
+}
+
+model SuccessionPlan {
+  id          String @id @default(cuid())
+  profileId   String
+  incumbentId String?
+  criticality String?
+  candidates  SuccessionCandidate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+}
+
+model SuccessionCandidate {
+  id         String @id @default(cuid())
+  planId     String
+  plan       SuccessionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  readiness  ReadinessLevel
+  flightRisk FlightRisk @default(LOW)
+  note       String?
+
+  @@unique([planId, employeeId])
+}
+
+model IdpPlan {
+  id         String @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  cycleLabel String
+  status     String @default("DRAFT")
+  items      IdpItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employeeId, cycleLabel])
+}
+
+model IdpItem {
+  id           String @id @default(cuid())
+  planId       String
+  plan         IdpPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  competencyId String
+  competency   Competency @relation(fields: [competencyId], references: [id], onDelete: Restrict)
+  /// Mô hình 70-20-10
+  learningType String // EXPERIENCE | EXPOSURE | EDUCATION
+  action       Json
+  targetDate   DateTime?
+  isDone       Boolean @default(false)
+  generatedByAi Boolean @default(false)
+
+  @@index([planId])
+}
+
+// ============================================================================
+// MIỀN 8 — AI
+// ============================================================================
+
+model AiJob {
+  id        String      @id @default(cuid())
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  jobType   String      // KSAO_DECODE | JD_SUMMARY | EVIDENCE_REVIEW | IDP_SUGGEST | INTERVIEW_Q
+  provider  String      // gemini | claude | mock
+  status    AiJobStatus @default(QUEUED)
+  input     Json
+  output    Json?
+  errorText String?
+  tokensUsed Int?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([jobType, status])
+  @@index([userId, createdAt])
+}

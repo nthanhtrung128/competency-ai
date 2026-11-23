@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mô hình Kim tự tháp Kép — Quản lý &amp; Chuyên gia</title>
+<style>
+:root{
+  --ink:#1A2530; --mute:#5B6B76; --line:#D7DEE3; --wash:#F4F6F8; --paper:#fff;
+  --mgmt:#1F3A66; --mgmt-bg:#E7EFF4;
+  --exp:#8E5A2F; --exp-bg:#FBF1E7;
+  --gold:#B9932B; --gold-bg:#FFF7E2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;background:var(--wash);color:var(--ink);padding:24px;font-size:13px}
+.sheet{max-width:1440px;margin:0 auto;background:var(--paper);border:1px solid var(--line);padding:32px 36px}
+
+.hd{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:20px}
+.eb{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+h1{font-size:22px;margin-top:6px;letter-spacing:-.01em}
+.sub{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.5;max-width:960px}
+
+/* ============ TWIN PYRAMIDS ============ */
+.twin{display:grid;grid-template-columns:1fr 90px 1fr;gap:0;margin:22px 0 8px;align-items:end}
+.colhead{grid-column:1/-1;display:grid;grid-template-columns:1fr 90px 1fr;margin-bottom:10px}
+.colhead div{text-align:center;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px;color:#fff}
+.colhead .mgmt{background:var(--mgmt)}
+.colhead .exp{background:var(--exp)}
+.colhead .mid{background:transparent}
+
+.pyr{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tier{color:#fff;font-weight:700;font-size:11px;text-align:center;padding:10px 6px;line-height:1.3;position:relative}
+.tier small{display:block;font-weight:400;font-size:9px;opacity:.85;margin-top:2px}
+/* widths: top narrow -> bottom wide, 6 tiers */
+.w1{width:32%} .w2{width:46%} .w3{width:60%} .w4{width:74%} .w5{width:88%} .w6{width:100%}
+.mgmt-tier{background:var(--mgmt)}
+.exp-tier{background:var(--exp)}
+
+.linkcol{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px}
+.linkrow{height:47px;display:flex;align-items:center;justify-content:center;width:100%}
+.linkrow span{font-size:15px;color:var(--gold);font-weight:700}
+.linkrow:first-child{height:52px}
+
+/* ============ LEGEND ============ */
+.legend{display:flex;gap:20px;margin:14px 0 26px;font-size:10px;color:var(--mute);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;display:inline-block}
+
+/* ============ SECTION ============ */
+.section{margin-top:30px}
+.band{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.band .tag{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:7px 16px;border-radius:2px;white-space:nowrap}
+.band .desc{font-size:11.5px;color:var(--mute);line-height:1.45}
+.mgmtband .tag{background:var(--mgmt)} .expband .tag{background:var(--exp)}
+
+table{width:100%;border-collapse:collapse;margin-bottom:14px}
+th{background:var(--ink);color:#fff;font-size:9.5px;text-align:left;padding:8px;font-weight:700}
+td{border:1px solid var(--line);padding:7px 8px;font-size:10.3px;vertical-align:top;line-height:1.42}
+tbody tr:nth-child(even) td{background:var(--wash)}
+td.lvl{font-weight:700;white-space:nowrap}
+.exp td.lvl{color:var(--exp)}
+.mgmt-table td.lvl{color:var(--mgmt)}
+
+.note{font-size:10px;color:var(--mute);font-style:italic;margin:8px 0 14px;line-height:1.55;border-left:3px solid var(--gold);padding-left:10px}
+
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.pcard{border:1px solid var(--line);background:var(--wash);padding:10px 12px;border-top:3px solid var(--gold)}
+.pcard b{display:block;font-size:11px;margin-bottom:4px}
+.pcard span{font-size:9.8px;color:var(--mute);line-height:1.4}
+
+.foot{margin-top:26px;border-top:1px solid var(--line);padding-top:10px;font-size:9.5px;color:var(--mute);line-height:1.6}
+
+@media print{@page{size:A3 landscape;margin:8mm}body{background:#fff;padding:0}.sheet{border:0;padding:0;max-width:none}}
+@media(max-width:1000px){.twin,.colhead{grid-template-columns:1fr}.linkcol{display:none}.principles{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="hd">
+  <div class="eb">Flamingo Group — Mô hình Tổ chức &amp; Phát triển Nghề nghiệp</div>
+  <h1>Kim tự tháp Kép: Nhánh Quản lý Điều hành &amp; Nhánh Chuyên gia</h1>
+  <div class="sub">Xây dựng thêm một trục phát triển song song với mô hình 6 Ngạch hiện có (vốn phản ánh nhánh Quản lý Điều hành), dành cho nhân sự lựa chọn con đường phát triển chuyên môn sâu thay vì quản lý con người — nguyên tắc "thang bậc kép" (dual career ladder) phổ biến trong Total Rewards nhằm giữ chân chuyên gia giỏi mà không ép họ phải chuyển sang vai trò quản lý để được ghi nhận và đãi ngộ tương xứng.</div>
+</div>
+
+<!-- ============ TWIN PYRAMID DIAGRAM ============ -->
+<div class="colhead">
+  <div class="mgmt">Có tham gia Quản lý Điều hành</div>
+  <div class="mid"></div>
+  <div class="exp">Không tham gia Quản lý Điều hành</div>
+</div>
+
+<div class="twin">
+  <div class="pyr">
+    <div class="tier mgmt-tier w1">NGẠCH 1<small>Lãnh đạo Tập đoàn</small></div>
+    <div class="tier mgmt-tier w2">NGẠCH 2<small>Quản lý cấp cao</small></div>
+    <div class="tier mgmt-tier w3">NGẠCH 3<small>Quản lý cấp trung</small></div>
+    <div class="tier mgmt-tier w4">NGẠCH 4<small>Quản lý cơ sở</small></div>
+    <div class="tier mgmt-tier w5">NGẠCH 5<small>Chuyên viên</small></div>
+    <div class="tier mgmt-tier w6">NGẠCH 6<small>Nhân viên</small></div>
+  </div>
+
+  <div class="linkcol">
+    <div class="linkrow"><span>⇔</span></div>
+    <div class="linkrow"><span>⇔</span></div>
+    <div class="linkrow"><span>⇔</span></div>
+    <div class="linkrow"><span>⇔</span></div>
+    <div class="linkrow"><span>⇔</span></div>
+    <div class="linkrow"><span>⇔</span></div>
+  </div>
+
+  <div class="pyr">
+    <div class="tier exp-tier w1">CỐ VẤN CAO CẤP<small>Principal Advisor</small></div>
+    <div class="tier exp-tier w2">CỐ VẤN<small>Advisor</small></div>
+    <div class="tier exp-tier w3">CHUYÊN GIA CAO CẤP<small>Senior Expert</small></div>
+    <div class="tier exp-tier w4">CHUYÊN GIA<small>Expert</small></div>
+    <div class="tier exp-tier w5">CHUYÊN VIÊN<small>Specialist</small></div>
+    <div class="tier exp-tier w6">NHÂN VIÊN<small>Staff</small></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><i style="background:var(--mgmt)"></i>Nhánh Quản lý Điều hành — thăng tiến gắn với quy mô đội ngũ quản lý</span>
+  <span><i style="background:var(--exp)"></i>Nhánh Chuyên gia — thăng tiến gắn với chiều sâu và phạm vi ảnh hưởng chuyên môn</span>
+  <span><i style="background:var(--gold)"></i>⇔ Cặp tương đương cấp bậc — cùng một mức lương/đãi ngộ, khác con đường phát triển</span>
+</div>
+
+<div class="note"><b>Nguyên tắc thiết kế cốt lõi:</b> Hai nhánh dùng chung một hệ thống Cấp (bậc lương) nền — mỗi cặp tương đương (⇔) được xếp vào cùng dải lương, để một Chuyên gia Cao cấp không quản lý ai vẫn được đãi ngộ ngang một Quản lý cấp trung có nhiều nhân sự báo cáo. Đây chính là cơ chế then chốt để nhánh Chuyên gia không bị xem là "lép vế" so với nhánh Quản lý.</div>
+
+<!-- ============ NGUYEN TAC 3 THE ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--gold)">Vì sao cần thang bậc kép</div><div class="desc">Ba lý do một Tập đoàn đa ngành như Flamingo cần cả hai nhánh phát triển song song</div></div>
+  <div class="principles">
+    <div class="pcard"><b>Giữ chân chuyên gia giỏi</b><span>Nhiều chuyên gia xuất sắc (kiến trúc sư trưởng, chuyên gia thẩm định tài chính, chuyên gia vận hành khách sạn) không phù hợp hoặc không muốn quản lý con người. Không có nhánh này, họ buộc phải rời đi hoặc miễn cưỡng làm quản lý kém hiệu quả để được thăng tiến.</span></div>
+    <div class="pcard"><b>Tách bạch "giỏi chuyên môn" và "giỏi quản lý"</b><span>Hai năng lực khác nhau. Đưa một chuyên gia giỏi lên làm quản lý mà không có năng lực lãnh đạo thường tạo ra một quản lý tồi và mất đi một chuyên gia giỏi — nguyên tắc kinh điển "Peter Principle".</span></div>
+    <div class="pcard"><b>Đúng bản chất hai mảng của Flamingo</b><span>Mảng Đầu tư và mảng Khách sạn đều cần chuyên gia sâu (quy hoạch kiến trúc, cấu trúc vốn, quản trị doanh thu khách sạn) mà vai trò quản lý không thể thay thế được chiều sâu chuyên môn này.</span></div>
+  </div>
+</div>
+
+<!-- ============ MO TA NHANH QUAN LY ============ -->
+<div class="section">
+  <div class="band mgmtband"><div class="tag">Nhánh Quản lý Điều hành — 6 Ngạch</div><div class="desc">Thăng tiến gắn với quy mô đội ngũ quản lý và phạm vi ra quyết định tổ chức</div></div>
+  <table class="mgmt-table">
+    <tr><th style="width:14%">Ngạch</th><th style="width:30%">Vai trò</th><th style="width:56%">Mô tả</th></tr>
+    <tr><td class="lvl">NGẠCH 1</td><td>Lãnh đạo Tập đoàn</td><td>Định hướng chiến lược và điều hành toàn bộ hệ thống Công ty/P&amp;L thành viên; đại diện Tập đoàn trước cổ đông, đối tác, cơ quan quản lý.</td></tr>
+    <tr><td class="lvl">NGẠCH 2</td><td>Quản lý cấp cao</td><td>Điều hành trực tiếp 1 Công ty thành viên hoặc 1 Khối chức năng lớn; chịu trách nhiệm kết quả hoạt động của đơn vị trước Lãnh đạo Tập đoàn.</td></tr>
+    <tr><td class="lvl">NGẠCH 3</td><td>Quản lý cấp trung</td><td>Quản lý và điều hành 1 đơn vị chức năng (Ban/Phòng); chịu trách nhiệm kết quả hoạt động của đơn vị trước cấp quản lý trực tiếp.</td></tr>
+    <tr><td class="lvl">NGẠCH 4</td><td>Quản lý cơ sở</td><td>Quản lý trực tiếp 1 nhóm/bộ phận nghiệp vụ nhỏ; giám sát chất lượng và tiến độ công việc hàng ngày.</td></tr>
+    <tr><td class="lvl">NGẠCH 5</td><td>Chuyên viên</td><td>Chủ động thực hiện công việc chuyên môn, ít cần giám sát; có thể hướng dẫn nhân sự cấp dưới khi cần.</td></tr>
+    <tr><td class="lvl">NGẠCH 6</td><td>Nhân viên</td><td>Thực hiện công việc cụ thể dưới sự giám sát, hướng dẫn của cấp trên.</td></tr>
+  </table>
+</div>
+
+<!-- ============ MO TA NHANH CHUYEN GIA ============ -->
+<div class="section">
+  <div class="band expband"><div class="tag">Nhánh Chuyên gia — 6 Cấp (đề xuất mới)</div><div class="desc">Thăng tiến gắn với chiều sâu chuyên môn, mức độ phức tạp của vấn đề xử lý, và phạm vi ảnh hưởng — không gắn với số lượng nhân sự quản lý</div></div>
+  <table class="exp">
+    <tr><th style="width:16%">Cấp</th><th style="width:16%">Ngạch tương đương</th><th style="width:68%">Mô tả vai trò</th></tr>
+    <tr>
+      <td class="lvl">NHÂN VIÊN</td><td>Ngạch 6</td>
+      <td>Thực hiện công việc chuyên môn cơ bản theo hướng dẫn; đang tích lũy kiến thức nền tảng của lĩnh vực.</td>
+    </tr>
+    <tr>
+      <td class="lvl">CHUYÊN VIÊN<br><small style="font-weight:400;color:#999">(Specialist)</small></td><td>Ngạch 5</td>
+      <td>Thực hiện độc lập các nghiệp vụ chuyên môn trong phạm vi rõ ràng; xử lý tốt các tình huống tiêu chuẩn của lĩnh vực; bắt đầu tích lũy chuyên môn sâu ở 1 mảng cụ thể.</td>
+    </tr>
+    <tr>
+      <td class="lvl">CHUYÊN GIA<br><small style="font-weight:400;color:#999">(Expert)</small></td><td>Ngạch 4</td>
+      <td>Được công nhận là người có chuyên môn sâu trong một lĩnh vực cụ thể; xử lý các vấn đề phức tạp, phi tiêu chuẩn mà quy trình thông thường không giải quyết được; có thể dẫn dắt một dự án chuyên môn mà không cần chức danh quản lý.</td>
+    </tr>
+    <tr>
+      <td class="lvl">CHUYÊN GIA CAO CẤP<br><small style="font-weight:400;color:#999">(Senior Expert)</small></td><td>Ngạch 3</td>
+      <td>Chuyên môn có uy tín, ảnh hưởng đến việc xây dựng chuẩn mực/quy trình chung của cả Khối; được các đơn vị khác trong Tập đoàn tìm đến tham vấn khi gặp vấn đề khó trong lĩnh vực.</td>
+    </tr>
+    <tr>
+      <td class="lvl">CỐ VẤN<br><small style="font-weight:400;color:#999">(Advisor)</small></td><td>Ngạch 2</td>
+      <td>Cố vấn tin cậy cho lãnh đạo cấp cao về các vấn đề chiến lược/kỹ thuật trong lĩnh vực phụ trách; có tầm ảnh hưởng tương đương một Quản lý cấp cao nhưng thông qua chuyên môn, không thông qua quyền quản lý nhân sự.</td>
+    </tr>
+    <tr>
+      <td class="lvl">CỐ VẤN CAO CẤP<br><small style="font-weight:400;color:#999">(Principal Advisor)</small></td><td>Ngạch 1</td>
+      <td>Chuyên gia đầu ngành, định hình định hướng chiến lược của Tập đoàn trong lĩnh vực chuyên sâu (ví dụ: kiến trúc quy hoạch, cấu trúc tài chính dự án, vận hành khách sạn cao cấp); vị thế ngang Lãnh đạo Tập đoàn nhưng đạt được bằng uy tín chuyên môn thay vì quyền lực tổ chức.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ CHUYEN DOI GIUA 2 NHANH ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--gold)">Cơ chế chuyển đổi giữa hai nhánh</div><div class="desc">Nhân sự không bị "khoá cứng" vào một nhánh trong toàn bộ sự nghiệp</div></div>
+  <table>
+    <tr><th style="width:22%">Tình huống</th><th style="width:78%">Nguyên tắc xử lý</th></tr>
+    <tr><td><b>Chuyên gia muốn chuyển sang quản lý</b></td><td>Đánh giá năng lực lãnh đạo riêng biệt với năng lực chuyên môn (đã có sẵn, không suy diễn từ trình độ chuyên môn) trước khi bổ nhiệm — tránh lặp lại tình trạng "chuyên gia giỏi thành quản lý kém".</td></tr>
+    <tr><td><b>Quản lý muốn quay lại chuyên môn</b></td><td>Cho phép chuyển ngang sang cấp tương đương ở nhánh Chuyên gia mà không bị xem là "giáng chức" — quan trọng để tránh tâm lý sợ rời ghế quản lý dù không còn phù hợp.</td></tr>
+    <tr><td><b>Một vị trí vừa cần chuyên môn sâu vừa cần quản lý một nhóm nhỏ</b></td><td>Xếp vào nhánh Quản lý (vì có trách nhiệm quản lý người), nhưng ghi nhận chuyên môn qua đánh giá năng lực chuyên môn riêng trong hệ thống lương thưởng.</td></tr>
+  </table>
+</div>
+
+<div class="foot">
+  <b>Lưu ý áp dụng:</b> Đây là mô hình khung đề xuất, mô phỏng theo đúng logic 6 tầng của mô hình Quản lý Điều hành hiện có. Số lượng nhân sự thực tế ở mỗi cấp của nhánh Chuyên gia cần được xác định qua rà soát vị trí thực tế tại Flamingo (hiện dữ liệu 1.307 người mới phản ánh nhánh Quản lý Điều hành). Việc quy đổi lương/đãi ngộ theo từng cặp tương đương (⇔) cần Ban Tổ chức Nhân sự phối hợp cùng Ban Tài chính rà soát trước khi ban hành chính thức.
+</div>
+
+</div>
+</body>
+</html>

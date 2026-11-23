@@ -1,0 +1,297 @@
+================================================================================
+ NHẬT KÝ DỰ ÁN — TÁI CƠ CẤU TỔ CHỨC, KHUNG NĂNG LỰC & ỨNG DỤNG COMPETENCYAI
+ Tập đoàn Flamingo · Ban Tổ chức Nhân sự
+ Cập nhật lần cuối: 14/10/2026 chiều (giờ Việt Nam)
+================================================================================
+
+Ký hiệu nguồn dùng trong mọi sản phẩm:
+  [SOURCE]     lấy từ tài liệu chính thức
+  [INFERENCE]  suy luận có căn cứ
+  [PROPOSAL]   đề xuất của nhóm HR, chưa được duyệt
+  [GAP]        thiếu dữ liệu nguồn, cần xác nhận
+
+--------------------------------------------------------------------------------
+1. MỤC ĐÍCH
+--------------------------------------------------------------------------------
+Chuẩn hoá lại bộ máy Flamingo theo một chuỗi logic học thuật, rồi đưa dần vào
+thực tiễn bằng một ứng dụng quản trị năng lực:
+
+  Chuỗi giá trị → Bản đồ năng lực tổ chức → Mô hình vận hành → Cơ cấu tổ chức
+  → RACI → Thư viện năng lực → Từ điển năng lực → Sổ tay khung năng lực
+  → Job Architecture → Ứng dụng CompetencyAI (360°, 9-Box, IDP)
+
+--------------------------------------------------------------------------------
+2. DÒNG THỜI GIAN
+--------------------------------------------------------------------------------
+[Trước 31/07/2026] (phiên trước, đã tóm tắt)
+  - Dựng chuỗi giá trị 2 mảng (Đầu tư BĐS I1–I8, Khách sạn H1–H6), mô hình kim
+    tự tháp nhân sự, báo cáo chuỗi giá trị cho lãnh đạo.
+
+31/07/2026
+  - Kim tự tháp kép: nhánh Quản lý điều hành và nhánh Chuyên gia (không quản lý),
+    kèm mô tả.
+  - Vẽ value stream song song theo mẫu Halcom; thêm value stream mới Lữ hành
+    (T1–T6). Tách 2 luồng Đầu tư và Khách sạn, phần so sánh để giữa, Lữ hành tách riêng.
+
+10/08/2026
+  - Business Capability Map: 71 năng lực tổ chức, 13 miền.
+    Kết luận "đủ cơ sở chuyển sang Operating Model".
+  - Chuyển chuỗi giá trị + CCTC PA3 thành Excel có thể báo cáo và chỉnh sửa.
+  - Operating Model, rồi Organization Design (6 đầu ra, đánh giá 5 tiêu chí).
+  - Việt hoá toàn bộ file Excel (có dấu), thêm sheet Capability.
+
+11/08/2026
+  - RACI 27 hoạt động liên đơn vị (mỗi hoạt động đúng 1 người chịu trách nhiệm A).
+  - QA Phase 1: NOT READY — thiếu lớp Function & Accountability.
+  - Thư viện năng lực có schema, luận chứng, logic đọc thành một luồng.
+
+12/08/2026
+  - Làm lại Từ điển năng lực cho Flamingo từ 2 bộ mẫu (bất động sản 500 nhân sự,
+    mẫu có câu hỏi phỏng vấn). Tiếng Việt, chú thích tiếng Anh.
+
+17/08/2026
+  - Đối chiếu NovaLand Value Chain + 3 tài liệu lớp khung năng lực → bổ sung
+    FU38–FU45 vào Từ điển, thêm sheet tóm tắt.
+  - Dựng ứng dụng theo các prompt trong "Bài thực tập tái tạo app khung năng lực";
+    so sánh làm trên Claude và Google AI Studio.
+
+18/08/2026
+  - Đánh giá: dữ liệu Từ điển đã đủ làm kiến thức nền cho app chưa.
+  - Hướng dẫn chạy phần mềm cho người không chuyên IT.
+
+24/08/2026
+  - Trả lời: app (bản AI Studio) đã có 360°, Kế thừa, IDP chưa → mới ở mức mô phỏng.
+
+05/09/2026
+  - Hoàn thiện khung theo phản hồi giảng viên: luận chứng vì sao chọn từng năng
+    lực, gắn giá trị công ty, xuống tầng Job Architecture và Job Role, làm Sổ tay
+    hướng dẫn toàn công ty (tham khảo cách làm của UNESCO).
+
+07/09/2026
+  - Cập nhật theo CCTC_Edit: gộp Ban Kiểm soát nội bộ vào Ban Pháp chế
+    → "Ban Pháp chế và Kiểm soát nội bộ" (Ban PC&KSNB); bỏ Ban KSNB, Ban Kiểm soát
+    khỏi sơ đồ; Hội đồng Đầu tư đã bỏ.
+  - Review bản export từ Google AI Studio: tìm 3 lỗi (gõ nhầm req.competencyCode;
+    render object gây trắng màn hình; xuất bản phiên bản không lưu trữ bản cũ).
+  - Hết token AI Studio → chọn hướng B: tự host miễn phí
+    (Neon PostgreSQL + Render + Cloudflare Pages).
+  - Xây backend: Express + TypeScript + Prisma + PostgreSQL, JWT, phân quyền thật,
+    phạm vi dữ liệu theo đơn vị, nhật ký, nhập nhân sự 2 bước (kiểm tra → ghi).
+
+08–09/09/2026
+  - Bổ sung: trang nhập nhân sự không cần gõ lệnh (import-console.html), lệnh
+    kiểm tra nhanh (smoke), nạp Từ điển, hướng dẫn 8 phần.
+
+23/09/2026
+  - Đóng gói toàn bộ thành CompetencyAI.zip (backend, frontend đã sửa 3 lỗi,
+    dữ liệu, tài liệu).
+  - Viết prompt bàn giao để làm tiếp trên ChatGPT (Prompt_Ban_Giao_ChatGPT.md).
+
+14/10/2026 — sáng: "phát triển tiếp app, đưa ra những thứ cần quyết định"
+  - Nối giao diện với máy chủ (nút "Kết nối máy chủ", chế độ Demo/Máy chủ).
+  - Job Architecture lên máy chủ (14 họ nghề, 6 cấp, 26 vai trò).
+  - PHÁT HIỆN: Sổ tay và Từ điển dùng 2 bộ mã khác nhau → 0/141 yêu cầu năng lực
+    của vai trò khớp mã. Lập bảng đối chiếu 60 dòng (trạng thái ĐỀ XUẤT).
+  - Khoá quản trị dữ liệu: không sửa trực tiếp bản đã ban hành; bỏ các nút tự sinh
+    chỉ báo / tự gán chủ quản của bản AI Studio (gán sai mã đơn vị).
+  - Đổi nhãn "Korn Ferry 4 cấp" → FLA-5 (5 mức).
+  - Lập Sổ quyết định (15 việc) → hỏi 4 câu chốt.
+
+14/10/2026 — trưa: người dùng chốt 4 quyết định
+  QĐ-01 Từ điển 57 + thêm 3 năng lực   QĐ-04 AI soạn nháp, chuyên gia sửa
+  QĐ-06 Cả 360°, 9-Box, IDP            QĐ-07 Tài khoản cho HR + quản lý
+  - Thêm CO7 Giao tiếp, CO8 Lập kế hoạch & Tổ chức, CO9 Hướng đến kết quả
+    (bản nháp). Đối chiếu tin cậy cao: 84 → 103/141.
+  - AI soạn 195 ô chỉ báo (180 ô FU Mức 1-2-4-5 + 15 ô CO7–CO9), file mẫu
+    có nhãn dự thảo; 3 lớp chặn ban hành nội dung chưa duyệt.
+  - Backend 360° / 9-Box / IDP / tài khoản (9 bảng mới, 6 quyền mới).
+  - Giao diện TalentHub 6 tab.
+  - Kiểm thử trên PostgreSQL 16 thật: smoke 19/19, kịch bản 46/46, giao diện chạy
+    trên trình duyệt từ đầu đến cuối.
+
+14/10/2026 — chiều: "take note toàn bộ, lưu quá trình vào file txt, tiếp tục"
+  - Tạo file nhật ký này. Phần tiếp theo ghi ở mục 11.
+
+--------------------------------------------------------------------------------
+3. SẢN PHẨM ĐÃ GIAO (thư mục outputs)
+--------------------------------------------------------------------------------
+Chuỗi giá trị & tổ chức
+  Flamingo_So_do_Chuoi_Gia_tri_theo_mau_Halcom.html   chuỗi giá trị mẫu Halcom
+  Flamingo_Value_Chain_2_Mang_KD.html                 2 mảng song song
+  Flamingo_Value_Chain_v2_Halcom_Logic.html           3 luồng, Lữ hành tách riêng
+  Flamingo_Value_Chain_v3.xlsx                        bản Excel chuỗi giá trị
+  Flamingo_BaoCao_ChuoiGiaTri_LanhDao.html            báo cáo cho lãnh đạo
+  Flamingo_Chuoi_Gia_Tri_Chi_Tiet.pptx                bản trình chiếu
+  Flamingo_ValueChain_CaseStudy_Format.html           dạng case study
+  Flamingo_KimTuThap_Kep_QuanLy_ChuyenGia.html        kim tự tháp kép
+  Flamingo_Business_Capability_Map.html               71 năng lực tổ chức
+  Flamingo_ValueStream_Capability_OperatingModel.xlsx value stream → capability → OM
+  Flamingo_ChuoiGiaTri_NangLuc_VanHanh_CoCau.xlsx     file tổng 42 sheet (VS → RACI → QA)
+  ValueChain_Mau_SaaS_Mamnon.html                     mẫu tham khảo
+
+Khung năng lực
+  Flamingo_TuDien_NangLuc.xlsx        Từ điển (10 sheet): chỉ báo, câu hỏi phỏng vấn
+  Flamingo_SoTay_KhungNangLuc.xlsx    Sổ tay (8 sheet): chiến lược → năng lực → vai trò
+  flamingo_seed_data.json             dữ liệu chuẩn nạp vào app (60 năng lực)
+  Mau_ChiBao_ChuyenMon_Muc1-5.xlsx    mẫu chuyên gia sửa dự thảo AI (48 năng lực)
+
+Ứng dụng
+  CompetencyAI.zip                    gói triển khai đầy đủ (bản chuẩn — luôn ghi đè)
+  CompetencyAI_API/                   mã nguồn backend (đồng bộ với gói)
+  CompetencyAI_GD0/                   thiết kế giai đoạn 0 (40 model, kiến trúc)
+  QUYET_DINH_HOAN_THIEN.md            Sổ quyết định
+  HuongDan_NguoiKhongChuyenIT.md      hướng dẫn cho người không chuyên IT
+  Review_AI_Studio_Export.md          đánh giá bản AI Studio
+  Prompt_Ban_Giao_ChatGPT.md          prompt bàn giao sang ChatGPT (bản 23/09, đã cũ)
+  NHAT_KY_DU_AN.txt                   file nhật ký này (bản chuẩn — luôn ghi đè)
+  (trong zip) 4-tai-lieu/TRIEN_KHAI.md  checklist đưa lên mạng
+
+Trong Project (claude.ai): claude/CompetencyAI_So_Quyet_Dinh_Hoan_Thien.md
+
+--------------------------------------------------------------------------------
+4. SỐ LIỆU NỀN CỦA KHUNG
+--------------------------------------------------------------------------------
+Chuỗi giá trị       I1–I8 Đầu tư BĐS · H1–H6 Khách sạn · T1–T6 Lữ hành
+Năng lực tổ chức    71, 13 miền
+RACI                27 hoạt động liên đơn vị
+Cơ cấu (CCTC_Edit)  34 đơn vị trong dữ liệu app; Ban PC&KSNB đã gộp;
+                    FTV, FRT, VPCT chưa có breakdown [GAP]
+Từ điển             60 năng lực = 9 Cốt lõi (CO1–CO9; CO7–CO9 bản nháp)
+                    + 6 Lãnh đạo (LE1–LE6) + 45 Chuyên môn (FU01–FU45)
+Thang               FLA-5: Nhận biết · Áp dụng cơ bản · Thành thạo · Nâng cao · Chuyên gia
+Giá trị cốt lõi     chưa có văn bản chính thức → không chấm điểm [GAP]
+Năng lực chưa chủ   FU02, FU16, FU23, FU29, FU43, FU45
+Job Architecture    3 chức năng · 14 họ nghề · 5 dòng nghề nghiệp · 6 cấp (L1–L6 ↔ Ngạch 6–1)
+                    · 26 vai trò (R01–R26)
+Chỉ báo             12 NL đủ 5 mức (CO1–CO6, LE1–LE6) · 45 NL FU mới có Mức 3 đã ban hành
+                    · 195 ô dự thảo AI chờ chuyên gia duyệt
+
+--------------------------------------------------------------------------------
+5. ỨNG DỤNG COMPETENCYAI — HIỆN TRẠNG
+--------------------------------------------------------------------------------
+Kiến trúc
+  1-backend   Express + TypeScript + Prisma 5 + PostgreSQL · 33 bảng
+              JWT (15 phút + làm mới 7 ngày, xoay vòng) · phân quyền thật · phạm vi
+              theo đơn vị và theo cấp dưới · nhật ký mọi thao tác ghi
+  2-frontend  React + Vite (từ bản AI Studio, đã sửa) · chế độ Demo / Máy chủ
+  Hạ tầng     Neon (CSDL, miễn phí) · Render (API, miễn phí, ngủ sau 15 phút)
+              · Cloudflare Pages (giao diện)
+
+Phân hệ chạy dữ liệu thật
+  Tổ chức · Từ điển năng lực & phiên bản (DRAFT → PUBLISHED → ARCHIVED)
+  · Job Architecture & yêu cầu năng lực · Đánh giá 360° · 9-Box · IDP
+  · Tài khoản · Nhật ký · Nhập nhân sự từ CSV
+  · Bảng điều khiển · Bàn duyệt (HR) · Kế hoạch kế thừa   (thêm lần 3, 14/10 chiều)
+Vẫn minh hoạ: Mô phỏng luân chuyển · Trợ lý AI
+
+Lệnh chính (thư mục 1-backend)
+  npm run seed:all            nạp quyền, vai trò, 34 đơn vị, 60 năng lực, Job Architecture
+  npm run dev                 chạy máy chủ
+  npm run smoke               kiểm tra nhanh (19 mục)
+  npm run import:indicators -- <file.xlsx> [--commit]   nạp chỉ báo chuyên gia đã sửa
+  npm run seed:job-architecture                         nạp lại sau khi duyệt bảng đối chiếu
+  npm run backup              sao lưu JSON (không chứa mật khẩu)
+  Triển khai lên mạng: 4-tai-lieu/TRIEN_KHAI.md
+
+Tài khoản mẫu: admin@ / hrlead@ / hrbp@ / manager@flamingo.vn — mật khẩu SEED_PASSWORD
+(mặc định Flamingo@2026, PHẢI đổi khi triển khai thật)
+
+--------------------------------------------------------------------------------
+6. QUYẾT ĐỊNH
+--------------------------------------------------------------------------------
+Đã chốt (14/10/2026)
+  QĐ-01  Từ điển 57 là chuẩn + thêm CO7, CO8, CO9
+  QĐ-04  AI soạn nháp, chuyên gia đơn vị chủ quản sửa, HR duyệt, Ban TGĐ phê duyệt
+  QĐ-06  Đưa 360°, 9-Box, IDP lên dữ liệu thật
+  QĐ-07  Thí điểm: tài khoản cho HR + quản lý; nhân viên được HR nhập hộ phiếu
+  QĐ-21  Đưa Kế hoạch kế thừa lên dữ liệu thật (chọn chiều 14/10)
+Áp dụng theo khuyến nghị, chờ xác nhận
+  QĐ-00  Thang FLA-5 (5 mức)
+Còn mở — chặn vận hành thật
+  QĐ-02  Duyệt bảng đối chiếu 60 dòng (đặc biệt VAL03 → LE3)
+  QĐ-03  Chủ quản 6 năng lực
+  QĐ-04b Lịch chuyên gia sửa 195 ô dự thảo
+  QĐ-10  Pháp lý dữ liệu cá nhân lưu ở Singapore (NĐ 13/2023, Luật 91/2025/QH15)
+Còn mở — khác
+  QĐ-05 Giá trị cốt lõi · QĐ-08 Trợ lý AI · QĐ-09 Ma trận quyền · QĐ-11 Gói hạ tầng
+  QĐ-12 Đơn vị vận hành · QĐ-13 Express/NestJS · QĐ-14 Breakdown FTV/FRT/VPCT
+  QĐ-15 Ngưỡng ẩn danh (đang 3) · QĐ-16 Ngưỡng gợi ý Tiềm năng (3,5 / 2,5)
+  QĐ-17 Nguồn trục Hiệu suất (ĐGNS) · QĐ-18 Năng lực trong 360° quản lý
+  QĐ-19 Người được đánh giá tự xem kết quả · QĐ-20 Quy tắc IDP
+  QĐ-22 Danh sách vị trí then chốt và quy tắc gợi ý ứng viên kế thừa
+
+--------------------------------------------------------------------------------
+7. LỖI ĐÃ PHÁT HIỆN VÀ SỬA
+--------------------------------------------------------------------------------
+Bản AI Studio
+  - req.competencyCode gõ nhầm (5 chỗ) → so sánh với undefined
+  - Render object vào JSX → trắng màn hình
+  - Xuất bản phiên bản không lưu trữ bản cũ → 2 bản cùng PUBLISHED
+  - Hồ sơ năng lực mượn chỉ báo của năng lực khác khi không thấy mã
+  - Nút tự sinh 180 chỉ báo rồi xoá cảnh báo; nút tự gán chủ quản với mã sai
+    (vd đưa Pháp chế vào B02 là Ban Quy hoạch Kiến trúc)
+  - Tạo bản nháp ở chế độ Demo không thêm được phiên bản
+  - 4 màn hình đọc dữ liệu mẫu cố định thay vì dữ liệu hiện hành
+  - Class nút bấm btn/btn-primary chưa từng được định nghĩa
+  - Chọn năng lực chưa có bản ban hành hiện nhầm phiên bản năng lực trước
+Backend
+  - Lỗi trong hàm async làm sập cả máy chủ (Express 4) → express-async-errors
+  - Mất kết nối CSDL bị báo nhầm "hết phiên đăng nhập" → trả 503
+  - CORS_ORIGINS="*" không hoạt động → giao diện không kết nối được
+  - Seed cũ chỉ 18 đơn vị, cây sai tầng → nạp đủ 34 từ dữ liệu chuẩn
+Dữ liệu
+  - Đơn vị chủ quản FU14/30/31/37/38/44 còn ghi "Ban Pháp chế"/"Ban KSNB"
+    → đổi thành Ban PC&KSNB
+  - 0/141 yêu cầu năng lực khớp mã → bảng đối chiếu
+
+--------------------------------------------------------------------------------
+8. KIỂM THỬ
+--------------------------------------------------------------------------------
+  - Biên dịch sạch backend + frontend từ bản giải nén mới của gói zip.
+  - PostgreSQL 16 thật (môi trường thử, dữ liệu nhân sự giả):
+      smoke 19/19 · kịch bản 360° → 9-Box → IDP → tài khoản 46/46
+      · kịch bản Bàn duyệt → Kế thừa → Bảng điều khiển 29/29
+      · production thiếu khoá JWT/CORS: từ chối khởi động · sao lưu không chứa mật khẩu
+      · tắt CSDL giữa chừng: máy chủ trả 503, không sập, tự phục hồi
+      · nạp chỉ báo (từ chối ô còn nhãn, ghi vết ô giữ nguyên văn AI)
+      · ban hành CO7 sau khi sửa: đạt; CO8 còn nhãn: bị chặn (422)
+  - Trình duyệt (Playwright) với máy chủ thật: đổi mật khẩu lần đầu, chấm phiếu,
+    đóng chiến dịch, kết quả, 9-Box, IDP, tài khoản; tạo bản nháp → ban hành.
+  - Giới hạn: môi trường thử chặn tải Prisma engine nên chạy bằng Prisma 7 + driver
+    pg; gói giao cho người dùng vẫn là Prisma 5. Lần đầu chạy trên máy thật,
+    npm run smoke là phép thử cuối.
+
+--------------------------------------------------------------------------------
+9. NGUYÊN TẮC LÀM VIỆC (giữ cho mọi bước sau)
+--------------------------------------------------------------------------------
+  - Gắn nhãn SOURCE / INFERENCE / PROPOSAL; không bịa số liệu, đơn vị, nội dung.
+  - Không ghi đè nội dung đã được rà soát; phần bổ sung phải phân biệt được.
+  - Việc chờ phê duyệt dùng lời lẽ thận trọng.
+  - Cơ cấu: Ban PC&KSNB đã gộp; Hội đồng Đầu tư đã bỏ; tài sản giữ ở cấp Tập đoàn.
+  - Dữ liệu nhân sự là dữ liệu cá nhân: không nạp CCCD, tài khoản ngân hàng, sức khoẻ.
+  - Hướng dẫn kỹ thuật viết từng bước cho người không chuyên IT.
+  - File đầu ra ghi đè đúng tên chuẩn để bàn giao trực tiếp.
+  - Hỏi xác nhận hướng làm bằng câu hỏi lựa chọn, rồi tự làm tiếp.
+
+--------------------------------------------------------------------------------
+10. VIỆC TIẾP THEO ĐỀ XUẤT
+--------------------------------------------------------------------------------
+  1. Gửi Mau_ChiBao_ChuyenMon_Muc1-5.xlsx cho đơn vị chủ quản (việc dài nhất).
+  2. Chốt QĐ-02, QĐ-03, QĐ-10.
+  3. Thí điểm 360° cấp quản lý L4–L6 trên 12 năng lực đã ban hành.
+
+--------------------------------------------------------------------------------
+11. NHẬT KÝ PHIÊN TIẾP THEO
+--------------------------------------------------------------------------------
+[14/10/2026 chiều] Tạo file nhật ký này.
+[14/10/2026 chiều] Người dùng chọn làm cả 4 hướng. Đã làm:
+  - Bàn duyệt (HR): duyệt đối chiếu mã theo nhãn (QĐ-02), gán chủ quản với phương án
+    điền sẵn (QĐ-03), so sánh và ban hành / trả lại bản nháp chỉ báo (QĐ-04b).
+    Xuất CSV đối chiếu đã duyệt để cập nhật file nguồn.
+  - Bảng điều khiển số liệu thật (khung, tổ chức, 360°, 9-Box, IDP, kế thừa), lọc theo quyền.
+  - Kế hoạch kế thừa: vị trí then chốt, ứng viên, mức sẵn sàng, rủi ro, gợi ý từ 9-Box,
+    bench strength (bảng SuccessionPlan, SuccessionCandidate).
+  - Gói triển khai: TRIEN_KHAI.md, preflight production, npm run backup, prisma db push.
+  - Sửa: máy chủ sập khi lỗi async; báo nhầm 401 khi mất CSDL; ẩn persona/lộ trình demo
+    ở chế độ máy chủ; gán chủ quản chỉ cho HR_LEAD/ADMIN.
+  - Kiểm thử: 46/46 + 29/29 trên PostgreSQL thật; giao diện chạy trên trình duyệt.

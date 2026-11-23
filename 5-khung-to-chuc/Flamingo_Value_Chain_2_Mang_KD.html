@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamingo — Sơ đồ Chuỗi giá trị (Value Chain)</title>
+<style>
+:root{
+  --ink:#12232E;
+  --ink-soft:#3A4E5C;
+  --paper:#FFFFFF;
+  --wash:#F2F5F7;
+  --line:#D8E0E5;
+
+  --inv:#14506B;         /* Đầu tư & Phát triển BĐS */
+  --inv-soft:#E6EFF3;
+  --inv-mid:#2E7A9B;
+
+  --hos:#B8365A;         /* Kinh doanh dịch vụ khách sạn */
+  --hos-soft:#FBEAEF;
+  --hos-mid:#D9647F;
+
+  --sup:#5C6B73;
+  --sup-soft:#EDF0F1;
+
+  --gold:#B98C2F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Segoe UI","Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  color:var(--ink);background:var(--wash);
+  -webkit-font-smoothing:antialiased;
+  padding:24px;
+}
+.sheet{
+  max-width:1400px;margin:0 auto;background:var(--paper);
+  padding:34px 38px 30px;border:1px solid var(--line);
+}
+
+/* ---------- Header ---------- */
+.head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:12px}
+.eyebrow{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+h1{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-top:6px}
+.sub{font-size:12.5px;color:var(--ink-soft);margin-top:5px;max-width:820px;line-height:1.5}
+.stamp{font-size:10px;color:var(--ink-soft);text-align:right;line-height:1.7;white-space:nowrap}
+
+/* ---------- Section titles ---------- */
+.band{display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.band .tag{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#fff;padding:5px 12px;border-radius:2px;white-space:nowrap;
+}
+.band .desc{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
+.band.inv .tag{background:var(--inv)}
+.band.hos .tag{background:var(--hos)}
+.band.sup .tag{background:var(--sup)}
+
+/* ---------- Chain ---------- */
+.chain{display:flex;gap:6px;align-items:stretch}
+.step{
+  flex:1;position:relative;background:var(--paper);
+  border:1px solid var(--line);border-top:3px solid var(--inv);
+  padding:11px 12px 12px;min-width:0;
+}
+.hos-chain .step{border-top-color:var(--hos)}
+.step .no{
+  font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--inv-mid);
+}
+.hos-chain .step .no{color:var(--hos-mid)}
+.step h3{font-size:12.5px;font-weight:700;line-height:1.3;margin:3px 0 7px}
+.step ul{list-style:none;font-size:10.5px;line-height:1.5;color:var(--ink-soft)}
+.step li{padding-left:9px;position:relative;margin-bottom:3px}
+.step li:before{content:"";position:absolute;left:0;top:6px;width:3px;height:3px;background:var(--inv-mid);border-radius:50%}
+.hos-chain .step li:before{background:var(--hos-mid)}
+.owner{
+  margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);
+  font-size:9.5px;font-weight:600;color:var(--inv);line-height:1.4;
+}
+.hos-chain .owner{color:var(--hos)}
+
+/* arrow between steps */
+.arrow{align-self:center;flex:0 0 10px;color:var(--line);font-size:15px;line-height:1}
+
+/* ---------- Outcome bar ---------- */
+.outcome{
+  margin-top:8px;display:flex;align-items:center;gap:10px;
+  background:var(--inv-soft);border-left:3px solid var(--inv);
+  padding:8px 14px;font-size:11px;color:var(--inv);font-weight:600;
+}
+.hos-outcome{background:var(--hos-soft);border-left-color:var(--hos);color:var(--hos)}
+
+/* ---------- Linkage ---------- */
+.link{
+  margin:22px 0;border:1px solid var(--line);background:var(--wash);
+  padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:18px;
+}
+.link h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.link .a h4{color:var(--inv)}
+.link .b h4{color:var(--hos)}
+.link p{font-size:11px;line-height:1.5;color:var(--ink-soft)}
+
+/* ---------- Support ---------- */
+.support{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.sup-box{
+  background:var(--sup-soft);border:1px solid var(--line);padding:9px 10px;
+}
+.sup-box h5{font-size:11px;font-weight:700;margin-bottom:4px}
+.sup-box p{font-size:10px;line-height:1.45;color:var(--ink-soft)}
+.sup-note{
+  margin-top:8px;font-size:10.5px;color:var(--ink-soft);font-style:italic;
+  border-left:3px solid var(--gold);padding-left:10px;
+}
+
+/* ---------- Footnote ---------- */
+.foot{
+  margin-top:24px;border-top:1px solid var(--line);padding-top:10px;
+  display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-soft);gap:20px
+}
+.legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;display:inline-block}
+
+@media print{
+  @page{size:A3 landscape;margin:8mm}
+  body{background:#fff;padding:0}
+  .sheet{border:none;max-width:none;padding:0}
+}
+@media (max-width:1100px){
+  .chain{flex-wrap:wrap}
+  .step{flex:1 1 30%}
+  .arrow{display:none}
+  .support{grid-template-columns:repeat(3,1fr)}
+  .link{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="head">
+    <div>
+      <div class="eyebrow">Flamingo Group · Organization Design</div>
+      <h1>Sơ đồ Chuỗi giá trị Tập đoàn</h1>
+      <div class="sub">Mô hình hai chuỗi giá trị song song — <strong>Đầu tư &amp; Phát triển Bất động sản</strong> (tạo tài sản) và <strong>Kinh doanh Dịch vụ Khách sạn</strong> (khai thác tài sản) — vận hành trên một nền Hoạt động Hỗ trợ dùng chung (Shared Services).</div>
+    </div>
+    <div class="stamp">
+      Nguồn: Talentnet–Mercer Insight<br>
+      Cơ cấu tổ chức cập nhật 17/07/2026<br>
+      Bản đồ họa nội bộ · 2026
+    </div>
+  </div>
+
+  <!-- ================= CHUỖI 1 ================= -->
+  <div class="band inv">
+    <div class="tag">Chuỗi giá trị 1 — Đầu tư &amp; Phát triển BĐS</div>
+    <div class="desc">Dòng chảy tạo giá trị theo 7 bước tuần tự của ngành BĐS nghỉ dưỡng — từ quỹ đất đến sản phẩm bàn giao.</div>
+  </div>
+
+  <div class="chain inv-chain">
+    <div class="step">
+      <div class="no">BƯỚC 01</div>
+      <h3>Đầu tư &amp; Phát triển quỹ đất</h3>
+      <ul>
+        <li>Tìm kiếm quỹ đất chiến lược, M&amp;A dự án</li>
+        <li>Thẩm định khả thi tài chính (NPV, IRR)</li>
+        <li>Thủ tục chủ trương đầu tư, giao đất</li>
+        <li>Giải phóng mặt bằng</li>
+      </ul>
+      <div class="owner">Ban Đầu tư · Hội đồng Đầu tư</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 02</div>
+      <h3>Quy hoạch &amp; Thiết kế</h3>
+      <ul>
+        <li>Quy hoạch chi tiết 1/500, tối ưu công năng</li>
+        <li>Concept kiến trúc &amp; định hình sản phẩm</li>
+        <li>Thiết kế cảnh quan đặc thù nghỉ dưỡng</li>
+        <li>R&amp;D mẫu nhà / mẫu phòng khách sạn</li>
+      </ul>
+      <div class="owner">Ban Quy hoạch Kiến trúc (FARC) · TT. Cảnh quan</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 03</div>
+      <h3>Cung ứng</h3>
+      <ul>
+        <li>Sàng lọc, đánh giá năng lực nhà thầu</li>
+        <li>Đấu thầu, đàm phán, ký kết hợp đồng</li>
+        <li>Điều phối chuỗi cung ứng vật tư theo tiến độ</li>
+      </ul>
+      <div class="owner">Ban Cung ứng Đấu thầu</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 04</div>
+      <h3>Xây dựng</h3>
+      <ul>
+        <li>Quản lý bản vẽ thi công, dự toán – quyết toán</li>
+        <li>Điều hành tiến độ, chất lượng, an toàn</li>
+        <li>Giám sát hiện trường, nghiệm thu công trình</li>
+      </ul>
+      <div class="owner">Ban Xây dựng · Các BQL Dự án · FCONS</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 05</div>
+      <h3>Tiếp thị</h3>
+      <ul>
+        <li>Định vị dự án thành "Điểm đến"</li>
+        <li>Quảng bá hệ sinh thái tiện ích, PR thương hiệu</li>
+        <li>Tổ chức sự kiện mở bán, tạo nguồn khách (lead)</li>
+      </ul>
+      <div class="owner">Ban Truyền thông &amp; Marketing · FLV</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 06</div>
+      <h3>Bán hàng</h3>
+      <ul>
+        <li>Quản lý đại lý phân phối &amp; bán hàng trực tiếp</li>
+        <li>Chính sách giá, chốt giao dịch, kinh doanh cho thuê</li>
+        <li>Quản lý hợp đồng, thu hồi công nợ</li>
+      </ul>
+      <div class="owner">Ban Kinh doanh BĐS (FLV)</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 07</div>
+      <h3>Bàn giao &amp; Hậu mãi</h3>
+      <ul>
+        <li>Bàn giao sản phẩm, thủ tục Giấy chứng nhận</li>
+        <li>Chăm sóc khách hàng, xử lý khiếu nại (CRM)</li>
+        <li>Đo lường NPS / CSAT để cải tiến</li>
+      </ul>
+      <div class="owner">FLV · Ban Pháp chế</div>
+    </div>
+  </div>
+
+  <div class="outcome">GIÁ TRỊ TẠO RA → Sản phẩm bất động sản bàn giao · Doanh thu bán hàng một lần · Hình thành quỹ tài sản vận hành cho Chuỗi giá trị 2</div>
+
+  <!-- ================= LINKAGE ================= -->
+  <div class="link">
+    <div class="a">
+      <h4>↓ Đầu tư chuyển giao cho Vận hành</h4>
+      <p>Tài sản hoàn thiện (khách sạn, resort, onsen-spa, công viên giải trí, tiện ích thương mại) được chuyển giao sang khối Vận hành để khai thác dòng tiền đều đặn. Tiêu chuẩn vận hành phải được đưa vào ngay từ bước Thiết kế (design-for-operations).</p>
+    </div>
+    <div class="b">
+      <h4>↑ Vận hành phản hồi ngược cho Đầu tư</h4>
+      <p>Dữ liệu vận hành (công suất phòng, ADR, RevPAR, hành vi khách) và uy tín thương hiệu dịch vụ trở thành lợi thế bán hàng cho các dự án BĐS tiếp theo, đồng thời là đầu vào R&amp;D sản phẩm cho Ban Quy hoạch Kiến trúc.</p>
+    </div>
+  </div>
+
+  <!-- ================= CHUỖI 2 ================= -->
+  <div class="band hos">
+    <div class="tag">Chuỗi giá trị 2 — Kinh doanh Dịch vụ Khách sạn</div>
+    <div class="desc">Dòng chảy khai thác tài sản theo vòng đời trải nghiệm khách hàng — tạo dòng tiền định kỳ và giá trị thương hiệu dịch vụ.</div>
+  </div>
+
+  <div class="chain hos-chain">
+    <div class="step">
+      <div class="no">BƯỚC 01</div>
+      <h3>Phát triển sản phẩm &amp; Định vị dịch vụ</h3>
+      <ul>
+        <li>Định vị thương hiệu khách sạn / resort</li>
+        <li>Thiết kế danh mục sản phẩm: lưu trú, F&amp;B, spa, MICE</li>
+        <li>Chiến lược giá &amp; phân khúc khách hàng mục tiêu</li>
+      </ul>
+      <div class="owner">Ban Kinh doanh Vận hành (FHR)</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 02</div>
+      <h3>Kinh doanh &amp; Phân phối</h3>
+      <ul>
+        <li>Quản lý kênh OTA, đại lý lữ hành, khách đoàn / MICE</li>
+        <li>Revenue Management: tối ưu ADR &amp; công suất</li>
+        <li>Bán trực tiếp, đặt phòng qua website / tổng đài</li>
+      </ul>
+      <div class="owner">FHR · FTV (lữ hành) · Ban Truyền thông &amp; Marketing</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 03</div>
+      <h3>Đặt phòng &amp; Đón khách</h3>
+      <ul>
+        <li>Quản lý booking, xác nhận, thanh toán</li>
+        <li>Lễ tân, check-in / check-out, concierge</li>
+        <li>Vận chuyển, đưa đón khách</li>
+      </ul>
+      <div class="owner">Cơ sở Vận hành KD DV · FRT</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 04</div>
+      <h3>Vận hành lưu trú</h3>
+      <ul>
+        <li>Buồng phòng, giặt là, vệ sinh</li>
+        <li>Kỹ thuật, an ninh, an toàn khách hàng</li>
+        <li>Duy trì cảnh quan &amp; tiện ích khu nghỉ dưỡng</li>
+      </ul>
+      <div class="owner">Cơ sở Vận hành KD DV</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 05</div>
+      <h3>Dịch vụ gia tăng &amp; Trải nghiệm</h3>
+      <ul>
+        <li>F&amp;B: nhà hàng, bar, tiệc, banquet</li>
+        <li>Onsen–Spa, công viên giải trí, thể thao</li>
+        <li>Tổ chức sự kiện, tour tuyến &amp; hoạt náo</li>
+      </ul>
+      <div class="owner">FRT · FTV · Cơ sở Vận hành KD DV</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 06</div>
+      <h3>Chăm sóc khách hàng &amp; Lòng trung thành</h3>
+      <ul>
+        <li>Quản lý phản hồi, đánh giá trên OTA / mạng xã hội</li>
+        <li>Chương trình khách hàng thân thiết, CRM</li>
+        <li>Đo lường NPS / CSAT, cải tiến chất lượng dịch vụ</li>
+      </ul>
+      <div class="owner">FHR · Ban Truyền thông &amp; Marketing</div>
+    </div>
+    <div class="arrow">▶</div>
+
+    <div class="step">
+      <div class="no">BƯỚC 07</div>
+      <h3>Quản lý tài sản &amp; Tái đầu tư</h3>
+      <ul>
+        <li>Bảo trì, bảo dưỡng, thay thế tài sản (CAPEX vận hành)</li>
+        <li>Cải tạo, nâng cấp (renovation) theo chu kỳ</li>
+        <li>Đánh giá hiệu quả khai thác từng cơ sở</li>
+      </ul>
+      <div class="owner">FHR · Ban Đầu tư · Ban Tài chính Kế toán</div>
+    </div>
+  </div>
+
+  <div class="outcome hos-outcome">GIÁ TRỊ TẠO RA → Dòng tiền định kỳ (RevPAR, F&amp;B revenue) · Thương hiệu dịch vụ · Gia tăng giá trị tài sản BĐS nắm giữ</div>
+
+  <!-- ================= SUPPORT ================= -->
+  <div class="band sup">
+    <div class="tag">Hoạt động Hỗ trợ — Shared Services</div>
+    <div class="desc">Phục vụ đồng thời toàn bộ 14 bước của hai chuỗi giá trị theo mô hình dịch vụ chia sẻ.</div>
+  </div>
+
+  <div class="support">
+    <div class="sup-box"><h5>Tài chính – Kế toán</h5><p>Hoạch định vốn, tối ưu dòng tiền, kiểm soát ngân sách, báo cáo tài chính hợp nhất.</p></div>
+    <div class="sup-box"><h5>Tổ chức Nhân sự</h5><p>Tuyển dụng, đào tạo, job architecture &amp; chính sách đãi ngộ cho lực lượng đa ngành.</p></div>
+    <div class="sup-box"><h5>Hành chính Quản trị</h5><p>Hạ tầng văn phòng, hậu cần, tiện ích hỗ trợ vận hành nội bộ.</p></div>
+    <div class="sup-box"><h5>Mua hàng</h5><p>Đấu thầu, đàm phán, quản lý hợp đồng và thanh toán, tối ưu chi phí toàn hệ thống.</p></div>
+    <div class="sup-box"><h5>Pháp chế</h5><p>An toàn pháp lý dự án, hợp đồng thương mại, giám sát tuân thủ toàn hệ thống.</p></div>
+    <div class="sup-box"><h5>Công nghệ Thông tin</h5><p>Hạ tầng số, PMS/POS, CRM, phần mềm bán hàng &amp; quản lý dự án, vận hành thông minh.</p></div>
+    <div class="sup-box"><h5>An ninh</h5><p>An ninh dự án, cơ sở lưu trú và tài sản Tập đoàn.</p></div>
+  </div>
+
+  <div class="sup-note">Chức năng Quản trị độc lập — Ban Thanh tra &amp; Kiểm soát Nội bộ — giám sát tuân thủ và hiệu quả trên cả hai chuỗi giá trị, báo cáo trực tiếp Hội đồng Quản trị.</div>
+
+  <!-- ================= FOOT ================= -->
+  <div class="foot">
+    <div class="legend">
+      <span><i class="dot" style="background:var(--inv)"></i> Chuỗi Đầu tư &amp; Phát triển BĐS</span>
+      <span><i class="dot" style="background:var(--hos)"></i> Chuỗi Kinh doanh Dịch vụ Khách sạn</span>
+      <span><i class="dot" style="background:var(--sup)"></i> Hoạt động Hỗ trợ dùng chung</span>
+      <span><i class="dot" style="background:var(--gold)"></i> Quản trị &amp; Kiểm soát độc lập</span>
+    </div>
+    <div>Nguyên tắc thiết kế: Cơ cấu tổ chức phải phản ánh đúng dòng chảy giá trị — mỗi bước có một chủ sở hữu (single owner), không chồng chéo chức năng.</div>
+  </div>
+
+</div>
+</body>
+</html>

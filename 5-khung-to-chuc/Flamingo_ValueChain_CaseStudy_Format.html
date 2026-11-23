@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamingo — Chuỗi giá trị theo mẫu Case Study</title>
+<style>
+:root{
+  --ink:#1A2530; --mute:#5B6B76; --line:#D7DEE3; --wash:#F4F6F8; --paper:#fff;
+  --inv:#2E5C9A; --inv-bg:#E7EFF4;
+  --hos:#B8365A; --hos-bg:#FBEAEF;
+  --gold:#B9932B; --gold-bg:#FFF7E2;
+  --sup:#5B6B76; --sup-bg:#EDF0F1;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;background:var(--wash);color:var(--ink);padding:24px;font-size:13px}
+.sheet{max-width:1420px;margin:0 auto;background:var(--paper);border:1px solid var(--line);padding:32px 36px}
+
+.hd{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
+.eb{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+h1{font-size:23px;margin-top:6px;letter-spacing:-.01em}
+.sub{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.5;max-width:940px}
+
+.decisions{display:flex;gap:8px;margin-top:14px}
+.dcard{flex:1;border-left:3px solid var(--gold);background:var(--gold-bg);padding:8px 12px}
+.dcard b{display:block;font-size:11px;margin-bottom:2px}
+.dcard span{font-size:10px;color:var(--mute);line-height:1.4}
+
+.section{margin-top:30px}
+.band{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.band .tag{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:7px 16px;border-radius:2px;white-space:nowrap}
+.band .desc{font-size:11.5px;color:var(--mute);line-height:1.45}
+.inv .tag{background:var(--inv)} .hos .tag{background:var(--hos)}
+
+.chain{display:flex;gap:4px;margin-bottom:4px}
+.step{flex:1;position:relative;padding:9px 14px 9px 18px;color:#fff;font-weight:700;font-size:10.5px;text-align:center;
+  clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 12px 50%);
+  display:flex;align-items:center;justify-content:center;min-height:46px;line-height:1.22}
+.step.first{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)}
+.inv .step{background:var(--inv)} .hos .step{background:var(--hos)}
+
+.detailrow{display:flex;gap:4px;margin-bottom:14px}
+.detail{flex:1;border:1px solid var(--line);border-top:3px solid var(--inv);padding:8px 9px;background:#fff;min-height:158px}
+.hos .detail{border-top-color:var(--hos)}
+.detail h6{font-size:9px;font-weight:700;text-decoration:underline;margin-bottom:4px;color:var(--ink)}
+.detail ul{list-style:none}
+.detail li{font-size:9.5px;line-height:1.38;padding-left:9px;position:relative;margin-bottom:3px;color:var(--mute)}
+.detail li:before{content:"";position:absolute;left:0;top:5px;width:3px;height:3px;border-radius:50%;background:var(--inv)}
+.hos .detail li:before{background:var(--hos)}
+.detail .owner{margin-top:6px;padding-top:5px;border-top:1px dashed var(--line);font-size:8.5px;font-weight:600;color:var(--inv)}
+.hos .detail .owner{color:var(--hos)}
+
+.outcome{padding:9px 15px;font-size:11px;font-weight:600;border-left:3px solid var(--inv);background:var(--inv-bg);color:var(--inv);margin-bottom:16px}
+.hos .outcome{border-left-color:var(--hos);background:var(--hos-bg);color:var(--hos)}
+
+.ksfgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ksf{border:1px solid var(--line);background:var(--wash);padding:10px 12px}
+.ksf b{display:block;font-size:11px;margin-bottom:4px}
+.ksf span{font-size:10px;color:var(--mute);line-height:1.4}
+
+.supgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:18px}
+.sup{border:1px solid var(--line);background:var(--sup-bg);padding:8px 10px}
+.sup h5{font-size:10.5px;margin-bottom:3px}
+.sup p{font-size:9.5px;line-height:1.4;color:var(--mute)}
+.sup.diff{background:var(--gold-bg);border-color:#D9C177}
+.sup.diff h5:after{content:" ◆";color:var(--gold)}
+
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+th{background:var(--ink);color:#fff;font-size:10px;text-align:left;padding:7px 9px}
+td{border:1px solid var(--line);padding:7px 9px;font-size:10.5px;vertical-align:top}
+tr:nth-child(even) td{background:var(--wash)}
+.catcore{color:var(--gold);font-weight:700}
+.catfunc{color:var(--inv);font-weight:700}
+.catlead{color:var(--hos);font-weight:700}
+
+.note{font-size:10px;color:var(--mute);font-style:italic;margin:6px 0 4px;line-height:1.5;border-left:3px solid var(--gold);padding-left:10px}
+.foot{margin-top:26px;border-top:1px solid var(--line);padding-top:10px;font-size:9.5px;color:var(--mute);line-height:1.6}
+
+@media print{@page{size:A3 landscape;margin:8mm}body{background:#fff;padding:0}.sheet{border:0;padding:0;max-width:none}}
+@media(max-width:1100px){.chain,.detailrow{flex-wrap:wrap}.ksfgrid,.supgrid{grid-template-columns:1fr 1fr}.decisions{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="hd">
+  <div class="eb">Flamingo Group — trình bày theo mẫu Case Study (Total Rewards 101, Day 8 & 9)</div>
+  <h1>Chuỗi giá trị Flamingo: Mảng Đầu tư BĐS & Mảng Khách sạn</h1>
+  <div class="sub">Cùng khuôn mẫu đã dùng cho case SaaS và Trường Mầm non Quốc tế: Value Stream theo bước → KSF (Key Success Factors) → Hoạt động hỗ trợ → Từ điển năng lực mẫu cho một số vị trí, phân loại Core / Functional / Leadership và thang mức thuần thục 1–5.</div>
+  <div class="decisions">
+    <div class="dcard"><b>Quyết định 1 — Mô hình khai thác</b><span>Flamingo TỰ VẬN HÀNH khách sạn, không thuê thương hiệu quản lý, không nhượng quyền.</span></div>
+    <div class="dcard"><b>Quyết định 2 — Sở hữu tài sản</b><span>Tài sản GIỮ TẠI TẬP ĐOÀN, không chuyển sang mô hình SPV độc lập.</span></div>
+  </div>
+</div>
+
+<!-- ============ MANG DAU TU ============ -->
+<div class="section inv">
+  <div class="band">
+    <div class="tag">Mảng 1 — Đầu tư & Phát triển Bất động sản</div>
+    <div class="desc">Cấu hình Value Chain (Stabell & Fjeldstad, 1998): chuyển hóa tuần tự quỹ đất thành sản phẩm bất động sản. Giá trị đo bằng doanh thu bán hàng một lần và IRR dự án.</div>
+  </div>
+
+  <div class="chain">
+    <div class="step first">I1. Nghiên cứu &<br>Phát triển thị trường</div>
+    <div class="step">I2. Lựa chọn dự án<br>· M&A · Quỹ đất</div>
+    <div class="step">I3. Marketing &<br>Định vị</div>
+    <div class="step">I4. Huy động vốn</div>
+    <div class="step">I5. Thực hiện<br>dự án</div>
+    <div class="step">I6. Bán hàng &<br>Hoàn thành DA</div>
+    <div class="step">I7. Quản trị tài sản<br>(giữ tại Tập đoàn)</div>
+    <div class="step">I8. Quan hệ các<br>bên liên quan</div>
+  </div>
+  <div class="detailrow">
+    <div class="detail">
+      <ul><li>Thu thập, phân tích dữ liệu thị trường BĐS nghỉ dưỡng</li><li>Tìm kiếm, đánh giá cơ hội: quỹ đất, điểm đến</li><li>Xác định thị trường chiến lược & khẩu vị rủi ro</li></ul>
+      <div class="owner">Ban Đầu tư</div>
+    </div>
+    <div class="detail">
+      <ul><li>Báo cáo tiền khả thi, thẩm định NPV/IRR</li><li>M&A, sang nhượng dự án</li><li>Thủ tục chủ trương, quy hoạch, giao đất, GPMB</li></ul>
+      <div class="owner">Ban Đầu tư + Pháp chế</div>
+    </div>
+    <div class="detail">
+      <ul><li>Định vị thương hiệu Flamingo & concept "Điểm đến"</li><li>Xác định thị trường mục tiêu: nhà đầu tư BĐS</li><li>Product brief — đầu vào cho thiết kế (I5)</li></ul>
+      <div class="owner">Ban Truyền thông & Marketing</div>
+    </div>
+    <div class="detail">
+      <ul><li>Đối tác, liên doanh, hợp tác đầu tư</li><li>Ngân hàng, tín dụng dự án</li><li>Cấu trúc vốn, dòng tiền dự án</li></ul>
+      <div class="owner">Ban Tài chính Kế toán</div>
+    </div>
+    <div class="detail">
+      <ul><li>Quy hoạch 1/500, concept kiến trúc, cảnh quan</li><li>Cung ứng, đấu thầu, hợp đồng khung</li><li>Kiểm soát chi phí – tiến độ – chất lượng – an toàn</li></ul>
+      <div class="owner">FARC + Ban Xây dựng</div>
+    </div>
+    <div class="detail">
+      <ul><li>Bán hàng, quản lý đại lý, chính sách giá</li><li>Thu hồi công nợ, cân đối dư nợ dự án</li><li>Bàn giao sản phẩm, thủ tục Giấy chứng nhận</li></ul>
+      <div class="owner">FLV</div>
+    </div>
+    <div class="detail">
+      <ul><li>KHÔNG chuyển SPV — giữ nguyên tại Tập đoàn</li><li>CAPEX, bảo trì do Hội đồng Tài sản quyết định</li><li>HĐQT quyết định giữ – cho thuê – thoái vốn</li></ul>
+      <div class="owner">Hội đồng Tài sản (mới)</div>
+    </div>
+    <div class="detail">
+      <ul><li>Chính quyền, xúc tiến đầu tư</li><li>Cộng đồng dân cư, trách nhiệm xã hội</li><li>Nhà đầu tư, ngân hàng, cổ đông (IR)</li></ul>
+      <div class="owner">Ban Tổng Giám đốc</div>
+    </div>
+  </div>
+  <div class="outcome">GIÁ TRỊ TẠO RA → Doanh thu bán hàng một lần · IRR dự án · Quỹ tài sản chuyển giao cho mảng Khách sạn khai thác</div>
+
+  <div class="ksfgrid">
+    <div class="ksf"><b>IRR & Tốc độ quay vòng vốn</b><span>Ngành BĐS thâm dụng vốn — tốc độ quay vòng quyết định số dự án chạy song song được.</span></div>
+    <div class="ksf"><b>Tỷ lệ hấp thụ bán hàng</b><span>Tốc độ bán quyết định thời điểm thu hồi vốn và giải phóng năng lực tài chính cho dự án tiếp theo.</span></div>
+    <div class="ksf"><b>Tuân thủ pháp lý đất đai</b><span>Thời gian hoàn tất pháp lý (chủ trương, quy hoạch, giao đất) là rủi ro tiến độ lớn nhất.</span></div>
+    <div class="ksf"><b>Kiểm soát chi phí xây dựng</b><span>Vượt tổng mức đầu tư ăn trực tiếp vào IRR — cần kiểm soát chặt tại I5.</span></div>
+  </div>
+
+  <div class="supgrid">
+    <div class="sup diff"><h5>Quản trị vốn & Cấu trúc tài chính</h5><p>Năng lực huy động vốn quyết định số dự án chạy song song — rào cản gia nhập ngành.</p></div>
+    <div class="sup"><h5>Pháp chế Dự án</h5><p>An toàn pháp lý đất đai, hợp đồng thương mại, M&A.</p></div>
+    <div class="sup"><h5>Cung ứng & Đấu thầu</h5><p>Hợp đồng khung, mua tập trung vật tư xây dựng.</p></div>
+    <div class="sup"><h5>Kiểm soát & Liêm chính</h5><p>Giám sát độc lập tại các điểm rủi ro cao: đất đai, đấu thầu.</p></div>
+  </div>
+
+  <table>
+    <tr><th style="width:16%">Vị trí giả định</th><th style="width:20%">Năng lực cốt lõi <span style="color:#ccc">(Core)</span></th><th style="width:22%">Năng lực chuyên môn <span style="color:#ccc">(Functional)</span></th><th style="width:22%">Năng lực lãnh đạo <span style="color:#ccc">(Leadership)</span></th><th>Mức thuần thục ví dụ (1–5)</th></tr>
+    <tr>
+      <td><b>Chuyên viên Đầu tư</b></td>
+      <td class="catcore">Tư duy phân tích</td>
+      <td class="catfunc">Thẩm định tài chính dự án (NPV/IRR)</td>
+      <td class="catlead">—</td>
+      <td>Mức 3: xây dựng độc lập mô hình tài chính cho dự án quy mô vừa</td>
+    </tr>
+    <tr>
+      <td><b>Trưởng Ban Cung ứng</b></td>
+      <td class="catcore">Chính trực</td>
+      <td class="catfunc">Đàm phán hợp đồng & quản trị nhà thầu</td>
+      <td class="catlead">Ra quyết định trong môi trường áp lực</td>
+      <td>Mức 4: tối ưu được chi phí toàn danh mục hợp đồng khung Tập đoàn</td>
+    </tr>
+    <tr>
+      <td><b>Giám đốc Đầu tư</b></td>
+      <td class="catcore">Tầm nhìn chiến lược</td>
+      <td class="catfunc">Cấu trúc vốn & quan hệ định chế tài chính</td>
+      <td class="catlead">Điều phối liên mảng (Hội đồng Tài sản)</td>
+      <td>Mức 5: thiết kế cấu trúc vốn tối ưu cho danh mục nhiều dự án song song</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ MANG KHACH SAN ============ -->
+<div class="section hos">
+  <div class="band">
+    <div class="tag">Mảng 2 — Kinh doanh Dịch vụ Khách sạn (Tự vận hành)</div>
+    <div class="desc">Cấu hình Value Network (Stabell & Fjeldstad, 1998): kết nối khách hàng qua mạng lưới kênh. Giá trị đo bằng doanh thu định kỳ theo công suất — không phải khối lượng sản xuất.</div>
+  </div>
+
+  <div class="chain">
+    <div class="step first">H1. Nghiên cứu &<br>Phát triển thị trường</div>
+    <div class="step">H2. Thiết kế dịch vụ<br>& Chuẩn vận hành</div>
+    <div class="step">H3. Marketing &<br>Phân phối</div>
+    <div class="step">H4. Cung cấp<br>dịch vụ</div>
+    <div class="step">H5. Quản trị doanh thu<br>& Khách hàng</div>
+    <div class="step">H6. Quan hệ các<br>bên liên quan</div>
+  </div>
+  <div class="detailrow">
+    <div class="detail">
+      <ul><li>Dùng chung kết quả nghiên cứu với I1</li><li>Bổ sung góc nhìn xu hướng du lịch, hành vi khách lưu trú</li></ul>
+      <div class="owner">Ban Đầu tư + FHR</div>
+    </div>
+    <div class="detail">
+      <ul><li>Danh mục dịch vụ: lưu trú, F&B, onsen–spa, giải trí, MICE</li><li>SOP tự xây dựng theo hạng sao</li><li>QUYẾT ĐỊNH: tự vận hành — tuyển & đào tạo tuyến đầu</li></ul>
+      <div class="owner">FHR</div>
+    </div>
+    <div class="detail">
+      <ul><li>Kênh OTA, đại lý lữ hành, đối tác quốc tế</li><li>Khách đoàn, MICE, sự kiện</li><li>Bán trực tiếp: web, tổng đài, tệp khách nội bộ</li></ul>
+      <div class="owner">FHR + FTV</div>
+    </div>
+    <div class="detail">
+      <ul><li>Đón tiếp, lưu trú, buồng phòng, concierge</li><li>F&B: nhà hàng, bar, banquet, sự kiện</li><li>Kỹ thuật, an ninh, cảnh quan tại cơ sở</li></ul>
+      <div class="owner">Cơ sở vận hành KD DV</div>
+    </div>
+    <div class="detail">
+      <ul><li>Revenue Management: giá động, ADR, công suất</li><li>Quản trị danh tiếng OTA, mạng xã hội</li><li>CRM, đo lường NPS/CSAT</li></ul>
+      <div class="owner">FHR</div>
+    </div>
+    <div class="detail">
+      <ul><li>Dùng chung với I8 — chính quyền, cộng đồng, đối tác</li><li>Bổ sung: đối tác thương hiệu, hãng lữ hành, hàng không</li></ul>
+      <div class="owner">Ban TGĐ + FHR</div>
+    </div>
+  </div>
+  <div class="outcome">GIÁ TRỊ TẠO RA → Doanh thu định kỳ (RevPAR) · Thương hiệu dịch vụ tự xây dựng · Gia tăng giá trị tài sản BĐS do Tập đoàn nắm giữ</div>
+
+  <div class="ksfgrid">
+    <div class="ksf"><b>RevPAR / ADR</b><span>Chỉ số sống còn của khách sạn tự vận hành — không có thương hiệu quản lý quốc tế đứng sau bảo chứng giá.</span></div>
+    <div class="ksf"><b>NPS / CSAT</b><span>Vì tự xây SOP từ đầu, đo lường trải nghiệm khách là cách duy nhất xác nhận chuẩn dịch vụ đạt yêu cầu.</span></div>
+    <div class="ksf"><b>Tỷ lệ giữ chân nhân sự tuyến đầu</b><span>Tự vận hành nghĩa là năng lực dịch vụ nằm hoàn toàn ở con người Flamingo — không thể thuê ngoài.</span></div>
+    <div class="ksf"><b>Chi phí phân phối kênh (OTA)</b><span>Phụ thuộc OTA quá mức sẽ bào mòn biên lợi nhuận của mô hình tự vận hành.</span></div>
+  </div>
+
+  <div class="supgrid">
+    <div class="sup diff"><h5>Đào tạo & Chuẩn hóa Dịch vụ Tuyến đầu</h5><p>Năng lực khác biệt hóa cốt lõi khi tự vận hành — không dựa vào SOP có sẵn của thương hiệu quốc tế.</p></div>
+    <div class="sup"><h5>PMS – POS – CRM hợp nhất</h5><p>Hạ tầng dữ liệu khách hàng dùng chung giữa các cơ sở và với mảng Đầu tư.</p></div>
+    <div class="sup"><h5>Quản lý Kênh Phân phối</h5><p>Đàm phán hoa hồng OTA, quản trị hợp đồng đại lý lữ hành.</p></div>
+    <div class="sup"><h5>An ninh & An toàn Cơ sở</h5><p>Tiêu chuẩn an toàn khách lưu trú riêng biệt với an toàn công trường xây dựng.</p></div>
+  </div>
+
+  <table>
+    <tr><th style="width:16%">Vị trí giả định</th><th style="width:20%">Năng lực cốt lõi <span style="color:#ccc">(Core)</span></th><th style="width:22%">Năng lực chuyên môn <span style="color:#ccc">(Functional)</span></th><th style="width:22%">Năng lực lãnh đạo <span style="color:#ccc">(Leadership)</span></th><th>Mức thuần thục ví dụ (1–5)</th></tr>
+    <tr>
+      <td><b>Lễ tân / Concierge</b></td>
+      <td class="catcore">Định hướng khách hàng</td>
+      <td class="catfunc">Vận hành PMS & xử lý tình huống khách hàng</td>
+      <td class="catlead">—</td>
+      <td>Mức 2: xử lý được yêu cầu tiêu chuẩn theo đúng SOP tự xây dựng</td>
+    </tr>
+    <tr>
+      <td><b>Revenue Manager</b></td>
+      <td class="catcore">Tư duy phân tích</td>
+      <td class="catfunc">Định giá động theo mùa vụ & công suất</td>
+      <td class="catlead">—</td>
+      <td>Mức 4: tối ưu RevPAR toàn hệ thống nhiều cơ sở cùng lúc</td>
+    </tr>
+    <tr>
+      <td><b>Giám đốc Vận hành Khách sạn (FHR)</b></td>
+      <td class="catcore">Chính trực & Trách nhiệm an toàn</td>
+      <td class="catfunc">Xây dựng chuẩn dịch vụ & vận hành đa cơ sở</td>
+      <td class="catlead">Xây dựng văn hóa dịch vụ & giữ chân nhân sự tuyến đầu</td>
+      <td>Mức 5: nhân bản chuẩn dịch vụ tự xây dựng sang cơ sở mới mà không suy giảm chất lượng</td>
+    </tr>
+  </table>
+</div>
+
+<div class="foot">
+  <b>Điểm khác biệt cần lưu ý khi trình bày:</b> Vì Flamingo tự vận hành (Quyết định 1), năng lực đào tạo dịch vụ tuyến đầu ở mảng Khách sạn được xếp Differentiating — tương đương vai trò của "Product Development" trong case SaaS: đây là năng lực không thể mua sẵn, phải tự xây từ đầu. Vì tài sản giữ tại Tập đoàn (Quyết định 2), bước I7 không phải điểm kết thúc chuỗi như mô hình SPV của Halcom, mà là điểm giao thoa quyền quyết định thường trực — cần Hội đồng Tài sản làm cơ chế quản trị chính thức.
+  <br><br>
+  <b>Nguồn tham chiếu:</b> Porter, M. (1985), Competitive Advantage · Stabell, C.B. & Fjeldstad, Ø.D. (1998), SMJ 19(5) · Mercer Organization Design · Halcom Value Chain Framework (tài liệu dự án).
+</div>
+
+</div>
+</body>
+</html>

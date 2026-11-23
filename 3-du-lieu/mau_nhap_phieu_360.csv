@@ -1,0 +1,5 @@
+﻿ma_phieu,ma_nv_duoc_danh_gia,quan_he,ma_nv_nguoi_danh_gia,ma_nang_luc,muc,nhan_xet
+P001,MA_NV_QUAN_LY,Cấp dưới,,CO1,4,Ví dụ: luôn báo cáo trung thực tiến độ dự án kể cả khi chậm
+P001,MA_NV_QUAN_LY,Cấp dưới,,CO2,3,
+P001,MA_NV_QUAN_LY,Cấp dưới,,LE1,,Không đủ cơ sở quan sát (để trống cột muc)
+P002,MA_NV_QUAN_LY,Đồng nghiệp,MA_NV_DONG_NGHIEP,CO1,3,

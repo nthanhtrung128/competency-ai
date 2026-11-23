@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sơ đồ chuỗi giá trị hoạt động của Flamingo</title>
+<style>
+:root{
+  --navy:#2E5C9A;      /* chevron xanh */
+  --navy-d:#1F3A66;    /* dải dọc trái */
+  --red:#D93B2B;       /* bước bổ sung / hiệu chỉnh */
+  --green:#5FA83C;     /* chevron lợi nhuận */
+  --ink:#1A1A1A;
+  --line:#C9D2DA;
+  --boxline:#2E5C9A;
+  --boxline-r:#D93B2B;
+  --paper:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Times New Roman",Times,serif;background:#F0F2F5;padding:20px;color:var(--ink)}
+.sheet{max-width:1500px;margin:0 auto;background:var(--paper);padding:18px 20px 22px;border:1px solid var(--line)}
+
+/* ---------- title ---------- */
+.title{border:2px solid var(--ink);text-align:center;padding:6px;margin:0 auto 14px;max-width:820px}
+.title h1{font-size:19px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+
+/* ---------- main frame ---------- */
+.frame{display:grid;grid-template-columns:34px 1fr 74px;gap:6px;align-items:stretch}
+.vband{background:var(--navy-d);color:#fff;display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:.14em}
+.core{display:flex;flex-direction:column;gap:7px}
+
+/* ---------- chevron rows ---------- */
+.chevrow{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.chev{
+  background:var(--navy);color:#fff;
+  clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%);
+  padding:8px 20px 8px 24px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+}
+.chev.first{clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)}
+.chev.red{background:var(--red)}
+.chev .n{font-size:10px;font-weight:700;line-height:1.15}
+.chev .t{font-size:10.5px;font-weight:700;line-height:1.2;text-transform:uppercase}
+
+/* ---------- red connector arrows ---------- */
+.arrows{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;height:16px}
+.arrows i{color:var(--red);font-size:15px;text-align:center;font-style:normal;line-height:16px}
+
+/* ---------- detail boxes ---------- */
+.boxrow{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;align-items:stretch}
+.box{border:1.5px solid var(--boxline);padding:6px 7px;background:#fff;min-height:158px}
+.box.red{border-color:var(--boxline-r)}
+.box h4{font-size:10px;font-weight:700;text-decoration:underline;text-transform:uppercase;margin-bottom:4px;line-height:1.2}
+.box p{font-size:9.5px;line-height:1.32;margin-bottom:2px}
+.box .sep{border-top:1px dashed var(--line);margin:5px 0 4px;padding-top:4px}
+.box .tagI{font-size:8.5px;font-weight:700;color:var(--navy);letter-spacing:.05em}
+.box .tagH{font-size:8.5px;font-weight:700;color:#8E2F4C;letter-spacing:.05em}
+
+/* ---------- margin chevron ---------- */
+.margin{
+  background:var(--green);color:#fff;
+  clip-path:polygon(0 0, calc(100% - 26px) 0, 100% 50%, calc(100% - 26px) 100%, 0 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+.margin span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:24px;font-weight:700;letter-spacing:.16em}
+
+/* ---------- support ---------- */
+.supwrap{display:grid;grid-template-columns:34px 1fr;gap:6px;margin-top:12px}
+.supcore{display:flex;flex-direction:column;gap:5px}
+.sup{border:1.5px solid var(--boxline);padding:6px 9px}
+.sup h5{font-size:10.5px;font-weight:700;margin-bottom:3px}
+.sup p{font-size:9.5px;line-height:1.45}
+.sup .new{color:var(--red)}
+
+/* ---------- legend ---------- */
+.legend{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;display:flex;gap:22px;flex-wrap:wrap;font-size:9.5px;font-family:Arial,sans-serif;color:#425663}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;display:inline-block}
+.foot{margin-top:6px;font-size:9px;font-family:Arial,sans-serif;color:#425663;line-height:1.5}
+
+@media print{@page{size:A3 landscape;margin:7mm}body{background:#fff;padding:0}.sheet{border:0;padding:0;max-width:none}}
+@media(max-width:1150px){.chevrow,.boxrow,.arrows{grid-template-columns:repeat(2,1fr)}.arrows{display:none}.vband{writing-mode:horizontal-tb;transform:none;padding:6px}.frame{grid-template-columns:1fr}.margin{display:none}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="title"><h1>Sơ đồ chuỗi giá trị hoạt động của Flamingo</h1></div>
+
+<div class="frame">
+  <div class="vband">HOẠT ĐỘNG CHÍNH</div>
+
+  <div class="core">
+
+    <!-- ===== DẢI TRÊN: ĐẦU TƯ & PHÁT TRIỂN BĐS ===== -->
+    <div class="chevrow">
+      <div class="chev first"><div class="n">I1.</div><div class="t">Nghiên cứu,<br>P.triển</div></div>
+      <div class="chev"><div class="n">I2.</div><div class="t">Lựa chọn<br>dự án</div></div>
+      <div class="chev red"><div class="n">I3.</div><div class="t">Marketing<br>&amp; Định vị</div></div>
+      <div class="chev red"><div class="n">I4.</div><div class="t">Huy động<br>vốn</div></div>
+      <div class="chev"><div class="n">I5.</div><div class="t">Thực hiện<br>dự án</div></div>
+      <div class="chev"><div class="n">I6.</div><div class="t">Bán hàng &amp;<br>hoàn thành DA</div></div>
+      <div class="chev"><div class="n">I7.</div><div class="t">Bàn giao &amp;<br>quản trị tài sản</div></div>
+      <div class="chev red"><div class="n">I8.</div><div class="t">Quan hệ với<br>các bên liên quan</div></div>
+    </div>
+
+    <div class="arrows">
+      <i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i><i>↑</i>
+    </div>
+
+    <!-- ===== HỘP CHI TIẾT ===== -->
+    <div class="boxrow">
+
+      <div class="box">
+        <h4>N.cứu, P.triển</h4>
+        <p>1.1 Thu thập &amp; p.tích thông tin thị trường BĐS nghỉ dưỡng, xu hướng du lịch.</p>
+        <p>1.2 Tìm kiếm &amp; đánh giá cơ hội: quỹ đất, điểm đến.</p>
+        <p>1.3 Tìm hiểu về đối thủ, benchmark ngành.</p>
+        <p>1.4 Chỉ rõ thị trường chiến lược &amp; khẩu vị rủi ro.</p>
+      </div>
+
+      <div class="box">
+        <h4>Lựa chọn dự án &amp; sản phẩm dịch vụ</h4>
+        <p class="tagI">MẢNG ĐẦU TƯ</p>
+        <p>I2.1 Báo cáo tiền khả thi, thẩm định NPV/IRR.</p>
+        <p>I2.2 M&amp;A, sang nhượng dự án.</p>
+        <p>I2.3 Thủ tục chủ trương, quy hoạch, giao đất, GPMB.</p>
+        <div class="sep"></div>
+        <p class="tagH">MẢNG KHÁCH SẠN</p>
+        <p>H2.1 Thiết kế danh mục dịch vụ: lưu trú, F&amp;B, onsen–spa, giải trí, MICE.</p>
+        <p>H2.2 Bộ tiêu chuẩn dịch vụ &amp; SOP.</p>
+        <p>H2.3 Chọn mô hình khai thác: tự vận hành / thuê thương hiệu.</p>
+      </div>
+
+      <div class="box red">
+        <h4>Marketing &amp; Định vị</h4>
+        <p>3.1 Định vị thương hiệu Flamingo &amp; concept "Điểm đến".</p>
+        <p>3.2 Thị trường mục tiêu kép: nhà đầu tư BĐS &amp; khách du lịch.</p>
+        <p>3.3 Phát triển khách hàng và đối tác.</p>
+        <p>3.4 Phát triển ý tưởng sản phẩm — đầu vào cho thiết kế.</p>
+      </div>
+
+      <div class="box red">
+        <h4>Gọi vốn &amp; Phân phối</h4>
+        <p class="tagI">MẢNG ĐẦU TƯ</p>
+        <p>I4.1 Đối tác, liên doanh.</p>
+        <p>I4.2 Ngân hàng, tín dụng dự án.</p>
+        <p>I4.3 Nhà đầu tư, trái phiếu, quỹ.</p>
+        <p>I4.4 Cấu trúc vốn, dòng tiền, SPV.</p>
+        <div class="sep"></div>
+        <p class="tagH">MẢNG KHÁCH SẠN</p>
+        <p>H3.1 Kênh OTA, đại lý lữ hành.</p>
+        <p>H3.2 Khách đoàn, MICE, sự kiện.</p>
+        <p>H3.3 Bán trực tiếp: web, tổng đài, tệp chủ sở hữu BĐS.</p>
+      </div>
+
+      <div class="box">
+        <h4>Thực hiện</h4>
+        <p class="tagI">MẢNG ĐẦU TƯ</p>
+        <p>I5.1 Quy hoạch 1/500, concept kiến trúc, cảnh quan.</p>
+        <p>I5.2 Cung ứng, đấu thầu, hợp đồng khung.</p>
+        <p>I5.3 Lập BQLDA, triển khai gói thầu, giám sát.</p>
+        <p>I5.4 Kiểm soát chi phí – tiến độ – chất lượng – an toàn.</p>
+        <div class="sep"></div>
+        <p class="tagH">MẢNG KHÁCH SẠN</p>
+        <p>H4.1 Đón tiếp, lưu trú, buồng phòng.</p>
+        <p>H4.2 F&amp;B, banquet, sự kiện.</p>
+        <p>H4.3 Onsen–spa, giải trí, lữ hành.</p>
+        <p>H4.4 Kỹ thuật, an ninh, cảnh quan tại cơ sở.</p>
+      </div>
+
+      <div class="box">
+        <h4>Kết thúc</h4>
+        <p class="tagI">MẢNG ĐẦU TƯ</p>
+        <p>I6.1 Bán hàng, quản lý đại lý, chính sách giá.</p>
+        <p>I6.2 Thu hồi công nợ, cân đối dư nợ.</p>
+        <p>I6.3 Bàn giao sản phẩm, thủ tục sổ đỏ.</p>
+        <p>I6.4 Nghiệm thu, hoàn công, quyết toán.</p>
+        <div class="sep"></div>
+        <p class="tagH">MẢNG KHÁCH SẠN</p>
+        <p>H5.1 Revenue Management: giá động, ADR, công suất.</p>
+        <p>H5.2 Quản trị danh tiếng OTA, mạng xã hội.</p>
+      </div>
+
+      <div class="box">
+        <h4>Vận hành &amp; Tài sản</h4>
+        <p>I7.1 Chuyển giao tài sản cho đơn vị/SPV vận hành.</p>
+        <p>I7.2 Bảo trì, bảo dưỡng, CAPEX vận hành.</p>
+        <p>I7.3 Cải tạo, nâng cấp theo chu kỳ.</p>
+        <p>I7.4 Theo dõi hiệu quả khai thác, kiểm toán hàng năm.</p>
+        <div class="sep"></div>
+        <p class="tagH">MẢNG KHÁCH SẠN</p>
+        <p>H5.3 CRM, khách hàng thân thiết toàn hệ sinh thái.</p>
+        <p>H5.4 Đo lường NPS/CSAT, vòng cải tiến dịch vụ.</p>
+      </div>
+
+      <div class="box red">
+        <h4>Quan hệ với các bên liên quan</h4>
+        <p>8.1 Chính quyền, vận động chính sách, xúc tiến đầu tư.</p>
+        <p>8.2 Cộng đồng dân cư, trách nhiệm xã hội địa phương.</p>
+        <p>8.3 Nhà đầu tư, ngân hàng, cổ đông (IR).</p>
+        <p>8.4 Đối tác thương hiệu quản lý, hãng lữ hành, hàng không.</p>
+        <div class="sep"></div>
+        <p><b>I8 &amp; H6</b></p>
+      </div>
+
+    </div>
+
+    <!-- ===== DẢI DƯỚI: KINH DOANH DỊCH VỤ KHÁCH SẠN ===== -->
+    <div class="chevrow">
+      <div class="chev first"><div class="n">H1.</div><div class="t">Nghiên cứu,<br>P.triển</div></div>
+      <div class="chev"><div class="n">H2.</div><div class="t">Thiết kế sản phẩm<br>dịch vụ</div></div>
+      <div class="chev red"><div class="n">H3.</div><div class="t">Marketing &amp; Phân phối</div></div>
+      <div class="chev" style="grid-column:5"><div class="n">H4.</div><div class="t">Cung cấp dịch vụ</div></div>
+      <div class="chev" style="grid-column:6 / span 2"><div class="n">H5.</div><div class="t">Quản trị doanh thu &amp; khách hàng</div></div>
+      <div class="chev red"><div class="n">H6.</div><div class="t">Quan hệ với<br>các bên liên quan</div></div>
+    </div>
+
+  </div>
+
+  <div class="margin"><span>LỢI NHUẬN</span></div>
+</div>
+
+<!-- ===== HOẠT ĐỘNG HỖ TRỢ ===== -->
+<div class="supwrap">
+  <div class="vband">HOẠT ĐỘNG HỖ TRỢ</div>
+  <div class="supcore">
+
+    <div class="sup">
+      <h5>A. QUẢN TRỊ &amp; ĐIỀU HÀNH</h5>
+      <p>Quản trị chiến lược; Lập kế hoạch và điều hành; <span class="new">Quản trị danh mục dự án và danh mục tài sản (giữ – cho thuê – thoái vốn).</span></p>
+    </div>
+
+    <div class="sup">
+      <h5>B. QUẢN TRỊ &amp; THỰC THI</h5>
+      <p>Tài chính: <span class="new">Thu xếp vốn; Phát triển nguồn vốn;</span> Phân tích hiệu quả tài chính; Điều phối dòng tiền tập trung;</p>
+      <p>Kế toán: Xây dựng và quản lý vận hành hệ thống kế toán; Hạch toán; Báo cáo; Thống kê;</p>
+      <p>Pháp chế: Pháp lý dự án và pháp lý vận hành cơ sở lưu trú;</p>
+      <p>Quan hệ cổ đông: Quản lý cổ đông;</p>
+      <p class="new">Kiểm soát &amp; quản trị rủi ro: quy trình quy định, thanh tra, kiểm tra, liêm chính — trọng tâm tại 3 điểm rủi ro cao: đất đai (I2.3), đấu thầu (I5.2), quan hệ chính quyền (8.1);</p>
+      <p class="new">Truyền thông và Thương hiệu: Truyền thông đối ngoại; Truyền thông nội bộ; Văn hóa; Nhận diện thương hiệu;</p>
+      <p class="new">Đối ngoại: Tìm hiểu, xúc tiến, thiết lập, kết nối quan hệ đối ngoại trong và ngoài nước;</p>
+      <p class="new">Quản trị vận hành hệ thống CNTT: PMS – POS – CRM hợp nhất; Hệ thống quản lý dữ liệu và thông tin; Bảo mật;</p>
+    </div>
+
+    <div class="sup">
+      <h5>C. QUẢN TRỊ NGUỒN NHÂN LỰC</h5>
+      <p>Hoạch định; Tuyển dụng; Đào tạo; Đãi ngộ; Đánh giá hiệu suất; Phát triển tổ chức; Quan hệ lao động; <span class="new">Đào tạo và chuẩn hóa đội ngũ dịch vụ tuyến đầu — năng lực khác biệt hóa, không phải chức năng back-office.</span></p>
+    </div>
+
+    <div class="sup">
+      <h5>D. MUA SẮM, HÀNH CHÍNH QUẢN TRỊ &amp; CƠ SỞ VẬT CHẤT</h5>
+      <p>Hành chính quản trị; Mua sắm <span class="new">(tách bạch mua sắm dự án — một lần, và mua sắm vận hành — lặp lại);</span> Hạ tầng; Y tế; An toàn lao động; An ninh; 5S; Dịch vụ thuê ngoài; Mặt bằng làm việc;</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="legend">
+  <span><i style="background:var(--navy)"></i>Bước giữ nguyên từ mô hình hiện tại</span>
+  <span><i style="background:var(--red)"></i>Bước bổ sung hoặc hiệu chỉnh vị trí so với sơ đồ cũ</span>
+  <span><i style="background:var(--green)"></i>Lợi nhuận (Margin) — kết quả của toàn chuỗi</span>
+  <span><i style="background:#8E2F4C"></i>Nội dung thuộc mảng Khách sạn</span>
+</div>
+
+<div class="foot">
+  <b>Ghi chú đọc sơ đồ:</b> Dải trên = mảng Đầu tư &amp; Phát triển BĐS (8 bước). Dải dưới = mảng Kinh doanh Dịch vụ Khách sạn (6 bước, các bước được kéo giãn để khớp cột với dải trên). Tiểu quy trình không có tiền tố (1.1, 3.1, 8.1) là nội dung <b>dùng chung cả hai mảng</b>; có tiền tố I hoặc H là nội dung riêng của từng mảng.
+  <b>Bốn bước hiệu chỉnh chính so với sơ đồ cũ:</b> (1) Marketing chuyển từ bước 5 lên bước 3 — đứng trước thiết kế, vì concept sản phẩm quyết định bản vẽ; (2) bổ sung bước Huy động vốn; (3) bổ sung bước Quan hệ với các bên liên quan; (4) tách mảng Khách sạn thành dải riêng vì đây là logic tạo giá trị theo mạng lưới, không phải chuỗi tuyến tính.
+</div>
+
+</div>
+</body>
+</html>

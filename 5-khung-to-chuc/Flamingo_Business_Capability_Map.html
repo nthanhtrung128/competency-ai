@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamingo — Business Capability Map</title>
+<style>
+:root{
+  --ink:#1A2530; --mute:#5B6B76; --line:#D7DEE3; --wash:#F4F6F8; --paper:#fff;
+  --inv:#2E5C9A; --inv-bg:#E7EFF4;
+  --hos:#B8365A; --hos-bg:#FBEAEF;
+  --tour:#2E7D6E; --tour-bg:#E6F1EE;
+  --core:#1F3A66; --core-bg:#E7EFF4;
+  --supp:#5B6B76; --supp-bg:#EDF0F1;
+  --gov:#7A4E8C; --gov-bg:#F1EBF5;
+  --gold:#B9932B; --gold-bg:#FFF7E2;
+  --red:#C13A2E; --red-bg:#FBEDEB;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;background:var(--wash);color:var(--ink);padding:24px;font-size:13px}
+.sheet{max-width:1460px;margin:0 auto;background:var(--paper);border:1px solid var(--line);padding:32px 36px}
+
+.hd{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:16px}
+.eb{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+h1{font-size:23px;margin-top:6px;letter-spacing:-.01em}
+.sub{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.5;max-width:980px}
+
+.logic{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.logic .lx{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;padding:7px 14px;border-radius:3px;letter-spacing:.05em}
+.logic .ar{color:var(--gold);font-weight:900;font-size:15px}
+
+/* toolbar */
+.toolbar{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--line);
+  padding:10px 0 11px;margin:16px 0 4px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tb-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-right:2px}
+.btn{font-family:inherit;font-size:10.5px;font-weight:600;padding:6px 12px;border:1px solid var(--line);
+  background:var(--paper);color:var(--ink);border-radius:3px;cursor:pointer;transition:.12s;white-space:nowrap}
+.btn:hover{background:var(--wash);border-color:var(--mute)}
+.btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.pri{background:var(--inv);color:#fff;border-color:var(--inv)}
+.tb-sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.tb-group{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.search{position:relative}
+.search input{font-family:inherit;font-size:11px;padding:6px 26px 6px 10px;border:1px solid var(--line);border-radius:3px;width:240px;outline:none;color:var(--ink)}
+.search input:focus{border-color:var(--inv)}
+.search .clr{position:absolute;right:6px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--mute);font-size:14px;background:none;border:0;display:none}
+.search.has .clr{display:block}
+.counter{font-size:10px;color:var(--mute);font-style:italic;margin-left:auto;white-space:nowrap}
+mark{background:#FFE9A8;padding:0 1px;border-radius:2px}
+
+.section{margin-top:32px}
+.band{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.band .tag{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:7px 16px;border-radius:2px;white-space:nowrap}
+.band .desc{font-size:11.5px;color:var(--mute);line-height:1.45}
+
+.part{display:flex;align-items:center;gap:10px;margin:20px 0 10px;cursor:pointer;user-select:none;padding:6px 8px 6px 0;border-radius:4px;transition:.12s}
+.part:hover{background:var(--wash)}
+.part .num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:none;background:var(--ink)}
+.part .lbl{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.part .hint{font-size:10.5px;color:var(--mute);font-style:italic}
+.part .chev{margin-left:auto;font-size:11px;color:var(--mute);font-weight:700;transition:transform .18s;padding-right:4px}
+.part.closed .chev{transform:rotate(-90deg)}
+.pbody.closed{display:none}
+
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+th{background:var(--ink);color:#fff;font-size:9.5px;text-align:left;padding:7px 8px;font-weight:700}
+td{border:1px solid var(--line);padding:6px 8px;font-size:10px;vertical-align:top;line-height:1.38}
+tbody tr:nth-child(even) td{background:var(--wash)}
+tr.hide{display:none}
+td.vsi{background:var(--inv)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+td.vsh{background:var(--hos)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+td.vst{background:var(--tour)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+td.vss{background:var(--supp)!important;color:#fff;font-weight:700;font-size:10px;letter-spacing:.04em}
+.cap{font-weight:700;color:var(--core)}
+
+.pill{display:inline-block;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px;color:#fff;white-space:nowrap;letter-spacing:.03em}
+.t-core{background:var(--core)} .t-supp{background:var(--supp)} .t-gov{background:var(--gov)}
+.s-src{background:#2E7D3E} .s-inf{background:var(--gold)} .s-prop{background:#2E5C9A} .s-gap{background:var(--red)}
+
+.note{font-size:10px;color:var(--mute);font-style:italic;margin:8px 0 14px;line-height:1.55;border-left:3px solid var(--gold);padding-left:10px}
+.warn{font-size:10.5px;color:var(--ink);margin:10px 0 14px;line-height:1.55;border-left:3px solid var(--red);background:var(--red-bg);padding:10px 12px}
+
+/* hierarchy */
+.dom{border:1px solid var(--line);border-left:3px solid var(--core);margin-bottom:6px;padding:9px 12px;background:var(--wash)}
+.dom b{font-size:11.5px;display:block;margin-bottom:5px;color:var(--core)}
+.dom .caps{display:flex;flex-wrap:wrap;gap:5px}
+.dom .caps span{font-size:9.5px;background:#fff;border:1px solid var(--line);padding:3px 8px;border-radius:3px}
+.dom .caps span.sub{background:var(--gold-bg);border-color:#E0CE9A}
+
+.verdict{margin-top:20px;padding:16px 18px;border:2px solid var(--red);background:var(--red-bg)}
+.verdict b{font-size:14px;display:block;margin-bottom:6px}
+.verdict p{font-size:11px;line-height:1.6}
+
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 4px;font-size:9.5px;color:var(--mute)}
+.legend span{display:flex;align-items:center;gap:5px}
+
+.foot{margin-top:26px;border-top:1px solid var(--line);padding-top:10px;font-size:9.5px;color:var(--mute);line-height:1.6}
+
+@media print{@page{size:A3 landscape;margin:8mm}body{background:#fff;padding:0}.sheet{border:0;padding:0;max-width:none}.toolbar{display:none!important}.pbody,.pbody.closed{display:block!important}tr.hide{display:table-row!important}}
+@media(max-width:1000px){.counter{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="hd">
+  <div class="eb">Flamingo Group — Business Architecture</div>
+  <h1>Business Capability Map — dẫn xuất từ Value Stream</h1>
+  <div class="sub">Xác định các năng lực (Business Capability) mà Tập đoàn cần <b>có khả năng làm được</b> để thực hiện đầy đủ ba Value Stream hiện tại. Capability được diễn đạt dưới dạng danh từ, không phải tên phòng ban, chức danh, quy trình hay công việc cụ thể. Value Stream được giữ nguyên tên và cấu trúc, không chỉnh sửa.</div>
+  <div class="logic">
+    <div class="lx">VALUE STREAM</div><span class="ar">→</span>
+    <div class="lx">VALUE STAGE</div><span class="ar">→</span>
+    <div class="lx">BUSINESS CAPABILITY</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="tb-group">
+    <span class="tb-label">Hiển thị</span>
+    <button class="btn pri" id="expandAll">Mở rộng tất cả</button>
+    <button class="btn" id="collapseAll">Thu gọn tất cả</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Value Stream</span>
+    <button class="btn on" data-vs="all">Tất cả</button>
+    <button class="btn" data-vs="I">Đầu tư</button>
+    <button class="btn" data-vs="H">Khách sạn</button>
+    <button class="btn" data-vs="T">Lữ hành</button>
+    <button class="btn" data-vs="S">Hỗ trợ</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Loại</span>
+    <button class="btn on" data-ty="all">Tất cả</button>
+    <button class="btn" data-ty="core">Core</button>
+    <button class="btn" data-ty="supp">Supporting</button>
+    <button class="btn" data-ty="gov">Governance</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Nguồn</span>
+    <button class="btn on" data-sr="all">Tất cả</button>
+    <button class="btn" data-sr="SOURCE">SOURCE</button>
+    <button class="btn" data-sr="INFERENCE">INFERENCE</button>
+    <button class="btn" data-sr="PROPOSAL">PROPOSAL</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group search" id="sw"><input type="text" id="q" placeholder="Tìm capability..."><button class="clr" id="qc">&times;</button></div>
+  <button class="btn" id="printBtn">In / Lưu PDF</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<div class="legend">
+  <span><i class="pill t-core">CORE</i> Năng lực tạo giá trị trực tiếp cho khách hàng</span>
+  <span><i class="pill t-supp">SUPPORTING</i> Năng lực nền tảng phục vụ chuỗi</span>
+  <span><i class="pill t-gov">GOVERNANCE</i> Năng lực định hướng &amp; kiểm soát</span>
+  <span><i class="pill s-src">SOURCE</i> Có căn cứ trực tiếp từ Value Stream</span>
+  <span><i class="pill s-inf">INFERENCE</i> Suy luận logic từ Value Stage</span>
+  <span><i class="pill s-prop">PROPOSAL</i> Đề xuất bổ sung</span>
+  <span><i class="pill s-gap">GAP</i> Thiếu dữ liệu</span>
+</div>
+
+<!-- ============ BƯỚC 1 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--ink)">Bước 1 — Phân tích Value Stream</div><div class="desc">Xác định Value Stream, Value Stage, Output và Customer/Stakeholder trước khi dẫn xuất Capability</div></div>
+  <div class="part"><div class="num">1</div><div class="lbl">Cấu trúc Value Stream đầu vào</div><div class="hint">Giữ nguyên từ tài liệu Chuỗi giá trị đã phê duyệt</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr><th style="width:16%">Value Stream</th><th style="width:8%">Số Stage</th><th style="width:34%">Value Stage</th><th style="width:21%">Output</th><th style="width:21%">Customer / Stakeholder</th></tr></thead>
+    <tbody>
+      <tr><td class="vsi">VS1 — Đầu tư &amp; Phát triển BĐS</td><td>8</td><td>I1 Nghiên cứu &amp; PT thị trường · I2 Lựa chọn dự án · I3 Marketing &amp; Định vị · I4 Huy động vốn · I5 Thực hiện dự án · I6 Bán hàng &amp; Hoàn thành · I7 Quản trị tài sản · I8 Quan hệ các bên liên quan</td><td>Sản phẩm BĐS bàn giao; doanh thu bán hàng một lần; quỹ tài sản vận hành</td><td>Nhà đầu tư BĐS; người mua; cơ quan quản lý; ngân hàng &amp; định chế tài chính</td></tr>
+      <tr><td class="vsh">VS2 — Kinh doanh Dịch vụ Khách sạn</td><td>6</td><td>H1 Nghiên cứu &amp; PT thị trường · H2 Thiết kế dịch vụ · H3 Marketing &amp; Phân phối · H4 Cung cấp dịch vụ · H5 Quản trị doanh thu &amp; KH · H6 Quan hệ các bên liên quan</td><td>Doanh thu định kỳ theo công suất; thương hiệu dịch vụ; gia tăng giá trị tài sản</td><td>Khách lưu trú; khách đoàn/MICE; kênh OTA &amp; đại lý; chủ sở hữu BĐS nội bộ</td></tr>
+      <tr><td class="vst">VS3 — Lữ hành &amp; Du lịch</td><td>6</td><td>T1 Nghiên cứu &amp; PT thị trường · T2 Thiết kế Tour · T3 Marketing &amp; Phân phối · T4 Vận hành Tour · T5 Quản trị doanh thu &amp; KH · T6 Quan hệ các bên liên quan</td><td>Biên lợi nhuận mỗi đoàn; tỷ lệ lấp đầy chỗ; lưu lượng khách cho hệ sinh thái</td><td>Khách lẻ &amp; khách đoàn; doanh nghiệp B2B; đối tác điểm đến, vận chuyển, hàng không</td></tr>
+      <tr><td class="vss">Hoạt động hỗ trợ (A–D)</td><td>4 nhóm</td><td>A Quản trị &amp; Điều hành · B Quản trị &amp; Thực thi · C Quản trị Nguồn nhân lực · D Mua sắm, Hành chính &amp; CSVC</td><td>Dịch vụ chia sẻ cho toàn bộ ba Value Stream</td><td>Nội bộ — các Khối kinh doanh; HĐQT; cơ quan quản lý</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>Ba Value Stage dùng chung:</b> Nghiên cứu &amp; PT thị trường (I1/H1/T1) và Quan hệ các bên liên quan (I8/H6/T6) là cùng một hoạt động thực hiện một lần, dùng chung cho cả ba Value Stream. Điều này dẫn tới hệ quả trực tiếp ở Bước 2: các Capability tương ứng là <b>capability dùng chung</b>, không nhân bản ba lần.</div>
+  </div>
+</div>
+
+<!-- ============ OUTPUT 1 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--core)">Output 1 — Value Stage → Business Capability</div><div class="desc">Bước 2 &amp; 3: xác định và phân loại Capability cho từng Value Stage</div></div>
+  <div class="part"><div class="num">2</div><div class="lbl">Bảng dẫn xuất Capability</div><div class="hint">Dùng bộ lọc và ô tìm kiếm ở thanh công cụ để lọc theo Value Stream / Loại / Nguồn</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table id="tbl1">
+    <thead><tr>
+      <th style="width:11%">Value Stream</th><th style="width:9%">Value Stage</th>
+      <th style="width:20%">Business Capability</th><th style="width:38%">Capability Description</th>
+      <th style="width:11%">Type</th><th style="width:11%">Source</th>
+    </tr></thead>
+    <tbody>
+
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I1/H1/T1</td><td class="cap">Market Intelligence</td><td>Khả năng thu thập, tổng hợp và diễn giải dữ liệu thị trường BĐS nghỉ dưỡng và xu hướng du lịch thành thông tin ra quyết định.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I1/H1/T1</td><td class="cap">Opportunity Identification &amp; Screening</td><td>Khả năng phát hiện, sàng lọc và chấm điểm cơ hội (quỹ đất, điểm đến, phân khúc mới) theo bộ tiêu chí nhất quán.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="supp" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I1/H1/T1</td><td class="cap">Competitive Benchmarking</td><td>Khả năng so sánh vị thế Tập đoàn với đối thủ theo bộ chỉ số ngành chuẩn hóa.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="gov" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I1/H1/T1</td><td class="cap">Strategic Portfolio Planning</td><td>Khả năng xác định thị trường chiến lược, khẩu vị rủi ro và phân bổ nguồn lực giữa ba mảng kinh doanh.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I2</td><td class="cap">Investment Appraisal</td><td>Khả năng thẩm định tính khả thi tài chính của dự án (mô hình dòng tiền, NPV/IRR, phân tích độ nhạy).</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I2</td><td class="cap">M&amp;A &amp; Deal Structuring</td><td>Khả năng định giá, đàm phán và cấu trúc giao dịch mua bán/sang nhượng dự án.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I2</td><td class="cap">Land Bank Management</td><td>Khả năng hình thành, nắm giữ và tối ưu danh mục quỹ đất theo định hướng chiến lược dài hạn.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I2</td><td class="cap">Regulatory &amp; Entitlement Management</td><td>Khả năng đưa dự án qua toàn bộ chu trình pháp lý: chủ trương đầu tư, quy hoạch, giao đất.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I2</td><td class="cap">Site Acquisition &amp; Resettlement</td><td>Khả năng giải phóng mặt bằng, thương lượng bồi thường và xử lý tranh chấp tại hiện trường.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I3/H3/T3</td><td class="cap">Brand Management</td><td>Khả năng xây dựng, định vị và bảo vệ giá trị thương hiệu Flamingo trên cả sản phẩm bán và sản phẩm dịch vụ.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I3/H3/T3</td><td class="cap">Customer Segmentation &amp; Insight</td><td>Khả năng phân khúc và thấu hiểu hai tệp khách hàng khác biệt: nhà đầu tư BĐS và khách du lịch.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I3/H2/T2</td><td class="cap">Product Concept Development</td><td>Khả năng chuyển hiểu biết thị trường thành ý tưởng sản phẩm (product brief) làm đầu vào bắt buộc cho khâu thiết kế.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I4</td><td class="cap">Capital Raising</td><td>Khả năng huy động vốn từ đa nguồn: đối tác liên doanh, tín dụng ngân hàng, trái phiếu, quỹ đầu tư.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I4</td><td class="cap">Financial Structuring</td><td>Khả năng thiết kế cấu trúc vốn và dòng tiền tối ưu cho từng dự án và cho danh mục nhiều dự án song song.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="INFERENCE"><td>VS1</td><td>I4</td><td class="cap">Treasury &amp; Liquidity Management</td><td>Khả năng điều phối dòng tiền tập trung và quản trị thanh khoản toàn Tập đoàn.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I5</td><td class="cap">Master Planning &amp; Architectural Design</td><td>Khả năng quy hoạch tổng thể và định hình ngôn ngữ kiến trúc đặc trưng cho các dự án nghỉ dưỡng.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I5</td><td class="cap">Landscape Design</td><td>Khả năng thiết kế và chuẩn hóa cảnh quan đặc thù khu nghỉ dưỡng, áp dụng nhất quán đa dự án.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I5</td><td class="cap">Construction Project Management</td><td>Khả năng điều hành thi công đạt đồng thời mục tiêu tiến độ, chi phí, chất lượng và an toàn.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I5</td><td class="cap">Contractor Management</td><td>Khả năng sàng lọc, đánh giá và quản trị hiệu suất nhà thầu trong suốt vòng đời hợp đồng.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T S" data-ty="supp" data-sr="SOURCE"><td>VS1·Hỗ trợ</td><td>I5 / D</td><td class="cap">Sourcing &amp; Procurement</td><td>Khả năng đấu thầu, đàm phán hợp đồng khung và mua tập trung — bao gồm cả mua sắm dự án (một lần) và mua sắm vận hành (lặp lại).</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="gov" data-sr="SOURCE"><td>VS1</td><td>I5</td><td class="cap">Cost, Schedule &amp; Quality Control</td><td>Khả năng kiểm soát độ lệch giữa thực tế và kế hoạch trên ba trục chi phí – tiến độ – chất lượng.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="INFERENCE"><td>VS1</td><td>I5</td><td class="cap">Health, Safety &amp; Environment (HSE)</td><td>Khả năng quản trị an toàn lao động và tác động môi trường tại công trường — tiêu chuẩn khác biệt với an toàn khách lưu trú.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I6</td><td class="cap">Sales Channel Management</td><td>Khả năng xây dựng, đánh giá và tối ưu mạng lưới đại lý phân phối BĐS.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="core" data-sr="SOURCE"><td>VS1</td><td>I6</td><td class="cap">Pricing Management</td><td>Khả năng thiết lập chính sách giá bán theo giai đoạn dự án và điều kiện thị trường.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I6</td><td class="cap">Credit &amp; Receivables Management</td><td>Khả năng quản trị công nợ khách hàng và cân đối dư nợ dự án theo kế hoạch dòng tiền.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I6</td><td class="cap">Property Handover &amp; Title Administration</td><td>Khả năng bàn giao sản phẩm và hoàn tất thủ tục Giấy chứng nhận quyền sở hữu cho khách hàng.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I6</td><td class="cap">Contract Closeout &amp; Settlement</td><td>Khả năng nghiệm thu, hoàn công và quyết toán hợp đồng đúng hạn sau bàn giao.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="I H" data-ty="gov" data-sr="SOURCE"><td>VS1·VS2</td><td>I7</td><td class="cap">Asset Portfolio Management</td><td>Khả năng quản trị danh mục tài sản ở cấp Tập đoàn và ra quyết định giữ – cho thuê – thoái vốn.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H" data-ty="supp" data-sr="SOURCE"><td>VS1·VS2</td><td>I7</td><td class="cap">Asset Maintenance &amp; Renovation</td><td>Khả năng hoạch định và thực thi bảo trì, cải tạo tài sản theo chu kỳ vòng đời.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H" data-ty="gov" data-sr="INFERENCE"><td>VS1·VS2</td><td>I7</td><td class="cap">Capital Expenditure Planning</td><td>Khả năng hoạch định và phân bổ ngân sách CAPEX vận hành giữa các tài sản cạnh tranh nguồn lực.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+    <tr data-vs="I H" data-ty="gov" data-sr="INFERENCE"><td>VS1·VS2</td><td>I7</td><td class="cap">Asset Performance Analytics</td><td>Khả năng đo lường hiệu quả khai thác của từng tài sản riêng lẻ (không chỉ hợp nhất cấp Tập đoàn).</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I8/H6/T6</td><td class="cap">Government &amp; Regulatory Affairs</td><td>Khả năng thiết lập và duy trì quan hệ chính danh với cơ quan quản lý, xúc tiến đầu tư.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="supp" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I8/H6/T6</td><td class="cap">Community Relations &amp; CSR</td><td>Khả năng xây dựng đồng thuận cộng đồng dân cư tại địa phương triển khai dự án.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I" data-ty="supp" data-sr="SOURCE"><td>VS1</td><td>I8</td><td class="cap">Investor Relations</td><td>Khả năng duy trì quan hệ và niềm tin của nhà đầu tư, ngân hàng, cổ đông.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I8/H6/T6</td><td class="cap">Strategic Partnership Management</td><td>Khả năng thiết lập và khai thác quan hệ đối tác chiến lược: hãng lữ hành, hàng không, đối tác thương hiệu.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="H" data-ty="core" data-sr="SOURCE"><td>VS2</td><td>H2</td><td class="cap">Service Product Design</td><td>Khả năng thiết kế danh mục dịch vụ (lưu trú, F&amp;B, onsen–spa, giải trí, MICE) và cơ cấu doanh thu mục tiêu.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H" data-ty="core" data-sr="SOURCE"><td>VS2</td><td>H2</td><td class="cap">Service Standard Management</td><td>Khả năng tự xây dựng, ban hành và duy trì bộ tiêu chuẩn dịch vụ (SOP) — trọng yếu vì Tập đoàn tự vận hành, không dựa vào chuẩn có sẵn của bên thứ ba.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H T" data-ty="core" data-sr="SOURCE"><td>VS2·VS3</td><td>H2/T4</td><td class="cap">Frontline Service Capability Development</td><td>Khả năng tuyển dụng, đào tạo và chuẩn hóa đội ngũ dịch vụ tuyến đầu — với mô hình tự vận hành, đây là nơi năng lực dịch vụ thực sự cư trú.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="H T" data-ty="core" data-sr="SOURCE"><td>VS2·VS3</td><td>H3/T3</td><td class="cap">Distribution Channel Management</td><td>Khả năng kết nối, đàm phán và tối ưu hỗn hợp kênh phân phối: OTA, đại lý lữ hành, đối tác quốc tế.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H T" data-ty="core" data-sr="SOURCE"><td>VS2·VS3</td><td>H3/T3</td><td class="cap">Group &amp; MICE Sales</td><td>Khả năng khai thác phân khúc khách đoàn, hội nghị, sự kiện và hợp đồng doanh nghiệp B2B.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H T" data-ty="core" data-sr="INFERENCE"><td>VS2·VS3</td><td>H3/T3</td><td class="cap">Direct &amp; Digital Commerce</td><td>Khả năng bán trực tiếp qua website, tổng đài, ứng dụng và khai thác tệp chủ sở hữu BĐS nội bộ — đòn bẩy giảm phụ thuộc kênh trung gian.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+
+    <tr data-vs="H" data-ty="core" data-sr="SOURCE"><td>VS2</td><td>H4</td><td class="cap">Accommodation Operations</td><td>Khả năng vận hành lưu trú: đón tiếp, buồng phòng, concierge theo tiêu chuẩn hạng sao.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H" data-ty="core" data-sr="SOURCE"><td>VS2</td><td>H4</td><td class="cap">Food &amp; Beverage Operations</td><td>Khả năng vận hành nhà hàng, bar, tiệc và sự kiện, bao gồm kiểm soát chi phí nguyên liệu và an toàn thực phẩm.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H" data-ty="core" data-sr="SOURCE"><td>VS2</td><td>H4</td><td class="cap">Leisure &amp; Wellness Operations</td><td>Khả năng vận hành onsen–spa, công viên giải trí, thể thao và hoạt động trải nghiệm tại khu nghỉ dưỡng.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H" data-ty="supp" data-sr="SOURCE"><td>VS2</td><td>H4</td><td class="cap">Facility &amp; Engineering Management</td><td>Khả năng bảo trì hệ thống kỹ thuật, cảnh quan và cơ sở vật chất tại điểm vận hành.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H" data-ty="supp" data-sr="SOURCE"><td>VS2</td><td>H4</td><td class="cap">Guest Safety &amp; Security</td><td>Khả năng đảm bảo an toàn và an ninh cho khách lưu trú — bộ tiêu chuẩn tách biệt với an toàn công trường.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="H T" data-ty="core" data-sr="SOURCE"><td>VS2·VS3</td><td>H5/T5</td><td class="cap">Revenue Management</td><td>Khả năng định giá động và phân bổ công suất/chỗ theo mùa vụ, kênh và phân khúc nhằm tối ưu doanh thu.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H T" data-ty="core" data-sr="SOURCE"><td>VS2·VS3</td><td>H5/T5</td><td class="cap">Reputation Management</td><td>Khả năng theo dõi và can thiệp vào danh tiếng trên kênh OTA, mạng xã hội và các nền tảng đánh giá.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="I H T" data-ty="core" data-sr="SOURCE"><td>VS1·VS2·VS3</td><td>I6/H5/T5</td><td class="cap">Customer Relationship Management</td><td>Khả năng quản trị dữ liệu và vòng đời khách hàng hợp nhất trên toàn hệ sinh thái ba mảng.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="H T" data-ty="gov" data-sr="SOURCE"><td>VS2·VS3</td><td>H5/T5</td><td class="cap">Customer Experience Measurement</td><td>Khả năng đo lường NPS/CSAT và đóng vòng cải tiến chất lượng dịch vụ dựa trên phản hồi.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="T" data-ty="core" data-sr="SOURCE"><td>VS3</td><td>T2</td><td class="cap">Tour Product Design</td><td>Khả năng thiết kế hành trình theo phân khúc và kết nối sản phẩm tour với hệ sinh thái lưu trú, dịch vụ sẵn có.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="T" data-ty="core" data-sr="SOURCE"><td>VS3</td><td>T2</td><td class="cap">Destination Partner Network Management</td><td>Khả năng thiết lập và duy trì mạng lưới đối tác tại điểm đến, vận chuyển và dịch vụ mặt đất — nền tảng giá thành và chất lượng tour.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="T" data-ty="core" data-sr="SOURCE"><td>VS3</td><td>T4</td><td class="cap">Tour Operations Management</td><td>Khả năng điều phối lịch trình, phương tiện và nhân sự cho nhiều đoàn khách đồng thời, kể cả mùa cao điểm.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="T" data-ty="core" data-sr="SOURCE"><td>VS3</td><td>T4</td><td class="cap">Tour Guide Management</td><td>Khả năng tuyển chọn, đào tạo, cấp chứng chỉ và quản trị chất lượng đội ngũ hướng dẫn viên theo tuyến điểm.</td><td><span class="pill t-core">CORE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="T" data-ty="supp" data-sr="SOURCE"><td>VS3</td><td>T4</td><td class="cap">Traveler Safety &amp; Incident Management</td><td>Khả năng xử lý sự cố khẩn cấp và đảm bảo an toàn đoàn khách trong suốt hành trình ngoài phạm vi cơ sở Tập đoàn.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    <tr data-vs="S" data-ty="gov" data-sr="SOURCE"><td>Hỗ trợ</td><td>A</td><td class="cap">Strategic Planning &amp; Performance Governance</td><td>Khả năng hoạch định chiến lược, lập kế hoạch và giám sát hiệu quả hoạt động toàn Tập đoàn.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Financial Management &amp; Accounting</td><td>Khả năng hạch toán, báo cáo hợp nhất và kế toán quản trị theo từng đơn vị/dự án/cơ sở.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="gov" data-sr="SOURCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Legal &amp; Compliance</td><td>Khả năng đảm bảo an toàn pháp lý cho dự án, hợp đồng thương mại và giấy phép vận hành cơ sở.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="gov" data-sr="SOURCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Internal Audit &amp; Integrity</td><td>Khả năng kiểm soát tuân thủ và quản trị rủi ro liêm chính, độc lập với các Khối kinh doanh.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="gov" data-sr="INFERENCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Enterprise Risk Management</td><td>Khả năng nhận diện, đo lường và ứng phó rủi ro ở cấp Tập đoàn — vượt trên phạm vi kiểm soát tuân thủ đơn thuần.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Corporate Communications</td><td>Khả năng truyền thông đối ngoại, truyền thông nội bộ và quản trị nhận diện thương hiệu Tập đoàn.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Digital Platform Management</td><td>Khả năng vận hành nền tảng công nghệ lõi PMS – POS – CRM hợp nhất giữa ba mảng kinh doanh.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="INFERENCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Data &amp; Analytics</td><td>Khả năng hợp nhất và khai thác dữ liệu khách hàng, vận hành, tài chính thành thông tin ra quyết định xuyên mảng.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+    <tr data-vs="S" data-ty="gov" data-sr="INFERENCE"><td>Hỗ trợ</td><td>B</td><td class="cap">Information Security</td><td>Khả năng bảo mật dữ liệu khách hàng và hệ thống thông tin của Tập đoàn.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-inf">INFERENCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>C</td><td class="cap">Talent Acquisition</td><td>Khả năng thu hút và tuyển chọn nhân sự cho cả ba mảng với đặc thù thị trường lao động khác nhau.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>C</td><td class="cap">Learning &amp; Development</td><td>Khả năng thiết kế và triển khai chương trình đào tạo chuẩn hóa toàn hệ thống.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>C</td><td class="cap">Total Rewards</td><td>Khả năng thiết kế hệ thống đãi ngộ gắn với giá trị vị trí và hiệu suất, đảm bảo công bằng nội bộ và cạnh tranh thị trường.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>C</td><td class="cap">Performance Management</td><td>Khả năng thiết lập mục tiêu, đo lường và phản hồi hiệu suất ở cấp cá nhân và đơn vị.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="gov" data-sr="SOURCE"><td>Hỗ trợ</td><td>C</td><td class="cap">Organization Development</td><td>Khả năng thiết kế cơ cấu tổ chức, khung năng lực và lộ trình nghề nghiệp phù hợp chiến lược kinh doanh.</td><td><span class="pill t-gov">GOVERNANCE</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>D</td><td class="cap">Administration &amp; Workplace Services</td><td>Khả năng cung cấp hạ tầng văn phòng, hậu cần và dịch vụ hành chính cho nhiều địa điểm.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+    <tr data-vs="S" data-ty="supp" data-sr="SOURCE"><td>Hỗ trợ</td><td>D</td><td class="cap">Corporate Security</td><td>Khả năng bảo vệ an ninh dự án, cơ sở và tài sản Tập đoàn.</td><td><span class="pill t-supp">SUPPORTING</span></td><td><span class="pill s-src">SOURCE</span></td></tr>
+
+    </tbody>
+  </table>
+  <div class="note">Tổng cộng <b>71 Business Capability</b>. Các Capability phục vụ nhiều Value Stream được ghi gộp một dòng (không nhân bản), đúng nguyên tắc "một Capability có thể phục vụ nhiều Value Stream".</div>
+  </div>
+</div>
+
+<!-- ============ OUTPUT 2 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--gold)">Output 2 — Capability Coverage</div><div class="desc">Các Capability dùng chung nhiều Value Stream — nơi quyết định hiệu quả cộng hưởng của mô hình tập đoàn</div></div>
+  <div class="part"><div class="num">3</div><div class="lbl">Ma trận phủ Value Stream</div><div class="hint">Chỉ liệt kê Capability phục vụ từ 2 Value Stream trở lên</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr><th style="width:22%">Capability</th><th style="width:16%">Value Stream liên quan</th><th style="width:14%">Value Stage</th><th style="width:14%">Mức độ cần thiết</th><th style="width:34%">Evidence</th></tr></thead>
+    <tbody>
+      <tr><td class="cap">Market Intelligence</td><td>VS1 · VS2 · VS3</td><td>I1/H1/T1</td><td><b>Bắt buộc</b></td><td>[SOURCE] Value Stage I1/H1/T1 được xác định là bước dùng chung, thực hiện một lần cho cả ba mảng.</td></tr>
+      <tr><td class="cap">Brand Management</td><td>VS1 · VS2 · VS3</td><td>I3/H3/T3</td><td><b>Bắt buộc</b></td><td>[SOURCE] Value Stage I3 nêu rõ định vị thương hiệu và concept "Điểm đến" phục vụ cả sản phẩm bán lẫn sản phẩm dịch vụ.</td></tr>
+      <tr><td class="cap">Customer Relationship Management</td><td>VS1 · VS2 · VS3</td><td>I6/H5/T5</td><td><b>Bắt buộc</b></td><td>[SOURCE] Xuất hiện ở cả ba Value Stream; H5.3 nêu "CRM toàn hệ sinh thái".</td></tr>
+      <tr><td class="cap">Government &amp; Regulatory Affairs</td><td>VS1 · VS2 · VS3</td><td>I8/H6/T6</td><td><b>Bắt buộc</b></td><td>[SOURCE] Value Stage I8/H6/T6 là bước dùng chung; một quan hệ phục vụ cả cấp phép dự án lẫn giấy phép vận hành.</td></tr>
+      <tr><td class="cap">Strategic Partnership Management</td><td>VS1 · VS2 · VS3</td><td>I8/H6/T6</td><td><b>Bắt buộc</b></td><td>[SOURCE] 8.4 nêu đối tác thương hiệu, hãng lữ hành, hàng không — phục vụ đồng thời cả ba mảng.</td></tr>
+      <tr><td class="cap">Revenue Management</td><td>VS2 · VS3</td><td>H5/T5</td><td><b>Bắt buộc</b></td><td>[SOURCE] H5.1 định giá động theo công suất; T5 định giá tour theo mùa vụ — cùng bản chất tối ưu doanh thu theo năng lực cung hữu hạn.</td></tr>
+      <tr><td class="cap">Distribution Channel Management</td><td>VS2 · VS3</td><td>H3/T3</td><td><b>Bắt buộc</b></td><td>[SOURCE] Cả H3 và T3 đều dựa trên mạng lưới OTA/đại lý lữ hành; T3 bổ sung kênh B2B doanh nghiệp.</td></tr>
+      <tr><td class="cap">Frontline Service Capability Development</td><td>VS2 · VS3</td><td>H2/T4</td><td><b>Bắt buộc</b></td><td>[SOURCE] Quyết định tự vận hành khiến năng lực dịch vụ nằm hoàn toàn ở đội ngũ nội bộ; T4 phụ thuộc chất lượng hướng dẫn viên.</td></tr>
+      <tr><td class="cap">Asset Portfolio Management</td><td>VS1 · VS2</td><td>I7</td><td><b>Bắt buộc</b></td><td>[SOURCE] Tài sản do VS1 tạo ra, VS2 khai thác, quyết định danh mục ở cấp Tập đoàn — điểm giao thoa thường trực.</td></tr>
+      <tr><td class="cap">Sourcing &amp; Procurement</td><td>VS1 · VS2 · VS3 · Hỗ trợ</td><td>I5 / D</td><td>Quan trọng</td><td>[SOURCE] Nhóm hỗ trợ D nêu rõ cần tách bạch mua sắm dự án (một lần) và mua sắm vận hành (lặp lại).</td></tr>
+      <tr><td class="cap">Customer Segmentation &amp; Insight</td><td>VS1 · VS2 · VS3</td><td>I3/H3/T3</td><td>Quan trọng</td><td>[SOURCE] I3.2 nêu "thị trường mục tiêu kép: nhà đầu tư BĐS &amp; khách du lịch".</td></tr>
+      <tr><td class="cap">Group &amp; MICE Sales</td><td>VS2 · VS3</td><td>H3/T3</td><td>Quan trọng</td><td>[SOURCE] H3.2 khách đoàn/MICE; T3 hợp đồng B2B doanh nghiệp — cùng năng lực bán theo nhóm.</td></tr>
+      <tr><td class="cap">Customer Experience Measurement</td><td>VS2 · VS3</td><td>H5/T5</td><td>Quan trọng</td><td>[SOURCE] H5.4 đo lường NPS/CSAT; T5 đo lường NPS/CSAT theo hành trình.</td></tr>
+      <tr><td class="cap">Digital Platform Management</td><td>VS1 · VS2 · VS3</td><td>Hỗ trợ B</td><td><b>Bắt buộc</b></td><td>[SOURCE] Nhóm hỗ trợ B nêu "PMS – POS – CRM hợp nhất"; là điều kiện kỹ thuật để CRM dùng chung hoạt động được.</td></tr>
+      <tr><td class="cap">Data &amp; Analytics</td><td>VS1 · VS2 · VS3</td><td>Hỗ trợ B</td><td>Quan trọng</td><td>[INFERENCE] Không nêu tường minh trong Value Stream, nhưng là điều kiện cần để Market Intelligence và Asset Performance Analytics vận hành.</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>Nhận định:</b> 15/71 Capability (21,1%) phục vụ từ 2 Value Stream trở lên. Đây chính là nhóm quyết định liệu Flamingo vận hành như <b>một Tập đoàn có cộng hưởng</b> hay chỉ là ba doanh nghiệp đặt cạnh nhau. Nếu các Capability này bị phân mảnh theo từng Khối, lợi thế quy mô của mô hình tập đoàn sẽ không hiện thực hóa được.</div>
+  </div>
+</div>
+
+<!-- ============ OUTPUT 3 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--red)">Output 3 — Capability Gap</div><div class="desc">Những chỗ chưa đủ căn cứ để khẳng định, cần bổ sung dữ liệu trước khi sang bước tiếp theo</div></div>
+  <div class="part"><div class="num">4</div><div class="lbl">Danh mục khoảng trống dữ liệu</div><div class="hint">Ghi nhận trung thực, không lấp bằng suy đoán</div><div class="chev">▼</div></div>
+  <div class="pbody">
+  <table>
+    <thead><tr><th style="width:20%">Gap</th><th style="width:30%">Mô tả</th><th style="width:26%">Ảnh hưởng</th><th style="width:24%">Dữ liệu cần bổ sung</th></tr></thead>
+    <tbody>
+      <tr><td class="cap">[GAP-1] Chưa có đánh giá mức độ trưởng thành</td><td>Capability Map hiện chỉ trả lời "cần có khả năng gì", chưa trả lời "hiện đang ở mức nào".</td><td>Không thể xác định capability nào cần đầu tư trước, capability nào đã đủ — tức chưa đủ cơ sở phân bổ nguồn lực.</td><td>Khảo sát maturity assessment (thang 1–5) cho từng capability, có ý kiến lãnh đạo Khối.</td></tr>
+      <tr><td class="cap">[GAP-2] Value Stream VS3 chưa có nguồn xác thực</td><td>Toàn bộ chuỗi T1–T6 được xây dựng bằng suy luận logic ngành lữ hành, chưa đối chiếu với tài liệu vận hành thực tế của FTV.</td><td>Các capability nhánh VS3 (Tour Product Design, Destination Partner Network...) có thể lệch so với cách FTV thực sự vận hành.</td><td>Tài liệu mô tả chức năng nhiệm vụ FTV; quy trình vận hành tour hiện hành; cơ cấu doanh thu thực tế.</td></tr>
+      <tr><td class="cap">[GAP-3] Chi tiết vận hành VS2 phần lớn là suy luận</td><td>Các Value Stage H2–H5 dựa trên logic ngành khách sạn nói chung, không dựa trên tài liệu khảo sát FHR.</td><td>Danh mục capability vận hành khách sạn có thể thừa (Tập đoàn chưa làm) hoặc thiếu (Tập đoàn có làm nhưng chưa nêu).</td><td>Tài liệu chức năng nhiệm vụ FHR và các Cơ sở Vận hành KD DV; danh mục dịch vụ thực tế đang khai thác.</td></tr>
+      <tr><td class="cap">[GAP-4] Chưa rõ ranh giới capability giữa Tập đoàn và Đơn vị thành viên</td><td>Value Stream không chỉ rõ capability nào tập trung ở Tập đoàn, capability nào phân tán về FLV/FHR/FTV.</td><td>Đây là biến số quyết định thiết kế Operating Model — không thể bỏ qua.</td><td>Quy chế phân cấp phân quyền hiện hành giữa Tập đoàn và các Công ty thành viên.</td></tr>
+      <tr><td class="cap">[GAP-5] Cơ chế quản trị tài sản liên mảng chưa tồn tại</td><td>Asset Portfolio Management được xác định là capability bắt buộc, nhưng chưa có đầu mối tổ chức nào đang thực sự đảm nhiệm.</td><td>Rủi ro tranh chấp trách nhiệm giữa bên tạo tài sản (VS1) và bên khai thác (VS2) khi tài sản xuống cấp.</td><td>Quyết định thành lập và quy chế hoạt động của cơ chế quản trị liên mảng — hiện mới ở mức [PROPOSAL].</td></tr>
+      <tr><td class="cap">[GAP-6] Chưa có dữ liệu hiện trạng nền tảng số</td><td>Digital Platform Management được xác định là bắt buộc, nhưng không rõ PMS/POS/CRM hiện đã hợp nhất hay còn phân mảnh.</td><td>Nếu dữ liệu khách hàng đang phân mảnh giữa FLV–FHR–FTV thì các capability dùng chung (CRM, Data &amp; Analytics) chỉ tồn tại trên giấy.</td><td>Bản đồ hệ thống ứng dụng hiện tại (application landscape) và luồng dữ liệu giữa ba mảng.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ============ OUTPUT 4 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--core)">Output 4 — Capability Hierarchy</div><div class="desc">Level 1 Domain → Level 2 Capability. Level 3 chỉ tạo ở nơi Value Stream có căn cứ trực tiếp.</div></div>
+  <div class="part"><div class="num">5</div><div class="lbl">Phân cấp năng lực</div><div class="hint">13 Capability Domain</div><div class="chev">▼</div></div>
+  <div class="pbody">
+
+  <div class="dom"><b>D1 — Market &amp; Strategy</b><div class="caps"><span>Market Intelligence</span><span>Opportunity Identification &amp; Screening</span><span>Competitive Benchmarking</span><span>Strategic Portfolio Planning</span><span>Strategic Planning &amp; Performance Governance</span></div></div>
+
+  <div class="dom"><b>D2 — Investment &amp; Development</b><div class="caps"><span>Investment Appraisal</span><span>M&amp;A &amp; Deal Structuring</span><span>Land Bank Management</span><span>Regulatory &amp; Entitlement Management</span><span>Site Acquisition &amp; Resettlement</span></div></div>
+
+  <div class="dom"><b>D3 — Capital &amp; Finance</b><div class="caps"><span>Capital Raising</span><span class="sub">↳ Partner &amp; JV Financing</span><span class="sub">↳ Bank Credit Financing</span><span class="sub">↳ Bond &amp; Institutional Financing</span><span>Financial Structuring</span><span>Treasury &amp; Liquidity Management</span><span>Financial Management &amp; Accounting</span><span>Credit &amp; Receivables Management</span></div></div>
+
+  <div class="dom"><b>D4 — Design &amp; Construction</b><div class="caps"><span>Master Planning &amp; Architectural Design</span><span>Landscape Design</span><span>Construction Project Management</span><span>Contractor Management</span><span>Cost, Schedule &amp; Quality Control</span><span>Health, Safety &amp; Environment</span></div></div>
+
+  <div class="dom"><b>D5 — Sales &amp; Commercial (Real Estate)</b><div class="caps"><span>Sales Channel Management</span><span>Pricing Management</span><span>Property Handover &amp; Title Administration</span><span>Contract Closeout &amp; Settlement</span></div></div>
+
+  <div class="dom"><b>D6 — Service Design &amp; Standards</b><div class="caps"><span>Service Product Design</span><span>Service Standard Management</span><span>Frontline Service Capability Development</span></div></div>
+
+  <div class="dom"><b>D7 — Hospitality Operations</b><div class="caps"><span>Accommodation Operations</span><span>Food &amp; Beverage Operations</span><span>Leisure &amp; Wellness Operations</span><span>Facility &amp; Engineering Management</span><span>Guest Safety &amp; Security</span></div></div>
+
+  <div class="dom"><b>D8 — Travel &amp; Tour Operations</b><div class="caps"><span>Tour Product Design</span><span>Destination Partner Network Management</span><span>Tour Operations Management</span><span>Tour Guide Management</span><span>Traveler Safety &amp; Incident Management</span></div></div>
+
+  <div class="dom"><b>D9 — Demand &amp; Revenue</b><div class="caps"><span>Distribution Channel Management</span><span class="sub">↳ OTA &amp; Travel Trade Channel</span><span class="sub">↳ Direct &amp; Digital Commerce</span><span>Group &amp; MICE Sales</span><span>Revenue Management</span></div></div>
+
+  <div class="dom"><b>D10 — Customer &amp; Brand</b><div class="caps"><span>Brand Management</span><span>Customer Segmentation &amp; Insight</span><span>Product Concept Development</span><span>Customer Relationship Management</span><span>Reputation Management</span><span>Customer Experience Measurement</span><span>Corporate Communications</span></div></div>
+
+  <div class="dom"><b>D11 — Asset Management</b><div class="caps"><span>Asset Portfolio Management</span><span>Asset Maintenance &amp; Renovation</span><span>Capital Expenditure Planning</span><span>Asset Performance Analytics</span></div></div>
+
+  <div class="dom"><b>D12 — Stakeholder, Risk &amp; Governance</b><div class="caps"><span>Government &amp; Regulatory Affairs</span><span>Community Relations &amp; CSR</span><span>Investor Relations</span><span>Strategic Partnership Management</span><span>Legal &amp; Compliance</span><span>Internal Audit &amp; Integrity</span><span>Enterprise Risk Management</span></div></div>
+
+  <div class="dom"><b>D13 — Enterprise Enablement</b><div class="caps"><span>Human Capital Management</span><span class="sub">↳ Talent Acquisition</span><span class="sub">↳ Learning &amp; Development</span><span class="sub">↳ Total Rewards</span><span class="sub">↳ Performance Management</span><span class="sub">↳ Organization Development</span><span>Digital Platform Management</span><span>Data &amp; Analytics</span><span>Information Security</span><span>Sourcing &amp; Procurement</span><span>Administration &amp; Workplace Services</span><span>Corporate Security</span></div></div>
+
+  <div class="note">Level 3 (ô nền vàng) chỉ được tạo ở 3 nhóm có căn cứ trực tiếp trong Value Stream: <b>Capital Raising</b> (I4.1–I4.3 nêu rõ ba nguồn vốn), <b>Distribution Channel Management</b> (H3.1–H3.3 nêu rõ kênh trung gian và kênh trực tiếp), và <b>Human Capital Management</b> (nhóm hỗ trợ C liệt kê rõ các chức năng thành phần). Các Domain còn lại <b>không tự tạo Level 3</b> vì tài liệu chưa đủ căn cứ.</div>
+  </div>
+</div>
+
+<!-- ============ OUTPUT 5 ============ -->
+<div class="section">
+  <div class="band"><div class="tag" style="background:var(--gov)">Output 5 — Quality Check</div><div class="desc">Bước 4: kiểm tra trùng lặp, bỏ sót và mức độ rõ ràng của Capability</div></div>
+  <div class="part"><div class="num">6</div><div class="lbl">Đánh giá chất lượng Capability Map</div><div class="hint">Kèm kết luận về mức độ sẵn sàng chuyển sang Operating Model</div><div class="chev">▼</div></div>
+  <div class="pbody">
+
+  <table>
+    <thead><tr><th style="width:16%">Tiêu chí</th><th style="width:14%">Kết quả</th><th style="width:70%">Diễn giải</th></tr></thead>
+    <tbody>
+      <tr><td class="cap">Coverage</td><td><b style="color:#2E7D3E">Đạt</b></td><td>20/20 Value Stage đều có ít nhất một Capability tương ứng. Không có Value Stage nào bị bỏ trống.</td></tr>
+      <tr><td class="cap">Duplication</td><td><b style="color:var(--gold)">Cần lưu ý</b></td><td>Đã gộp 4 cặp có nguy cơ trùng: (1) kênh phân phối khách sạn và kênh lữ hành → gộp thành <i>Distribution Channel Management</i> với 2 sub-capability; (2) đào tạo dịch vụ khách sạn và quản trị hướng dẫn viên → giữ tách vì bối cảnh vận hành khác biệt; (3) mua sắm dự án và mua sắm vận hành → gộp thành <i>Sourcing &amp; Procurement</i>; (4) an toàn công trường / an toàn khách lưu trú / an toàn hành trình → <b>giữ tách ba capability</b> vì ba bộ tiêu chuẩn và khung pháp lý khác nhau.</td></tr>
+      <tr><td class="cap">Missing Capability</td><td><b style="color:var(--gold)">Đã bổ sung</b></td><td>Bốn capability không xuất hiện tường minh trong Value Stream nhưng bắt buộc phải có, đã bổ sung và gắn nhãn [INFERENCE]: <i>Enterprise Risk Management</i>, <i>Data &amp; Analytics</i>, <i>Information Security</i>, <i>Treasury &amp; Liquidity Management</i>.</td></tr>
+      <tr><td class="cap">Ambiguous Capability</td><td><b style="color:var(--gold)">2 mục</b></td><td><i>Product Concept Development</i> — ranh giới với <i>Service Product Design</i> và <i>Tour Product Design</i> chưa dứt khoát, cần làm rõ đây là năng lực cấp Tập đoàn hay cấp từng mảng. <i>Strategic Portfolio Planning</i> — chồng lấn một phần với <i>Asset Portfolio Management</i> ở khâu quyết định danh mục.</td></tr>
+      <tr><td class="cap">Capability chưa có căn cứ</td><td><b style="color:var(--red)">14/71 (19,7%)</b></td><td>10 capability gắn nhãn [INFERENCE] và toàn bộ nhóm VS3 chưa được đối chiếu tài liệu nguồn (xem GAP-2, GAP-3). Tỷ lệ này vượt ngưỡng an toàn để đưa vào thiết kế tổ chức chính thức.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn"><b>Nhận định trọng yếu:</b> Capability Map đã <b>đủ về mặt cấu trúc</b> (phủ hết Value Stage, phân loại rõ, không còn trùng lặp lớn), nhưng <b>chưa đủ về mặt xác thực</b>. Cụ thể: (1) chưa biết mức độ trưởng thành hiện tại của từng capability; (2) chưa biết capability nào tập trung ở Tập đoàn, capability nào phân tán về đơn vị thành viên. Đây chính là hai đầu vào bắt buộc của Operating Model — thiếu chúng, việc thiết kế Operating Model sẽ dựa trên giả định thay vì dữ liệu.</div>
+
+  <div class="verdict">
+    <b>CAPABILITY MAP ĐÃ ĐỦ CƠ SỞ CHUYỂN SANG OPERATING MODEL: <span style="color:var(--red)">NO</span></b>
+    <p>Cần đóng tối thiểu <b>ba điều kiện</b> trước khi chuyển bước:<br>
+    <b>①</b> Bổ sung tài liệu nguồn cho VS2 và VS3 để hạ tỷ lệ capability chưa xác thực từ 24% xuống dưới 10% (đóng GAP-2, GAP-3).<br>
+    <b>②</b> Thực hiện đánh giá mức độ trưởng thành (maturity assessment) cho toàn bộ 71 capability, có xác nhận của lãnh đạo từng Khối (đóng GAP-1).<br>
+    <b>③</b> Làm rõ ranh giới phân cấp capability giữa Tập đoàn và các Công ty thành viên FLV/FHR/FTV (đóng GAP-4).<br>
+    Hai gap còn lại (GAP-5 cơ chế quản trị tài sản, GAP-6 hiện trạng nền tảng số) không chặn bước chuyển tiếp, nhưng cần được đưa vào danh mục quyết định của Operating Model.</p>
+  </div>
+  </div>
+</div>
+
+<div class="foot">
+  <b>Nguyên tắc đã áp dụng:</b> Value Stream được giữ nguyên tên và cấu trúc, không chỉnh sửa. Capability được diễn đạt dưới dạng danh từ, không phải động từ, không trùng tên phòng ban hay chức danh hiện có. Không tạo Capability chỉ vì đang tồn tại một đơn vị tương ứng — ví dụ không tạo capability "Ban Hành chính Quản trị" mà dùng <i>Administration &amp; Workplace Services</i>. Level 3 chỉ được tạo ở nơi Value Stream cung cấp căn cứ trực tiếp.
+  <br><br>
+  <b>Phạm vi tài liệu này:</b> chỉ dừng ở Capability Map. Không xây dựng Operating Model, không đề xuất cơ cấu tổ chức, không phân bổ capability về đơn vị — các nội dung đó thuộc bước tiếp theo và chỉ nên thực hiện sau khi ba điều kiện nêu trên được đóng.
+</div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,c){return (c||document).querySelector(s);};
+  var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
+
+  $$(".part").forEach(function(p){
+    p.addEventListener("click",function(){
+      var b=p.nextElementSibling;
+      if(!b||!b.classList.contains("pbody"))return;
+      p.classList.toggle("closed"); b.classList.toggle("closed");
+    });
+  });
+  function setAll(open){
+    $$(".part").forEach(function(p){
+      var b=p.nextElementSibling;
+      if(!b||!b.classList.contains("pbody"))return;
+      p.classList.toggle("closed",!open); b.classList.toggle("closed",!open);
+    });
+  }
+  $("#expandAll").addEventListener("click",function(){setAll(true);});
+  $("#collapseAll").addEventListener("click",function(){setAll(false);});
+
+  var fVS="all",fTY="all",fSR="all",qStr="";
+  function bind(sel,setter){
+    $$(sel).forEach(function(btn){
+      btn.addEventListener("click",function(){
+        setter(btn.getAttribute(sel.replace(/[\[\]]/g,"").split("=")[0]));
+        $$(sel).forEach(function(b){b.classList.remove("on");});
+        btn.classList.add("on"); refresh();
+      });
+    });
+  }
+  bind("[data-vs]",function(v){fVS=v;});
+  bind("[data-ty]",function(v){fTY=v;});
+  bind("[data-sr]",function(v){fSR=v;});
+
+  var qEl=$("#q"),wrap=$("#sw");
+  qEl.addEventListener("input",function(){
+    qStr=qEl.value.trim().toLowerCase();
+    wrap.classList.toggle("has",qStr.length>0); refresh();
+  });
+  $("#qc").addEventListener("click",function(){qEl.value="";qStr="";wrap.classList.remove("has");refresh();qEl.focus();});
+
+  function stripMarks(el){
+    $$("mark",el).forEach(function(m){m.replaceWith(document.createTextNode(m.textContent));});
+    el.normalize();
+  }
+  function highlight(el,term){
+    if(!term)return;
+    var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),nodes=[],n;
+    while((n=w.nextNode()))nodes.push(n);
+    nodes.forEach(function(node){
+      var i=node.nodeValue.toLowerCase().indexOf(term);
+      if(i<0)return;
+      var mk=document.createElement("mark");
+      mk.textContent=node.nodeValue.substr(i,term.length);
+      var after=node.splitText(i);
+      after.nodeValue=after.nodeValue.substr(term.length);
+      node.parentNode.insertBefore(mk,after);
+    });
+  }
+
+  function refresh(){
+    var tb=$("#tbl1 tbody"); if(!tb)return;
+    var shown=0,total=0;
+    $$("tr",tb).forEach(function(tr){
+      stripMarks(tr); total++;
+      var vs=tr.getAttribute("data-vs")||"";
+      var okVS=(fVS==="all")||vs.split(" ").indexOf(fVS)>=0;
+      var okTY=(fTY==="all")||tr.getAttribute("data-ty")===fTY;
+      var okSR=(fSR==="all")||tr.getAttribute("data-sr")===fSR;
+      var okQ=!qStr||tr.textContent.toLowerCase().indexOf(qStr)>=0;
+      var show=okVS&&okTY&&okSR&&okQ;
+      tr.classList.toggle("hide",!show);
+      if(show){shown++; if(qStr)highlight(tr,qStr);}
+    });
+    $("#counter").textContent="Hiển thị "+shown+" / "+total+" capability";
+  }
+
+  $("#printBtn").addEventListener("click",function(){window.print();});
+  refresh();
+})();
+</script>
+</body>
+</html>

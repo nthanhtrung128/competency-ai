@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CompetencyAI — Bảng nhập dữ liệu Nhân sự</title>
+<style>
+:root{--brand:#2563eb;--brand-600:#1d4ed8;--brand-50:#eff6ff;--brand-100:#dbeafe;
+ --bg:#f6f9fe;--surface:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;
+ --ok:#16a34a;--ok-bg:#dcfce7;--warn:#d97706;--warn-bg:#fef3c7;--danger:#dc2626;--danger-bg:#fee2e2}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+.top{height:58px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:50}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+.top b{font-size:14.5px}.top small{display:block;font-size:10.5px;color:var(--muted)}
+.sp{margin-left:auto}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.card h2{font-size:15px;margin-bottom:3px}
+.card .sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;color:var(--ink)}
+input[type=text],input[type=password],input[type=email]{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:13px;outline:none}
+input:focus{border-color:var(--brand)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{font-family:inherit;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:.12s}
+.btn:hover:not(:disabled){border-color:var(--brand);color:var(--brand)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-primary:hover:not(:disabled){background:var(--brand-600);color:#fff}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.steps{display:flex;gap:0;margin-bottom:18px}
+.step{flex:1;padding:10px 12px;border:1px solid var(--line);background:var(--surface);font-size:12px;position:relative}
+.step:first-child{border-radius:8px 0 0 8px}.step:last-child{border-radius:0 8px 8px 0}
+.step.on{background:var(--brand-50);border-color:var(--brand);color:var(--brand);font-weight:600}
+.step.done{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.step b{display:block;font-size:11px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:34px;text-align:center;background:var(--brand-50);cursor:pointer;transition:.15s}
+.drop:hover,.drop.over{border-color:var(--brand);background:var(--brand-100)}
+.drop .ic{font-size:30px;margin-bottom:8px}
+.drop p{font-size:13px;color:var(--muted)}
+.kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.k{border:1px solid var(--line);border-radius:9px;padding:12px;text-align:center}
+.k .n{font-size:24px;font-weight:800;letter-spacing:-.5px}
+.k .l{font-size:10.5px;color:var(--muted);margin-top:2px}
+.k.ok .n{color:var(--ok)}.k.warn .n{color:var(--warn)}.k.err .n{color:var(--danger)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--ink);color:#fff;text-align:left;padding:8px;font-size:10.5px;font-weight:700;position:sticky;top:0}
+td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
+tr:hover td{background:var(--brand-50)}
+.tag{display:inline-block;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px}
+.t-ok{background:var(--ok-bg);color:var(--ok)}.t-warn{background:var(--warn-bg);color:var(--warn)}
+.t-err{background:var(--danger-bg);color:var(--danger)}
+.msg{padding:11px 13px;border-radius:8px;font-size:12.5px;margin-bottom:12px;line-height:1.55}
+.m-ok{background:var(--ok-bg);color:#14532d;border-left:3px solid var(--ok)}
+.m-warn{background:var(--warn-bg);color:#78350f;border-left:3px solid var(--warn)}
+.m-err{background:var(--danger-bg);color:#7f1d1d;border-left:3px solid var(--danger)}
+.m-info{background:var(--brand-50);color:#1e3a8a;border-left:3px solid var(--brand)}
+.hide{display:none}
+.scroll{max-height:380px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.pill{font-size:11px;background:var(--brand-50);color:var(--brand);padding:3px 9px;border-radius:99px;font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{font-size:12px;padding:6px 12px;border:1px solid var(--line);border-radius:7px;background:var(--surface);cursor:pointer}
+.tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:11.5px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="mark">CA</div>
+  <div><b>Bảng nhập dữ liệu Nhân sự</b><small>CompetencyAI — không cần gõ lệnh</small></div>
+  <div class="sp"></div>
+  <span id="who" class="pill hide"></span>
+  <button class="btn hide" id="logoutBtn" onclick="logout()">Đăng xuất</button>
+</div>
+
+<div class="wrap">
+
+  <!-- BƯỚC 0: KẾT NỐI -->
+  <div class="card" id="loginCard">
+    <h2>Bước 1 · Kết nối hệ thống</h2>
+    <div class="sub">Nhập địa chỉ máy chủ và tài khoản có quyền nhập dữ liệu (Trưởng Ban Nhân sự hoặc Quản trị hệ thống).</div>
+    <div style="margin-bottom:12px">
+      <label>Địa chỉ máy chủ API</label>
+      <input type="text" id="apiUrl" value="http://localhost:8080" placeholder="https://ten-app.onrender.com">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Chạy trên máy thì để nguyên. Đã deploy lên Render thì dán địa chỉ Render vào.</div>
+    </div>
+    <div class="row" style="margin-bottom:12px">
+      <div><label>Email</label><input type="email" id="email" value="hrlead@flamingo.vn"></div>
+      <div><label>Mật khẩu</label><input type="password" id="password" value="Flamingo@2026"></div>
+    </div>
+    <button class="btn btn-primary" onclick="login()">Kết nối</button>
+    <div id="loginMsg" style="margin-top:12px"></div>
+  </div>
+
+  <!-- KHU LÀM VIỆC -->
+  <div id="work" class="hide">
+
+    <div class="steps">
+      <div class="step done" id="s1"><b>1 · Kết nối</b>Đã đăng nhập</div>
+      <div class="step on" id="s2"><b>2 · Chọn file</b>Tải file CSV lên</div>
+      <div class="step" id="s3"><b>3 · Kiểm tra</b>Xem lỗi trước khi ghi</div>
+      <div class="step" id="s4"><b>4 · Ghi thật</b>Lưu vào hệ thống</div>
+    </div>
+
+    <!-- CHỌN FILE -->
+    <div class="card" id="uploadCard">
+      <h2>Bước 2 · Chọn file dữ liệu nhân sự</h2>
+      <div class="sub">File định dạng CSV UTF-8. Chưa có file mẫu? Xem <code>templates/mau_nhap_nhan_su.csv</code> trong bộ mã nguồn.</div>
+      <div class="drop" id="drop" onclick="document.getElementById('file').click()">
+        <div class="ic">📄</div>
+        <p><b>Bấm để chọn file</b> hoặc kéo thả vào đây</p>
+        <p style="font-size:11.5px;margin-top:6px">Chỉ nhận .csv · tối đa 5MB</p>
+      </div>
+      <input type="file" id="file" accept=".csv" class="hide" onchange="pickFile(this.files[0])">
+      <div id="fileInfo" class="hide" style="margin-top:12px"></div>
+      <div class="msg m-info" style="margin-top:14px">
+        <b>Bước này an toàn.</b> Hệ thống chỉ đọc và kiểm tra file, <b>chưa ghi gì vào dữ liệu thật</b>. Bạn sẽ được xem kết quả trước khi quyết định.
+      </div>
+    </div>
+
+    <!-- KẾT QUẢ KIỂM TRA -->
+    <div class="card hide" id="resultCard">
+      <h2>Bước 3 · Kết quả kiểm tra</h2>
+      <div class="sub" id="batchInfo"></div>
+      <div class="kpi" id="kpi"></div>
+      <div id="verdict"></div>
+
+      <div class="tabs" style="margin-top:14px">
+        <div class="tab on" onclick="loadRows('ERROR',this)">Dòng lỗi</div>
+        <div class="tab" onclick="loadRows('WARNING',this)">Cảnh báo</div>
+        <div class="tab" onclick="loadRows('OK',this)">Hợp lệ</div>
+        <div class="tab" onclick="loadRows('',this)">Tất cả</div>
+      </div>
+      <div class="scroll"><table id="rowTable"><tbody></tbody></table></div>
+
+      <div style="margin-top:16px;display:flex;gap:10px">
+        <button class="btn btn-ok" id="commitBtn" onclick="commit()">Ghi vào hệ thống</button>
+        <button class="btn" onclick="reset()">Chọn file khác</button>
+        <button class="btn btn-danger" onclick="cancelBatch()">Huỷ lô này</button>
+      </div>
+    </div>
+
+    <!-- HOÀN TẤT -->
+    <div class="card hide" id="doneCard">
+      <h2>Bước 4 · Hoàn tất</h2>
+      <div id="doneMsg"></div>
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="reset()">Nhập lô tiếp theo</button>
+        <button class="btn" onclick="viewEmployees()">Xem danh sách nhân sự</button>
+      </div>
+      <div id="empList" style="margin-top:14px"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let API='', TOKEN='', BATCH='', FILE=null;
+
+const $=id=>document.getElementById(id);
+const show=(id,v=true)=>$(id).classList.toggle('hide',!v);
+
+function setStep(n){
+  ['s1','s2','s3','s4'].forEach((id,i)=>{
+    const el=$(id); el.className='step';
+    if(i<n-1) el.classList.add('done');
+    else if(i===n-1) el.classList.add('on');
+  });
+}
+
+async function call(path,opts={}){
+  const r=await fetch(API+path,{
+    ...opts,
+    headers:{...(opts.headers||{}), ...(TOKEN?{Authorization:'Bearer '+TOKEN}:{})}
+  });
+  const text=await r.text();
+  let data; try{data=JSON.parse(text)}catch{data={error:text}}
+  if(!r.ok) throw new Error(data.error||('Lỗi '+r.status));
+  return data;
+}
+
+async function login(){
+  API=$('apiUrl').value.trim().replace(/\/$/,'');
+  const box=$('loginMsg');
+  box.innerHTML='<div class="msg m-info">Đang kết nối…</div>';
+  try{
+    const h=await fetch(API+'/health').then(r=>r.json());
+    if(h.db!=='connected') throw new Error('Máy chủ chạy nhưng không kết nối được cơ sở dữ liệu');
+  }catch(e){
+    box.innerHTML='<div class="msg m-err"><b>Không kết nối được máy chủ.</b><br>'+e.message+
+      '<br><br>Kiểm tra: máy chủ đã chạy chưa (<code>npm run dev</code>), địa chỉ có đúng không. '+
+      'Nếu dùng Render gói miễn phí, dịch vụ ngủ sau 15 phút — lần gọi đầu chờ 30–60 giây rồi thử lại.</div>';
+    return;
+  }
+  try{
+    const d=await call('/api/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:$('email').value.trim(),password:$('password').value})
+    });
+    TOKEN=d.accessToken;
+    const me=await call('/api/auth/me');
+    if(!me.permissions.includes('employee:import')){
+      box.innerHTML='<div class="msg m-err"><b>Tài khoản này không có quyền nhập dữ liệu.</b><br>'+
+        'Quyền hiện có: '+me.permissions.join(', ')+'<br>Cần quyền <code>employee:import</code>. '+
+        'Dùng tài khoản Trưởng Ban Nhân sự hoặc Quản trị hệ thống.</div>';
+      TOKEN=''; return;
+    }
+    $('who').textContent=me.name+' · '+me.roles.join(', ');
+    show('who'); show('logoutBtn'); show('loginCard',false); show('work');
+    setStep(2);
+  }catch(e){
+    box.innerHTML='<div class="msg m-err">'+e.message+'</div>';
+  }
+}
+
+function logout(){location.reload()}
+
+// kéo thả
+const drop=$('drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0]; if(f) pickFile(f)});
+
+function pickFile(f){
+  if(!f) return;
+  if(!f.name.toLowerCase().endsWith('.csv')){
+    $('fileInfo').innerHTML='<div class="msg m-err">Chỉ nhận file .csv. Trong Excel chọn <b>Lưu dưới dạng → CSV UTF-8</b>.</div>';
+    show('fileInfo'); return;
+  }
+  FILE=f;
+  $('fileInfo').innerHTML='<div class="msg m-ok"><b>'+f.name+'</b> · '+(f.size/1024).toFixed(1)+' KB'+
+    '</div><button class="btn btn-primary" onclick="validate()">Kiểm tra file này</button>';
+  show('fileInfo');
+}
+
+async function validate(){
+  $('fileInfo').innerHTML='<div class="msg m-info">Đang kiểm tra… File lớn có thể mất một phút.</div>';
+  const fd=new FormData(); fd.append('file',FILE);
+  try{
+    const d=await call('/api/import/employees/validate',{method:'POST',body:fd});
+    BATCH=d.batchId;
+    const s=d.summary;
+    $('batchInfo').textContent='File: '+FILE.name+' · Mã lô: '+BATCH;
+    $('kpi').innerHTML=[
+      ['Tổng dòng',s.tong,''],['Hợp lệ',s.hopLe,'ok'],['Cảnh báo',s.canhBao,'warn'],
+      ['Lỗi',s.loi,'err'],['Sẽ tạo mới',s.seTao,'']
+    ].map(([l,n,c])=>'<div class="k '+c+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>').join('');
+
+    const hasErr=s.loi>0;
+    $('verdict').innerHTML=hasErr
+      ? '<div class="msg m-err"><b>Có '+s.loi+' dòng lỗi — chưa ghi được.</b><br>'+
+        'Xem tab "Dòng lỗi" bên dưới, sửa trong Excel rồi tải lại. <b>Chưa có gì được ghi vào hệ thống.</b></div>'
+      : '<div class="msg m-ok"><b>Không có lỗi.</b> Sẽ tạo mới '+s.seTao+' người và cập nhật '+s.seCapNhat+' người. '+
+        'Bấm <b>Ghi vào hệ thống</b> để lưu.</div>';
+    $('commitBtn').disabled=hasErr;
+    $('fileInfo').innerHTML='';
+    show('uploadCard',false); show('resultCard'); setStep(3);
+    loadRows(hasErr?'ERROR':'OK',document.querySelector('.tab'));
+  }catch(e){
+    $('fileInfo').innerHTML='<div class="msg m-err">'+e.message+'</div>';
+  }
+}
+
+async function loadRows(status,tabEl){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  if(tabEl) tabEl.classList.add('on');
+  const d=await call('/api/import/employees/'+BATCH+'/rows'+(status?'?status='+status:''));
+  const tb=$('rowTable').querySelector('tbody');
+  if(d.rows.length===0){ tb.innerHTML='<tr><td style="padding:20px;text-align:center;color:var(--muted)">Không có dòng nào</td></tr>'; return; }
+  tb.innerHTML='<tr><th style="width:60px">Dòng</th><th style="width:110px">Mã NV</th><th style="width:170px">Họ tên</th>'+
+    '<th style="width:80px">Trạng thái</th><th style="width:90px">Hành động</th><th>Ghi chú</th></tr>'+
+    d.rows.map(r=>{
+      const raw=r.raw||{};
+      const msgs=(r.messages||[]).map(m=>
+        '<div style="color:'+(m.level==='ERROR'?'var(--danger)':'var(--warn)')+'">• '+m.text+'</div>').join('')||'—';
+      const tag=r.status==='OK'?'t-ok':r.status==='WARNING'?'t-warn':'t-err';
+      return '<tr><td>'+r.rowNumber+'</td><td>'+(raw.employee_code||'')+'</td><td>'+(raw.full_name||'')+
+        '</td><td><span class="tag '+tag+'">'+r.status+'</span></td><td>'+(r.action||'')+'</td><td>'+msgs+'</td></tr>';
+    }).join('');
+}
+
+async function commit(){
+  if(!confirm('Ghi dữ liệu vào hệ thống?\n\nSau bước này lô sẽ không ghi lại được lần hai.')) return;
+  $('commitBtn').disabled=true;
+  $('verdict').innerHTML='<div class="msg m-info">Đang ghi…</div>';
+  try{
+    const d=await call('/api/import/employees/'+BATCH+'/commit',{method:'POST'});
+    $('doneMsg').innerHTML='<div class="msg m-ok"><b>Đã ghi xong.</b><br>Tạo mới: <b>'+d.daTao+
+      '</b> người · Cập nhật: <b>'+d.daCapNhat+'</b> người<br><br>'+
+      'Mọi thao tác đã được ghi vào nhật ký hệ thống.</div>';
+    show('resultCard',false); show('doneCard'); setStep(4);
+  }catch(e){
+    $('verdict').innerHTML='<div class="msg m-err">'+e.message+'</div>';
+    $('commitBtn').disabled=false;
+  }
+}
+
+async function cancelBatch(){
+  if(!confirm('Huỷ lô này? Dữ liệu vùng đệm vẫn giữ để tra cứu.')) return;
+  try{ await call('/api/import/employees/'+BATCH+'/cancel',{method:'POST'}); reset(); }
+  catch(e){ alert(e.message) }
+}
+
+async function viewEmployees(){
+  const d=await call('/api/employees?take=50');
+  $('empList').innerHTML='<div class="sub">Hiển thị '+d.employees.length+' / '+d.total+' người'+
+    (d.scopeApplied?' (đã lọc theo phạm vi dữ liệu của bạn)':'')+'</div>'+
+    '<div class="scroll"><table><tbody><tr><th>Mã NV</th><th>Họ tên</th><th>Đơn vị</th><th>Chức danh</th><th>Quản lý</th></tr>'+
+    d.employees.map(e=>'<tr><td>'+e.employeeCode+'</td><td>'+e.fullName+'</td><td>'+
+      (e.orgUnit?e.orgUnit.name:'—')+'</td><td>'+(e.jobTitle||'—')+'</td><td>'+
+      (e.manager?e.manager.fullName:'—')+'</td></tr>').join('')+'</tbody></table></div>';
+}
+
+function reset(){
+  BATCH=''; FILE=null; $('file').value='';
+  $('fileInfo').innerHTML=''; show('fileInfo',false);
+  $('empList').innerHTML='';
+  show('resultCard',false); show('doneCard',false); show('uploadCard');
+  setStep(2);
+}
+</script>
+</body>
+</html>

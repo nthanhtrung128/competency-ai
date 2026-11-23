@@ -1,0 +1,3518 @@
+{
+  "proficiencyScale": {
+    "code": "FLA-5",
+    "name": {
+      "vi": "Thang thành thục Flamingo 5 mức",
+      "en": "Flamingo 5-Level Proficiency Scale"
+    },
+    "levelCount": 5,
+    "levels": [
+      {
+        "level": 1,
+        "label": {
+          "vi": "Nhận biết",
+          "en": "Aware"
+        },
+        "desc": {
+          "vi": "Hiểu khái niệm và thuật ngữ cơ bản. Thực hiện được việc đơn giản khi có hướng dẫn từng bước. Cần giám sát thường xuyên.",
+          "en": "Understands basic concepts and terminology. Performs simple tasks with step-by-step guidance. Requires regular supervision."
+        }
+      },
+      {
+        "level": 2,
+        "label": {
+          "vi": "Áp dụng cơ bản",
+          "en": "Basic Application"
+        },
+        "desc": {
+          "vi": "Thực hiện được công việc quen thuộc theo quy trình có sẵn. Nhận biết được khi nào cần hỏi ý kiến.",
+          "en": "Performs familiar work using established procedures. Recognises when to seek guidance."
+        }
+      },
+      {
+        "level": 3,
+        "label": {
+          "vi": "Thành thạo",
+          "en": "Proficient"
+        },
+        "desc": {
+          "vi": "Làm việc độc lập trong tình huống tiêu chuẩn. Tự xử lý được vấn đề thường gặp. Có thể hướng dẫn người mới.",
+          "en": "Works independently in standard situations. Resolves common issues. Can coach newcomers."
+        }
+      },
+      {
+        "level": 4,
+        "label": {
+          "vi": "Nâng cao",
+          "en": "Advanced"
+        },
+        "desc": {
+          "vi": "Xử lý được tình huống phức tạp, phi tiêu chuẩn. Tối ưu hóa cách làm hiện tại. Được các đơn vị khác tìm đến tham vấn.",
+          "en": "Handles complex, non-standard situations. Optimises existing practice. Consulted by other units."
+        }
+      },
+      {
+        "level": 5,
+        "label": {
+          "vi": "Chuyên gia",
+          "en": "Expert"
+        },
+        "desc": {
+          "vi": "Thiết kế chuẩn mực cho toàn hệ thống. Dẫn dắt và phát triển người khác. Định hình cách Tập đoàn làm việc trong lĩnh vực này.",
+          "en": "Designs enterprise-wide standards. Leads and develops others. Shapes how the Group works in this domain."
+        }
+      }
+    ],
+    "dimensions": [
+      {
+        "level": 1,
+        "complexity": "nhiệm vụ có cấu trúc, quen thuộc",
+        "autonomy": "theo hướng dẫn, có kiểm tra",
+        "scope": "công việc cá nhân",
+        "impact": "chất lượng đầu ra cá nhân",
+        "interaction": "đồng nghiệp và quản lý trực tiếp"
+      },
+      {
+        "level": 2,
+        "complexity": "tình huống thông thường, có ngoại lệ đơn giản",
+        "autonomy": "độc lập trong chuẩn đã xác lập",
+        "scope": "gói công việc hoặc nhóm nhỏ",
+        "impact": "tiến độ và chi phí trong phạm vi được giao",
+        "interaction": "các bên liên quan trong cùng quy trình"
+      },
+      {
+        "level": 3,
+        "complexity": "vấn đề phức tạp, nhiều phụ thuộc",
+        "autonomy": "tự định hướng, tư vấn được người khác",
+        "scope": "phòng ban hoặc dự án",
+        "impact": "kết quả phòng ban hoặc dự án",
+        "interaction": "nhiều chức năng, nhà thầu hoặc khách hàng"
+      },
+      {
+        "level": 4,
+        "complexity": "vấn đề mới, chưa có tiền lệ trong Tập đoàn",
+        "autonomy": "tự chủ hoàn toàn, thiết lập cách làm",
+        "scope": "khối hoặc nhiều đơn vị",
+        "impact": "kết quả khối và chuẩn mực chung",
+        "interaction": "lãnh đạo cấp cao và đối tác chiến lược"
+      },
+      {
+        "level": 5,
+        "complexity": "vấn đề chiến lược, tác động dài hạn",
+        "autonomy": "định hình hướng đi cho toàn Tập đoàn",
+        "scope": "toàn Tập đoàn",
+        "impact": "kết quả và uy tín Tập đoàn",
+        "interaction": "HĐQT, cơ quan quản lý, thị trường"
+      }
+    ]
+  },
+  "orgUnits": [
+    {
+      "code": "FLA",
+      "tier": 0,
+      "parent": null,
+      "name": {
+        "vi": "Tập đoàn Flamingo",
+        "en": "Flamingo Group"
+      },
+      "unitType": "GROUP",
+      "head": null
+    },
+    {
+      "code": "DHDCD",
+      "tier": 1,
+      "parent": "FLA",
+      "name": {
+        "vi": "Đại hội đồng Cổ đông",
+        "en": "General Meeting of Shareholders"
+      },
+      "unitType": "GOVERNANCE",
+      "head": null
+    },
+    {
+      "code": "HDQT",
+      "tier": 2,
+      "parent": "DHDCD",
+      "name": {
+        "vi": "Hội đồng Quản trị",
+        "en": "Board of Directors"
+      },
+      "unitType": "GOVERNANCE",
+      "head": null
+    },
+    {
+      "code": "VPCT",
+      "tier": 3,
+      "parent": "HDQT",
+      "name": {
+        "vi": "Văn phòng Chủ tịch",
+        "en": "Chairman's Office"
+      },
+      "unitType": "SUPPORT",
+      "head": null,
+      "note": "Trực thuộc HĐQT (nét đứt). Bản vẽ chưa nêu chi tiết Phòng & chức năng — [GAP]"
+    },
+    {
+      "code": "BTGD",
+      "tier": 3,
+      "parent": "HDQT",
+      "name": {
+        "vi": "Ban Tổng Giám đốc Tập đoàn",
+        "en": "Group Executive Board"
+      },
+      "unitType": "EXECUTIVE",
+      "head": null
+    },
+    {
+      "code": "K1",
+      "tier": 4,
+      "parent": "BTGD",
+      "name": {
+        "vi": "Khối Đầu tư - Xây dựng",
+        "en": "Investment & Construction Block"
+      },
+      "unitType": "BLOCK",
+      "head": null
+    },
+    {
+      "code": "B01",
+      "tier": 5,
+      "parent": "K1",
+      "name": {
+        "vi": "Ban Đầu tư",
+        "en": "Investment Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B02",
+      "tier": 5,
+      "parent": "K1",
+      "name": {
+        "vi": "Ban Quy hoạch Kiến trúc",
+        "en": "Planning & Architecture Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B03",
+      "tier": 5,
+      "parent": "K1",
+      "name": {
+        "vi": "Ban Xây dựng & QLDA",
+        "en": "Construction & Project Management Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B04",
+      "tier": 5,
+      "parent": "K1",
+      "name": {
+        "vi": "Ban Cung ứng Đấu thầu",
+        "en": "Procurement & Tendering Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "K2",
+      "tier": 4,
+      "parent": "BTGD",
+      "name": {
+        "vi": "Khối Kinh doanh",
+        "en": "Commercial Block"
+      },
+      "unitType": "BLOCK",
+      "head": null
+    },
+    {
+      "code": "B05",
+      "tier": 5,
+      "parent": "K2",
+      "name": {
+        "vi": "Ban Kinh doanh BĐS",
+        "en": "Real Estate Sales Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B06",
+      "tier": 5,
+      "parent": "K2",
+      "name": {
+        "vi": "Ban Kinh doanh Vận hành",
+        "en": "Operations & Commercial Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B07",
+      "tier": 5,
+      "parent": "K2",
+      "name": {
+        "vi": "Ban Truyền thông & Thương hiệu",
+        "en": "Communications & Brand Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "FTV",
+      "tier": 5,
+      "parent": "K2",
+      "name": {
+        "vi": "FTV — Đơn vị Lữ hành",
+        "en": "FTV — Travel Unit"
+      },
+      "unitType": "SUBSIDIARY",
+      "head": null,
+      "note": "Bản vẽ chỉ liệt kê tên đơn vị, chưa có breakdown chức năng — [GAP]"
+    },
+    {
+      "code": "FRT",
+      "tier": 5,
+      "parent": "K2",
+      "name": {
+        "vi": "FRT — Đơn vị Dịch vụ Nghỉ dưỡng",
+        "en": "FRT — Resort Services Unit"
+      },
+      "unitType": "SUBSIDIARY",
+      "head": null,
+      "note": "Bản vẽ chỉ liệt kê tên đơn vị, chưa có breakdown chức năng — [GAP]"
+    },
+    {
+      "code": "K3",
+      "tier": 4,
+      "parent": "BTGD",
+      "name": {
+        "vi": "Khối Quản trị Nội bộ",
+        "en": "Corporate Services Block"
+      },
+      "unitType": "BLOCK",
+      "head": null
+    },
+    {
+      "code": "B10",
+      "tier": 5,
+      "parent": "K3",
+      "name": {
+        "vi": "Ban Tài chính Kế toán",
+        "en": "Finance & Accounting Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B11",
+      "tier": 5,
+      "parent": "K3",
+      "name": {
+        "vi": "Ban Nhân sự và Quản trị Hành chính",
+        "en": "HR & Administration Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B12",
+      "tier": 5,
+      "parent": "K3",
+      "name": {
+        "vi": "Ban Pháp chế và Kiểm soát nội bộ",
+        "en": "Legal & Internal Control Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null,
+      "note": "Cập nhật: gộp chức năng KSNB, Tuân thủ và An ninh vào Ban Pháp chế — không tách độc lập trực thuộc BTGĐ"
+    },
+    {
+      "code": "B13",
+      "tier": 5,
+      "parent": "K3",
+      "name": {
+        "vi": "Ban Công nghệ Thông tin",
+        "en": "Information Technology Department"
+      },
+      "unitType": "DEPARTMENT",
+      "head": null
+    },
+    {
+      "code": "B10-P1",
+      "tier": 6,
+      "parent": "B10",
+      "name": {
+        "vi": "Phòng Kế toán",
+        "en": "Accounting Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B10-P2",
+      "tier": 6,
+      "parent": "B10",
+      "name": {
+        "vi": "Phòng Tài chính & Quản trị vốn",
+        "en": "Treasury & Capital Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B10-P3",
+      "tier": 6,
+      "parent": "B10",
+      "name": {
+        "vi": "Phòng Kế hoạch tài chính & Kiểm soát tài chính",
+        "en": "FP&A and Financial Control Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B11-P1",
+      "tier": 6,
+      "parent": "B11",
+      "name": {
+        "vi": "Phòng Tổ chức & Phát triển NNL",
+        "en": "Organization & People Development Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B11-P2",
+      "tier": 6,
+      "parent": "B11",
+      "name": {
+        "vi": "Phòng Chính sách & Dịch vụ nhân sự",
+        "en": "HR Policy & Services Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B11-P3",
+      "tier": 6,
+      "parent": "B11",
+      "name": {
+        "vi": "Phòng Quản trị Hành chính",
+        "en": "Administration Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B11-P4",
+      "tier": 6,
+      "parent": "B11",
+      "name": {
+        "vi": "Phòng Quản lý tài sản",
+        "en": "Asset Management Division"
+      },
+      "unitType": "DIVISION",
+      "head": null,
+      "note": "Phạm vi: TSCĐ, CCDC, kho, mặt bằng văn phòng — KHÔNG phải tài sản khai thác"
+    },
+    {
+      "code": "B12-P1",
+      "tier": 6,
+      "parent": "B12",
+      "name": {
+        "vi": "Phòng Pháp chế",
+        "en": "Legal Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B12-P2",
+      "tier": 6,
+      "parent": "B12",
+      "name": {
+        "vi": "Phòng Kiểm soát Nội bộ & Quản trị Rủi ro",
+        "en": "Internal Control & Risk Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B12-P3",
+      "tier": 6,
+      "parent": "B12",
+      "name": {
+        "vi": "Phòng Tuân thủ & An ninh",
+        "en": "Compliance & Security Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B13-P1",
+      "tier": 6,
+      "parent": "B13",
+      "name": {
+        "vi": "Phòng Hạ tầng CNTT & An toàn thông tin",
+        "en": "IT Infrastructure & Security Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B13-P2",
+      "tier": 6,
+      "parent": "B13",
+      "name": {
+        "vi": "Phòng Ứng dụng doanh nghiệp & Chuyển đổi số",
+        "en": "Enterprise Applications & Digital Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    },
+    {
+      "code": "B13-P3",
+      "tier": 6,
+      "parent": "B13",
+      "name": {
+        "vi": "Phòng Dữ liệu & Công nghệ số",
+        "en": "Data & Digital Technology Division"
+      },
+      "unitType": "DIVISION",
+      "head": null
+    }
+  ],
+  "competencyCategories": [
+    {
+      "code": "VAL",
+      "framework": "FLAMINGO",
+      "role": "CORE_VALUES",
+      "name": {
+        "vi": "Giá trị cốt lõi",
+        "en": "Core Values"
+      },
+      "note": "KHÔNG có thang mức — chỉ tuân thủ hoặc vi phạm. Không đưa vào bảng chấm điểm định kỳ.",
+      "scored": false
+    },
+    {
+      "code": "COR",
+      "framework": "FLAMINGO",
+      "role": "CORE",
+      "name": {
+        "vi": "Năng lực cốt lõi",
+        "en": "Core Competencies"
+      },
+      "note": "Áp dụng mọi vị trí, khác nhau về mức yêu cầu",
+      "scored": true
+    },
+    {
+      "code": "LEA",
+      "framework": "FLAMINGO",
+      "role": "MANAGEMENT",
+      "name": {
+        "vi": "Năng lực lãnh đạo",
+        "en": "Leadership Competencies"
+      },
+      "note": "Ngạch 1–4 nhánh Quản lý; nhánh Chuyên gia từ cấp Chuyên gia trở lên",
+      "scored": true
+    },
+    {
+      "code": "FUN",
+      "framework": "FLAMINGO",
+      "role": "FUNCTIONAL",
+      "name": {
+        "vi": "Năng lực chuyên môn",
+        "en": "Functional Competencies"
+      },
+      "note": "Theo Job Family — mỗi vai trò tối đa 4",
+      "scored": true
+    },
+    {
+      "code": "MET",
+      "framework": "FLAMINGO",
+      "role": "META",
+      "name": {
+        "vi": "Năng lực tương lai",
+        "en": "Meta / Future Skills"
+      },
+      "note": "Ưu tiên nhóm kế cận và vị trí trọng yếu",
+      "scored": true
+    }
+  ],
+  "competencies": [
+    {
+      "code": "CO1",
+      "category": "COR",
+      "name": {
+        "vi": "Chính trực & Tuân thủ",
+        "en": "Integrity & Compliance"
+      },
+      "definition": {
+        "vi": "Hành xử trung thực, minh bạch và tuân thủ quy định trong mọi tình huống, kể cả khi không có ai giám sát và khi việc tuân thủ gây bất lợi ngắn hạn cho bản thân hoặc đơn vị."
+      },
+      "derivedFrom": "Ba điểm rủi ro liêm chính cao nhất trong chuỗi giá trị: thủ tục đất đai (I2.3), đấu thầu (I5.2), quan hệ chính quyền (8.1). Cùng với năng lực tổ chức C59 Internal Audit & Integrity và C60 Enterprise Risk Management.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Biết và tuân thủ quy định của đơn vị mình. Báo cáo khi phát hiện sai sót của bản thân."
+        },
+        {
+          "level": 2,
+          "indicator": "Nhận diện được tình huống có xung đột lợi ích và chủ động báo cáo cấp trên."
+        },
+        {
+          "level": 3,
+          "indicator": "Từ chối yêu cầu trái quy định dù đến từ cấp trên hoặc đối tác. Ghi nhận bằng văn bản."
+        },
+        {
+          "level": 4,
+          "indicator": "Thiết kế được chốt kiểm soát cho quy trình mình phụ trách. Phát hiện rủi ro liêm chính trước khi phát sinh hậu quả."
+        },
+        {
+          "level": 5,
+          "indicator": "Xây dựng văn hóa liêm chính cho toàn khối. Xử lý được tình huống nhạy cảm mà vẫn giữ được quan hệ công việc."
+        }
+      ],
+      "positiveIndicators": [
+        "Nói và làm nhất quán, kể cả khi bất lợi cho bản thân.",
+        "Chủ động báo cáo sai sót của chính mình trước khi bị phát hiện.",
+        "Từ chối yêu cầu trái quy định và ghi nhận bằng văn bản."
+      ],
+      "negativeIndicators": [
+        "Chỉ tuân thủ khi biết có người kiểm tra.",
+        "Im lặng khi thấy đồng nghiệp làm sai để giữ quan hệ.",
+        "Diễn giải quy định theo hướng có lợi cho mình khi có vùng xám."
+      ],
+      "scored": true,
+      "overuseWarning": "Cứng nhắc đến mức cản trở công việc; áp dụng quy định máy móc mà không xét bối cảnh; biến việc tuân thủ thành cách né tránh trách nhiệm ra quyết định."
+    },
+    {
+      "code": "CO2",
+      "category": "COR",
+      "name": {
+        "vi": "Tư duy Khách hàng",
+        "en": "Customer Orientation"
+      },
+      "definition": {
+        "vi": "Đặt trải nghiệm và giá trị của khách hàng làm căn cứ khi ra quyết định công việc, kể cả với vị trí không trực tiếp tiếp xúc khách hàng."
+      },
+      "derivedFrom": "Hai trong ba Value Stream (Khách sạn, Lữ hành) vận hành theo mô hình mạng lưới — giá trị đến từ trải nghiệm chứ không từ khối lượng sản xuất. Năng lực C11, C49, C50.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Biết ai là khách hàng của công việc mình làm, kể cả khách hàng nội bộ."
+        },
+        {
+          "level": 2,
+          "indicator": "Phản hồi yêu cầu khách hàng đúng hạn và đúng cam kết."
+        },
+        {
+          "level": 3,
+          "indicator": "Chủ động phát hiện điểm chưa hài lòng của khách và đề xuất cách khắc phục."
+        },
+        {
+          "level": 4,
+          "indicator": "Thiết kế lại quy trình dựa trên dữ liệu phản hồi khách hàng, không chỉ dựa trên thuận tiện nội bộ."
+        },
+        {
+          "level": 5,
+          "indicator": "Định hình chuẩn trải nghiệm khách hàng cho toàn hệ sinh thái ba mảng."
+        }
+      ],
+      "positiveIndicators": [
+        "Biết rõ ai là khách hàng của công việc mình, kể cả khách hàng nội bộ.",
+        "Chủ động tìm hiểu nguyên nhân đằng sau phàn nàn thay vì chỉ xử lý bề mặt.",
+        "Đề xuất thay đổi quy trình dựa trên phản hồi khách hàng."
+      ],
+      "negativeIndicators": [
+        "Xử lý yêu cầu khách theo đúng quy trình nhưng bỏ qua vấn đề thực sự của họ.",
+        "Đổ lỗi cho bộ phận khác khi khách phàn nàn.",
+        "Cho rằng mình đã biết khách cần gì mà không kiểm chứng."
+      ],
+      "scored": true,
+      "overuseWarning": "Đáp ứng mọi yêu cầu khách hàng bất kể chi phí và tính khả thi; hứa vượt khả năng thực hiện; hy sinh lợi ích dài hạn của Tập đoàn để làm hài lòng khách trước mắt."
+    },
+    {
+      "code": "CO3",
+      "category": "COR",
+      "name": {
+        "vi": "Tư duy Phân tích & Dữ liệu",
+        "en": "Analytical & Data Thinking"
+      },
+      "definition": {
+        "vi": "Sử dụng dữ liệu và lập luận có cấu trúc để ra quyết định, thay vì dựa trên cảm tính hoặc thói quen."
+      },
+      "derivedFrom": "Năng lực C01 Market Intelligence, C05 Investment Appraisal, C31 Asset Performance Analytics, C63 Data & Analytics. Đồng thời là điều kiện để đóng khoảng trống “chưa đo được hiệu quả từng tài sản”.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Thu thập và trình bày được số liệu công việc của mình một cách chính xác."
+        },
+        {
+          "level": 2,
+          "indicator": "Đọc hiểu báo cáo, phát hiện được điểm bất thường trong số liệu."
+        },
+        {
+          "level": 3,
+          "indicator": "Phân tích nguyên nhân và đưa ra kết luận có căn cứ số liệu."
+        },
+        {
+          "level": 4,
+          "indicator": "Xây dựng mô hình phân tích cho vấn đề phức tạp nhiều biến số."
+        },
+        {
+          "level": 5,
+          "indicator": "Thiết kế bộ chỉ số và hệ thống đo lường cho toàn khối hoặc toàn Tập đoàn."
+        }
+      ],
+      "positiveIndicators": [
+        "Kiểm chứng số liệu trước khi đưa vào báo cáo.",
+        "Phát hiện được điểm bất thường trong dữ liệu và truy nguyên nhân.",
+        "Trình bày kết luận kèm giả định và giới hạn của dữ liệu."
+      ],
+      "negativeIndicators": [
+        "Đưa ra kết luận dựa trên một vài trường hợp lẻ tẻ.",
+        "Trình bày số liệu mà không hiểu cách số liệu đó được tạo ra.",
+        "Bỏ qua dữ liệu trái với quan điểm ban đầu của mình."
+      ],
+      "scored": true,
+      "overuseWarning": "Đòi hỏi dữ liệu hoàn hảo trước khi quyết định, gây chậm trễ; phân tích quá mức cần thiết cho vấn đề đơn giản; dùng số liệu để trì hoãn thay vì để quyết định."
+    },
+    {
+      "code": "CO4",
+      "category": "COR",
+      "name": {
+        "vi": "Trách nhiệm An toàn",
+        "en": "Safety Accountability"
+      },
+      "definition": {
+        "vi": "Coi an toàn của con người là điều kiện không đánh đổi, ở cả ba bối cảnh khác nhau: công trường xây dựng, cơ sở lưu trú và hành trình lữ hành."
+      },
+      "derivedFrom": "Ba năng lực an toàn được giữ TÁCH RIÊNG chứ không gộp (C22 HSE công trường, C46 Guest Safety, C55 Traveler Safety) vì ba bộ tiêu chuẩn và khung pháp lý khác nhau.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Tuân thủ quy định an toàn tại vị trí làm việc của mình."
+        },
+        {
+          "level": 2,
+          "indicator": "Nhận diện được mối nguy trong phạm vi công việc và báo cáo kịp thời."
+        },
+        {
+          "level": 3,
+          "indicator": "Chủ động dừng công việc khi phát hiện điều kiện không an toàn, không chờ chỉ đạo."
+        },
+        {
+          "level": 4,
+          "indicator": "Thiết kế biện pháp phòng ngừa cho hoạt động mình phụ trách, không chỉ xử lý sự cố sau khi xảy ra."
+        },
+        {
+          "level": 5,
+          "indicator": "Xây dựng chuẩn an toàn phù hợp đặc thù từng bối cảnh và giám sát việc tuân thủ toàn hệ thống."
+        }
+      ],
+      "positiveIndicators": [
+        "Tuân thủ quy định an toàn ngay cả khi làm chậm tiến độ.",
+        "Chủ động dừng công việc khi phát hiện điều kiện không an toàn.",
+        "Báo cáo sự cố suýt xảy ra chứ không chỉ sự cố đã xảy ra."
+      ],
+      "negativeIndicators": [
+        "Bỏ qua bước kiểm tra an toàn để kịp tiến độ.",
+        "Chỉ báo cáo sự cố khi không thể giấu được.",
+        "Coi an toàn là việc của bộ phận chuyên trách, không phải của mình."
+      ],
+      "scored": true,
+      "overuseWarning": "Dừng công việc quá mức cần thiết vì rủi ro rất thấp; tạo ra quá nhiều thủ tục kiểm tra làm tê liệt vận hành; dùng lý do an toàn để né việc khó."
+    },
+    {
+      "code": "CO5",
+      "category": "COR",
+      "name": {
+        "vi": "Phối hợp Liên đơn vị",
+        "en": "Cross-unit Collaboration"
+      },
+      "definition": {
+        "vi": "Làm việc hiệu quả với đơn vị khác trên những hoạt động không thuộc trọn vẹn phạm vi của một đơn vị nào."
+      },
+      "derivedFrom": "Bốn điểm chồng lấn trách nhiệm đã phát hiện (kiểm soát chi phí, quản trị nhà thầu, an ninh, quan hệ chính quyền) và 15 năng lực dùng chung từ 2 Value Stream trở lên. Đây là năng lực quyết định Tập đoàn có cộng hưởng hay không.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Chia sẻ thông tin đầy đủ và đúng hạn cho đơn vị liên quan."
+        },
+        {
+          "level": 2,
+          "indicator": "Hiểu được vai trò của đơn vị khác trong chuỗi giá trị chung, không chỉ phạm vi của mình."
+        },
+        {
+          "level": 3,
+          "indicator": "Chủ động làm rõ ranh giới trách nhiệm khi có vùng chồng lấn, thay vì né tránh hoặc đùn đẩy."
+        },
+        {
+          "level": 4,
+          "indicator": "Điều phối được nhóm liên đơn vị đạt kết quả chung dù không có quyền quản lý trực tiếp."
+        },
+        {
+          "level": 5,
+          "indicator": "Thiết kế cơ chế phối hợp bền vững (quy trình, RACI, SLA) thay cho việc xử lý từng vụ việc."
+        }
+      ],
+      "positiveIndicators": [
+        "Chủ động làm rõ ranh giới trách nhiệm khi có vùng chồng lấn.",
+        "Chia sẻ thông tin đầy đủ ngay cả khi không được yêu cầu.",
+        "Đạt được kết quả chung dù không có quyền quản lý trực tiếp bên kia."
+      ],
+      "negativeIndicators": [
+        "Chỉ làm đúng phần của mình rồi coi như xong, không quan tâm kết quả chung.",
+        "Giữ thông tin làm lợi thế trong đàm phán nội bộ.",
+        "Đùn đẩy phần việc thuộc vùng xám sang đơn vị khác."
+      ],
+      "scored": true,
+      "overuseWarning": "Tham vấn quá nhiều bên làm chậm quyết định; ưu tiên giữ hòa khí đến mức không dám nêu vấn đề; họp hành quá nhiều thay vì làm việc."
+    },
+    {
+      "code": "CO6",
+      "category": "COR",
+      "name": {
+        "vi": "Học hỏi & Thích ứng",
+        "en": "Learning Agility"
+      },
+      "definition": {
+        "vi": "Chủ động học kiến thức mới và điều chỉnh cách làm khi bối cảnh thay đổi, đặc biệt trong lĩnh vực Tập đoàn phải tự xây dựng từ đầu."
+      },
+      "derivedFrom": "Quyết định tự vận hành khách sạn nghĩa là Tập đoàn phải tự xây chuẩn dịch vụ mà không dựa vào chuẩn có sẵn của thương hiệu quản lý quốc tế. Năng lực C37, C38.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Tiếp thu hướng dẫn và áp dụng được vào công việc."
+        },
+        {
+          "level": 2,
+          "indicator": "Chủ động tìm hiểu kiến thức mới liên quan đến công việc mà không cần được yêu cầu."
+        },
+        {
+          "level": 3,
+          "indicator": "Rút kinh nghiệm từ sai sót và điều chỉnh cách làm cho lần sau."
+        },
+        {
+          "level": 4,
+          "indicator": "Học từ thực tiễn bên ngoài và chuyển hóa thành cách làm phù hợp với Tập đoàn."
+        },
+        {
+          "level": 5,
+          "indicator": "Xây dựng cơ chế học hỏi và chia sẻ tri thức cho toàn đơn vị."
+        }
+      ],
+      "positiveIndicators": [
+        "Tự tìm hiểu kiến thức mới liên quan công việc mà không cần được yêu cầu.",
+        "Thừa nhận sai sót và thay đổi cách làm sau khi rút kinh nghiệm.",
+        "Học từ thực tiễn bên ngoài và chuyển hóa cho phù hợp với Tập đoàn."
+      ],
+      "negativeIndicators": [
+        "Lặp lại cùng một sai sót nhiều lần.",
+        "Phản đối cách làm mới chỉ vì khác với thói quen.",
+        "Chờ được đào tạo mới chịu học."
+      ],
+      "scored": true,
+      "overuseWarning": "Chạy theo phương pháp mới liên tục làm đội ngũ mất ổn định; áp dụng mô hình bên ngoài mà không điều chỉnh theo bối cảnh Tập đoàn."
+    },
+    {
+      "code": "CO7",
+      "category": "COR",
+      "name": {
+        "vi": "Giao tiếp",
+        "en": "Communication"
+      },
+      "definition": {
+        "vi": "Truyền đạt thông tin rõ ràng, chính xác, phù hợp người nghe, và lắng nghe để bảo đảm thông điệp được hiểu và thực hiện đúng."
+      },
+      "derivedFrom": "[SOURCE] Sổ tay sheet 03, COR01: mô hình tự vận hành đòi hỏi chuẩn dịch vụ được truyền đạt chính xác tới 722 nhân sự tuyến đầu (55,2% tổng nhân sự). Nếu không có: SOP ban hành nhưng không được thực thi đúng, chất lượng dịch vụ không đồng nhất giữa các cơ sở.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Truyền đạt đúng thông tin công việc của mình khi được hỏi; xác nhận lại yêu cầu trước khi làm."
+        },
+        {
+          "level": 2,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Trình bày mạch lạc vấn đề và đề xuất trong nhóm; viết email, biên bản đúng trọng tâm, không cần sửa nhiều."
+        },
+        {
+          "level": 3,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Điều chỉnh cách truyền đạt theo từng người nghe (khách, đồng nghiệp, cấp trên); kiểm tra người nghe hiểu đúng và làm đúng."
+        },
+        {
+          "level": 4,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Truyền đạt thay đổi hoặc chuẩn mới tới nhiều đơn vị, xử lý được phản đối và thông tin trái chiều; thiết kế tài liệu hướng dẫn mà người tuyến đầu áp dụng được."
+        },
+        {
+          "level": 5,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Định hình cách Tập đoàn truyền đạt chuẩn mực và thay đổi lớn; đại diện Tập đoàn trao đổi với đối tác, cơ quan quản lý trong tình huống nhạy cảm."
+        }
+      ],
+      "scored": true,
+      "draft": true,
+      "replacesHandbookCode": "COR01",
+      "dataGap": "Năng lực mới theo QĐ-01 (14/10/2026). Định nghĩa và 5 mức là DỰ THẢO AI — chờ chuyên gia sửa, HR duyệt, Ban TGĐ phê duyệt."
+    },
+    {
+      "code": "CO8",
+      "category": "COR",
+      "name": {
+        "vi": "Lập kế hoạch & Tổ chức",
+        "en": "Planning & Organising"
+      },
+      "definition": {
+        "vi": "Xác định mục tiêu, sắp xếp thứ tự công việc, nguồn lực và mốc thời gian; nhận diện sớm điểm phụ thuộc và điểm nghẽn."
+      },
+      "derivedFrom": "[SOURCE] Sổ tay sheet 03, COR03: chuỗi giá trị Đầu tư có 8 bước tuần tự (I1–I8), mỗi bước phụ thuộc đầu ra bước trước; một bước trễ kéo theo toàn chuỗi trễ. Nếu không có: dự án trễ dây chuyền mà không ai dự báo trước được điểm nghẽn.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Lập được danh sách việc cần làm trong tuần theo hướng dẫn và hoàn thành đúng hạn được giao."
+        },
+        {
+          "level": 2,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Tự sắp xếp thứ tự ưu tiên công việc của mình, báo trước khi có nguy cơ trễ hạn."
+        },
+        {
+          "level": 3,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Lập kế hoạch cho một đầu việc nhiều bước, xác định mốc, nguồn lực và các điểm phụ thuộc với đơn vị khác."
+        },
+        {
+          "level": 4,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Lập và điều phối kế hoạch liên đơn vị cho dự án lớn, dự báo điểm nghẽn trên đường găng và có phương án dự phòng."
+        },
+        {
+          "level": 5,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Thiết kế khung lập kế hoạch và quản lý tiến độ dùng chung cho toàn khối hoặc toàn Tập đoàn, gắn với chu kỳ ngân sách và đầu tư."
+        }
+      ],
+      "scored": true,
+      "draft": true,
+      "replacesHandbookCode": "COR03",
+      "dataGap": "Năng lực mới theo QĐ-01 (14/10/2026). Định nghĩa và 5 mức là DỰ THẢO AI — chờ chuyên gia sửa, HR duyệt, Ban TGĐ phê duyệt."
+    },
+    {
+      "code": "CO9",
+      "category": "COR",
+      "name": {
+        "vi": "Hướng đến kết quả",
+        "en": "Drive for Results"
+      },
+      "definition": {
+        "vi": "Cam kết đạt kết quả đã thống nhất về chất lượng, chi phí và thời hạn; tự chịu trách nhiệm và chủ động gỡ vướng để đạt mục tiêu."
+      },
+      "derivedFrom": "[SOURCE] Sổ tay sheet 03, COR02: bốn KSF của mảng Đầu tư là chỉ số kết quả có thời hạn (IRR, tỷ lệ hấp thụ, thời gian pháp lý, kiểm soát chi phí). Nếu không có: công việc hoàn thành nhưng không đúng hạn hoặc không đạt chỉ tiêu; trong ngành thâm dụng vốn, chậm tiến độ là mất tiền.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Hoàn thành nhiệm vụ được giao đúng yêu cầu khi có hướng dẫn và kiểm tra."
+        },
+        {
+          "level": 2,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Tự theo dõi chỉ tiêu cá nhân, chủ động xử lý vướng mắc thông thường để hoàn thành đúng hạn."
+        },
+        {
+          "level": 3,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Đạt chỉ tiêu nhóm trong điều kiện có trở ngại; đặt mục tiêu cao hơn mức tối thiểu và đo được kết quả."
+        },
+        {
+          "level": 4,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Đặt và đạt mục tiêu thách thức cho đơn vị, cân đối được tiến độ – chi phí – chất lượng khi có đánh đổi."
+        },
+        {
+          "level": 5,
+          "indicator": "[DỰ THẢO AI – CHƯA DUYỆT] Xây dựng văn hóa và hệ thống chịu trách nhiệm về kết quả trên toàn khối hoặc Tập đoàn, gắn mục tiêu đơn vị với KSF chiến lược."
+        }
+      ],
+      "scored": true,
+      "draft": true,
+      "replacesHandbookCode": "COR02",
+      "dataGap": "Năng lực mới theo QĐ-01 (14/10/2026). Định nghĩa và 5 mức là DỰ THẢO AI — chờ chuyên gia sửa, HR duyệt, Ban TGĐ phê duyệt."
+    },
+    {
+      "code": "LE1",
+      "category": "LEA",
+      "name": {
+        "vi": "Tư duy Chiến lược & Danh mục",
+        "en": "Strategic & Portfolio Thinking"
+      },
+      "definition": {
+        "vi": "Nhìn được bức tranh toàn Tập đoàn khi ra quyết định, cân đối nguồn lực giữa ba mảng kinh doanh thay vì tối ưu riêng mảng mình phụ trách."
+      },
+      "derivedFrom": "Năng lực C04 Strategic Portfolio Planning và C56 Strategic Planning & Performance Governance — cả hai hiện KHÔNG có chủ sở hữu trong cơ cấu. Đây là khoảng trống năng lực lãnh đạo cần lấp.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Hiểu được chiến lược Tập đoàn và vị trí đơn vị mình trong đó."
+        },
+        {
+          "level": 2,
+          "indicator": "Gắn kế hoạch đơn vị với định hướng chung, không lập kế hoạch tách rời."
+        },
+        {
+          "level": 3,
+          "indicator": "Cân nhắc tác động lên đơn vị khác trước khi quyết định trong phạm vi mình."
+        },
+        {
+          "level": 4,
+          "indicator": "Đề xuất được phương án đánh đổi nguồn lực giữa các ưu tiên cạnh tranh nhau."
+        },
+        {
+          "level": 5,
+          "indicator": "Định hình danh mục đầu tư và phân bổ nguồn lực cấp Tập đoàn."
+        }
+      ],
+      "positiveIndicators": [
+        "Gắn kế hoạch đơn vị với định hướng chung của Tập đoàn.",
+        "Cân nhắc tác động lên đơn vị khác trước khi quyết định.",
+        "Đề xuất được phương án đánh đổi giữa các ưu tiên cạnh tranh nhau."
+      ],
+      "negativeIndicators": [
+        "Chỉ tối ưu chỉ tiêu của đơn vị mình, bất kể ảnh hưởng nơi khác.",
+        "Lập kế hoạch tách rời khỏi định hướng Tập đoàn.",
+        "Né tránh việc đánh đổi bằng cách xin thêm nguồn lực."
+      ],
+      "scored": true,
+      "overuseWarning": "Bàn chiến lược quá nhiều mà chậm triển khai; nhìn quá xa mà bỏ qua vấn đề trước mắt; thay đổi định hướng thường xuyên làm đội ngũ mất phương hướng."
+    },
+    {
+      "code": "LE2",
+      "category": "LEA",
+      "name": {
+        "vi": "Ra quyết định trong điều kiện không chắc chắn",
+        "en": "Decision Making under Uncertainty"
+      },
+      "definition": {
+        "vi": "Đưa ra quyết định kịp thời và có căn cứ khi thông tin chưa đầy đủ, đồng thời nêu rõ mức độ tin cậy của căn cứ đó."
+      },
+      "derivedFrom": "Bảng Quyền quyết định (12 quyết định trọng yếu) và thực tế còn 11 quyết định đang chờ cùng 7 khoảng trống dữ liệu. Lãnh đạo phải quyết trong điều kiện dữ liệu chưa đủ.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Ra được quyết định trong phạm vi được giao, không đẩy hết lên cấp trên."
+        },
+        {
+          "level": 2,
+          "indicator": "Phân biệt được việc nào tự quyết, việc nào phải xin ý kiến."
+        },
+        {
+          "level": 3,
+          "indicator": "Nêu rõ giả định và mức độ chắc chắn khi trình phương án."
+        },
+        {
+          "level": 4,
+          "indicator": "Quyết định được khi phương án nào cũng có rủi ro, và chịu trách nhiệm về lựa chọn đó."
+        },
+        {
+          "level": 5,
+          "indicator": "Thiết lập ngưỡng và cơ chế phân cấp quyết định cho toàn hệ thống."
+        }
+      ],
+      "positiveIndicators": [
+        "Ra quyết định trong phạm vi được giao, không đẩy hết lên cấp trên.",
+        "Nêu rõ giả định và mức độ chắc chắn khi trình phương án.",
+        "Chịu trách nhiệm về lựa chọn kể cả khi kết quả không như mong đợi."
+      ],
+      "negativeIndicators": [
+        "Trì hoãn quyết định để chờ thông tin hoàn hảo.",
+        "Đẩy quyết định lên cấp trên để tránh trách nhiệm.",
+        "Quyết định nhanh nhưng không nêu được căn cứ khi bị hỏi."
+      ],
+      "scored": true,
+      "overuseWarning": "Quyết định quá nhanh mà không tham vấn đủ; tự tin quá mức vào phán đoán cá nhân; thay đổi quyết định liên tục khi gặp phản đối."
+    },
+    {
+      "code": "LE3",
+      "category": "LEA",
+      "name": {
+        "vi": "Trách nhiệm giải trình Đầu-Cuối",
+        "en": "End-to-end Accountability"
+      },
+      "definition": {
+        "vi": "Nhận trách nhiệm về kết quả cuối cùng của một chuỗi hoạt động, kể cả phần do đơn vị khác thực hiện."
+      },
+      "derivedFrom": "Nguyên tắc thiết kế tổ chức số 1: mỗi Value Stage phải có đúng một đơn vị chịu trách nhiệm cuối cùng. Hiện có 4 điểm phân tán trách nhiệm chưa được phân định.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Hoàn thành đúng phần việc được giao và báo cáo trung thực kết quả."
+        },
+        {
+          "level": 2,
+          "indicator": "Không đổ lỗi cho đơn vị khác khi kết quả chung không đạt."
+        },
+        {
+          "level": 3,
+          "indicator": "Chủ động theo dõi cả những mắt xích không thuộc đơn vị mình nhưng ảnh hưởng đến kết quả."
+        },
+        {
+          "level": 4,
+          "indicator": "Nhận trách nhiệm về kết quả chuỗi và điều phối các bên để khắc phục."
+        },
+        {
+          "level": 5,
+          "indicator": "Thiết kế cơ chế trách nhiệm giải trình rõ ràng cho hoạt động liên đơn vị."
+        }
+      ],
+      "positiveIndicators": [
+        "Theo dõi cả những mắt xích không thuộc đơn vị mình nhưng ảnh hưởng kết quả.",
+        "Nhận trách nhiệm về kết quả chung thay vì chỉ phần việc của mình.",
+        "Chủ động điều phối các bên để khắc phục khi chuỗi bị đứt."
+      ],
+      "negativeIndicators": [
+        "Báo cáo hoàn thành phần việc của mình dù kết quả chung không đạt.",
+        "Đổ lỗi cho đơn vị khác khi có vấn đề.",
+        "Chỉ theo dõi chỉ tiêu của mình, không quan tâm đầu ra cuối cùng."
+      ],
+      "scored": true,
+      "overuseWarning": "Ôm đồm việc của đơn vị khác làm mờ ranh giới trách nhiệm; can thiệp quá sâu vào phạm vi người khác; nhận trách nhiệm cả những việc mình không có quyền quyết định."
+    },
+    {
+      "code": "LE4",
+      "category": "LEA",
+      "name": {
+        "vi": "Dẫn dắt Thay đổi",
+        "en": "Leading Change"
+      },
+      "definition": {
+        "vi": "Đưa đơn vị đi qua thay đổi về cơ cấu, quy trình hoặc cách làm mà vẫn duy trì được kết quả và tinh thần đội ngũ."
+      },
+      "derivedFrom": "12 thay đổi cơ cấu đã đề xuất, trong đó có 4 đơn vị lập mới và nhiều điểm phân định lại trách nhiệm. Mọi thay đổi đều kèm rủi ro đã được ghi nhận.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Chấp nhận và thực hiện thay đổi được yêu cầu."
+        },
+        {
+          "level": 2,
+          "indicator": "Giải thích được lý do thay đổi cho nhân viên của mình."
+        },
+        {
+          "level": 3,
+          "indicator": "Chủ động xử lý phản ứng tiêu cực trong đội ngũ khi có thay đổi."
+        },
+        {
+          "level": 4,
+          "indicator": "Thiết kế lộ trình chuyển đổi cho đơn vị, có tính đến rủi ro và phương án dự phòng."
+        },
+        {
+          "level": 5,
+          "indicator": "Dẫn dắt thay đổi quy mô Tập đoàn, kể cả thay đổi động chạm quyền lợi các bên."
+        }
+      ],
+      "positiveIndicators": [
+        "Giải thích được lý do thay đổi bằng ngôn ngữ nhân viên hiểu.",
+        "Chủ động xử lý phản ứng tiêu cực thay vì chờ nó tự lắng xuống.",
+        "Có phương án dự phòng khi thay đổi gặp trở ngại."
+      ],
+      "negativeIndicators": [
+        "Thông báo thay đổi mà không giải thích lý do.",
+        "Bỏ mặc nhân viên tự thích nghi.",
+        "Rút lại thay đổi ngay khi gặp phản đối đầu tiên."
+      ],
+      "scored": true,
+      "overuseWarning": "Thay đổi liên tục làm đội ngũ kiệt sức; áp đặt thay đổi mà không lắng nghe; đánh giá thấp chi phí chuyển đổi."
+    },
+    {
+      "code": "LE5",
+      "category": "LEA",
+      "name": {
+        "vi": "Phát triển Đội ngũ Kế cận",
+        "en": "Developing Others"
+      },
+      "definition": {
+        "vi": "Xây dựng năng lực cho nhân sự dưới quyền và chuẩn bị lớp kế cận, thay vì chỉ khai thác năng lực sẵn có."
+      },
+      "derivedFrom": "Mô hình kim tự tháp nhân sự (1.307 người, 6 Ngạch) với tầng đáy 55,2%. Năng lực C38 Frontline Service Capability Development và C66 Learning & Development. Mô hình thang bậc kép cho nhánh chuyên gia.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Hướng dẫn được người mới về công việc cụ thể."
+        },
+        {
+          "level": 2,
+          "indicator": "Phản hồi thường xuyên và cụ thể về hiệu suất của nhân viên."
+        },
+        {
+          "level": 3,
+          "indicator": "Xác định được khoảng trống năng lực của từng nhân viên và giao việc để họ phát triển."
+        },
+        {
+          "level": 4,
+          "indicator": "Xây dựng lộ trình phát triển cho đội ngũ, chủ động chuẩn bị người kế cận cho vị trí của mình."
+        },
+        {
+          "level": 5,
+          "indicator": "Thiết kế chương trình phát triển năng lực cho toàn khối, gồm cả nhánh quản lý và nhánh chuyên gia."
+        }
+      ],
+      "positiveIndicators": [
+        "Giao việc có độ khó tăng dần để nhân viên phát triển.",
+        "Phản hồi cụ thể và thường xuyên, không chỉ vào kỳ đánh giá.",
+        "Chủ động chuẩn bị người có thể thay thế vị trí của mình."
+      ],
+      "negativeIndicators": [
+        "Chỉ giao việc cho người đã làm tốt sẵn.",
+        "Phản hồi chung chung hoặc chỉ khi có vấn đề.",
+        "Giữ thông tin và quan hệ để không ai thay thế được mình."
+      ],
+      "scored": true,
+      "overuseWarning": "Đầu tư phát triển dàn trải cho mọi người mà không ưu tiên; bảo bọc nhân viên quá mức khiến họ không tự lập; đề bạt sớm khi chưa đủ năng lực."
+    },
+    {
+      "code": "LE6",
+      "category": "LEA",
+      "name": {
+        "vi": "Quản trị Đối tác & Các bên liên quan",
+        "en": "Stakeholder & Partnership Management"
+      },
+      "definition": {
+        "vi": "Xây dựng và duy trì quan hệ chính danh, bền vững với các bên bên ngoài Tập đoàn."
+      },
+      "derivedFrom": "Năng lực C32 Government & Regulatory Affairs, C33 Community Relations & CSR, C34 Investor Relations, C35 Strategic Partnership Management — nhóm Value Stage dùng chung I8/H6/T6.",
+      "behavioralIndicators": [
+        {
+          "level": 1,
+          "indicator": "Giao tiếp chuyên nghiệp với đối tác trong phạm vi công việc được giao."
+        },
+        {
+          "level": 2,
+          "indicator": "Duy trì được quan hệ làm việc ổn định với đối tác thường xuyên."
+        },
+        {
+          "level": 3,
+          "indicator": "Đàm phán được điều khoản có lợi mà vẫn giữ được quan hệ dài hạn."
+        },
+        {
+          "level": 4,
+          "indicator": "Xây dựng quan hệ với đối tác chiến lược, xử lý được tình huống xung đột lợi ích."
+        },
+        {
+          "level": 5,
+          "indicator": "Đại diện Tập đoàn trước cơ quan quản lý, cộng đồng và nhà đầu tư ở các vấn đề trọng yếu."
+        }
+      ],
+      "positiveIndicators": [
+        "Duy trì được quan hệ ổn định qua nhiều kỳ làm việc.",
+        "Đàm phán được điều khoản có lợi mà vẫn giữ quan hệ dài hạn.",
+        "Xử lý được tình huống xung đột lợi ích một cách minh bạch."
+      ],
+      "negativeIndicators": [
+        "Chỉ liên hệ đối tác khi cần việc.",
+        "Cam kết vượt thẩm quyền để lấy lòng đối tác.",
+        "Để quan hệ cá nhân chi phối quyết định công việc."
+      ],
+      "scored": true,
+      "overuseWarning": "Nhượng bộ quá nhiều để giữ quan hệ; dành quá nhiều thời gian đối ngoại mà bỏ bê điều hành nội bộ; xây quan hệ phụ thuộc cá nhân thay vì thuộc về tổ chức."
+    },
+    {
+      "code": "FU01",
+      "category": "FUN",
+      "domain": "D1",
+      "domainName": "Thị trường & Chiến lược",
+      "name": {
+        "vi": "Nghiên cứu & Phân tích thị trường",
+        "en": "Market Research & Analysis"
+      },
+      "owningUnit": "Ban Đầu tư",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Độc lập lập báo cáo thị trường định kỳ, chỉ ra được cơ hội và rủi ro có căn cứ số liệu."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU02",
+      "category": "FUN",
+      "domain": "D1",
+      "domainName": "Thị trường & Chiến lược",
+      "name": {
+        "vi": "Hoạch định Chiến lược & Danh mục",
+        "en": "Strategy & Portfolio Planning"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xây dựng được phương án phân bổ nguồn lực giữa các mảng kèm phân tích đánh đổi."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU03",
+      "category": "FUN",
+      "domain": "D2",
+      "domainName": "Đầu tư & Phát triển dự án",
+      "name": {
+        "vi": "Thẩm định Đầu tư & Mô hình tài chính",
+        "en": "Investment Appraisal & Financial Modelling"
+      },
+      "owningUnit": "Ban Đầu tư; Ban TCKT",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Độc lập xây dựng mô hình dòng tiền và tính NPV/IRR cho dự án quy mô vừa."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU04",
+      "category": "FUN",
+      "domain": "D2",
+      "domainName": "Đầu tư & Phát triển dự án",
+      "name": {
+        "vi": "Phát triển Quỹ đất & Pháp lý dự án",
+        "en": "Land Development & Project Entitlement"
+      },
+      "owningUnit": "Ban Đầu tư",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xử lý được thủ tục pháp lý phức tạp và tình huống tranh chấp tại hiện trường."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU05",
+      "category": "FUN",
+      "domain": "D2",
+      "domainName": "Đầu tư & Phát triển dự án",
+      "name": {
+        "vi": "Mua bán & Sáp nhập dự án",
+        "en": "M&A and Deal Structuring"
+      },
+      "owningUnit": "Ban Đầu tư",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Định giá và đàm phán được giao dịch sang nhượng dự án, nhận diện rủi ro pháp lý và tài chính."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU06",
+      "category": "FUN",
+      "domain": "D3",
+      "domainName": "Vốn & Tài chính",
+      "name": {
+        "vi": "Huy động vốn & Quan hệ định chế",
+        "en": "Capital Raising & Institutional Relations"
+      },
+      "owningUnit": "Ban TCKT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thu xếp được nguồn vốn cho dự án qua nhiều kênh, thiết kế cấu trúc vốn phù hợp."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU07",
+      "category": "FUN",
+      "domain": "D3",
+      "domainName": "Vốn & Tài chính",
+      "name": {
+        "vi": "Kế toán & Báo cáo tài chính",
+        "en": "Accounting & Financial Reporting"
+      },
+      "owningUnit": "Ban TCKT",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Lập được báo cáo tài chính đơn vị và tham gia hợp nhất, đúng chuẩn mực và đúng hạn."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU08",
+      "category": "FUN",
+      "domain": "D3",
+      "domainName": "Vốn & Tài chính",
+      "name": {
+        "vi": "Kiểm soát Tài chính & Ngân sách",
+        "en": "Financial Control & Budgeting"
+      },
+      "owningUnit": "Ban TCKT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Phát hiện và cảnh báo được độ lệch chi phí trước khi vượt ngưỡng, đề xuất biện pháp xử lý."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU09",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "Quy hoạch & Thiết kế Kiến trúc",
+        "en": "Master Planning & Architectural Design"
+      },
+      "owningUnit": "Ban QHKT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Chủ trì được hồ sơ quy hoạch 1/500 và giải trình với cơ quan quản lý."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU10",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "Quản lý Dự án Xây dựng",
+        "en": "Construction Project Management"
+      },
+      "owningUnit": "Ban XD&QLDA",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Đưa được dự án về đích đúng tiến độ và ngân sách, xử lý phát sinh hiện trường."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU11",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "Đấu thầu & Quản trị Nhà thầu",
+        "en": "Tendering & Contractor Management"
+      },
+      "owningUnit": "Ban Cung ứng ĐT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Tổ chức đấu thầu minh bạch, đàm phán được hợp đồng khung tối ưu chi phí."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU12",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "An toàn Lao động & Môi trường",
+        "en": "Health, Safety & Environment"
+      },
+      "owningUnit": "Ban XD&QLDA",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Triển khai và giám sát được biện pháp an toàn tại công trường theo quy định."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU13",
+      "category": "FUN",
+      "domain": "D5",
+      "domainName": "Kinh doanh Bất động sản",
+      "name": {
+        "vi": "Bán hàng & Quản trị Kênh phân phối BĐS",
+        "en": "Real Estate Sales & Channel Management"
+      },
+      "owningUnit": "Ban KD BĐS",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Đánh giá và nâng cấp được chất lượng mạng lưới đại lý, đề xuất chính sách giá phù hợp thị trường."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU14",
+      "category": "FUN",
+      "domain": "D5",
+      "domainName": "Kinh doanh Bất động sản",
+      "name": {
+        "vi": "Quản lý Hợp đồng & Thủ tục sở hữu",
+        "en": "Contract & Title Administration"
+      },
+      "owningUnit": "Ban KD BĐS; Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Quản lý độc lập danh mục hợp đồng của một dự án, hoàn tất thủ tục Giấy chứng nhận."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU15",
+      "category": "FUN",
+      "domain": "D6",
+      "domainName": "Thiết kế Dịch vụ & Tiêu chuẩn",
+      "name": {
+        "vi": "Thiết kế Sản phẩm Dịch vụ",
+        "en": "Service Product Design"
+      },
+      "owningUnit": "Ban KD Vận hành",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết kế độc lập gói dịch vụ cho một cơ sở, gắn với cơ cấu doanh thu mục tiêu."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU16",
+      "category": "FUN",
+      "domain": "D6",
+      "domainName": "Thiết kế Dịch vụ & Tiêu chuẩn",
+      "name": {
+        "vi": "Xây dựng & Quản trị Tiêu chuẩn Dịch vụ",
+        "en": "Service Standard Management"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Biên soạn được bộ SOP cho một loại hình dịch vụ và tổ chức đào tạo triển khai."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU17",
+      "category": "FUN",
+      "domain": "D7",
+      "domainName": "Vận hành Khách sạn",
+      "name": {
+        "vi": "Vận hành Lưu trú",
+        "en": "Accommodation Operations"
+      },
+      "owningUnit": "Cơ sở vận hành",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xử lý độc lập tình huống khách hàng theo SOP, duy trì tiêu chuẩn trong mùa cao điểm."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU18",
+      "category": "FUN",
+      "domain": "D7",
+      "domainName": "Vận hành Khách sạn",
+      "name": {
+        "vi": "Vận hành F&B",
+        "en": "Food & Beverage Operations"
+      },
+      "owningUnit": "Cơ sở vận hành",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Kiểm soát tỷ lệ chi phí nguyên liệu trong chuẩn ngành, đảm bảo an toàn thực phẩm."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU19",
+      "category": "FUN",
+      "domain": "D7",
+      "domainName": "Vận hành Khách sạn",
+      "name": {
+        "vi": "Vận hành Trải nghiệm & Wellness",
+        "en": "Leisure & Wellness Operations"
+      },
+      "owningUnit": "FRT; Cơ sở vận hành",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Nâng được doanh thu dịch vụ trải nghiệm trên mỗi lượt khách, quản lý an toàn thiết bị."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU20",
+      "category": "FUN",
+      "domain": "D7",
+      "domainName": "Vận hành Khách sạn",
+      "name": {
+        "vi": "Kỹ thuật & Cơ sở vật chất",
+        "en": "Facility & Engineering Management"
+      },
+      "owningUnit": "Cơ sở vận hành",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Chuyển từ sửa chữa bị động sang bảo trì phòng ngừa, lập được kế hoạch bảo trì chu kỳ."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU21",
+      "category": "FUN",
+      "domain": "D8",
+      "domainName": "Vận hành Lữ hành",
+      "name": {
+        "vi": "Thiết kế Sản phẩm Tour",
+        "en": "Tour Product Design"
+      },
+      "owningUnit": "FTV",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết kế độc lập sản phẩm tour mới và đàm phán được với đối tác điểm đến."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU22",
+      "category": "FUN",
+      "domain": "D8",
+      "domainName": "Vận hành Lữ hành",
+      "name": {
+        "vi": "Điều hành Tour & Quản trị Hướng dẫn viên",
+        "en": "Tour Operations & Guide Management"
+      },
+      "owningUnit": "FTV",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Điều phối được nhiều đoàn khách đồng thời trong mùa cao điểm, xử lý sự cố hành trình."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU23",
+      "category": "FUN",
+      "domain": "D9",
+      "domainName": "Nhu cầu & Doanh thu",
+      "name": {
+        "vi": "Quản trị Doanh thu",
+        "en": "Revenue Management"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Tối ưu được RevPAR đồng thời cho nhiều cơ sở qua định giá động và phân bổ công suất."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU24",
+      "category": "FUN",
+      "domain": "D9",
+      "domainName": "Nhu cầu & Doanh thu",
+      "name": {
+        "vi": "Quản trị Kênh phân phối Dịch vụ",
+        "en": "Service Distribution Channel Management"
+      },
+      "owningUnit": "Ban KD Vận hành; FTV",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Cân đối được tỷ trọng kênh để tối ưu chi phí phân phối, đàm phán hoa hồng OTA."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU25",
+      "category": "FUN",
+      "domain": "D9",
+      "domainName": "Nhu cầu & Doanh thu",
+      "name": {
+        "vi": "Bán hàng Khách đoàn & MICE",
+        "en": "Group & MICE Sales"
+      },
+      "owningUnit": "Ban KD Vận hành",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Chốt độc lập hợp đồng khách đoàn quy mô vừa, phối hợp tổ chức sự kiện."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU26",
+      "category": "FUN",
+      "domain": "D10",
+      "domainName": "Khách hàng & Thương hiệu",
+      "name": {
+        "vi": "Quản trị Thương hiệu",
+        "en": "Brand Management"
+      },
+      "owningUnit": "Ban TT&TH",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xây dựng định vị thống nhất cho cả sản phẩm bán và sản phẩm dịch vụ."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU27",
+      "category": "FUN",
+      "domain": "D10",
+      "domainName": "Khách hàng & Thương hiệu",
+      "name": {
+        "vi": "Truyền thông & Quản trị Danh tiếng",
+        "en": "Communications & Reputation Management"
+      },
+      "owningUnit": "Ban TT&TH",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xử lý được khủng hoảng truyền thông, quản trị đánh giá trên kênh OTA và mạng xã hội."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU28",
+      "category": "FUN",
+      "domain": "D10",
+      "domainName": "Khách hàng & Thương hiệu",
+      "name": {
+        "vi": "CRM & Phân tích Khách hàng",
+        "en": "CRM & Customer Analytics"
+      },
+      "owningUnit": "Ban TT&TH; Ban CNTT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Vận hành chương trình khách hàng thân thiết và phân tích được hành vi tệp khách."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU29",
+      "category": "FUN",
+      "domain": "D11",
+      "domainName": "Quản trị Tài sản",
+      "name": {
+        "vi": "Quản trị Danh mục Tài sản & CAPEX",
+        "en": "Asset Portfolio & CAPEX Management"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Đo lường và so sánh được hiệu quả từng tài sản riêng lẻ, lập kế hoạch CAPEX có ưu tiên."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU30",
+      "category": "FUN",
+      "domain": "D12",
+      "domainName": "Các bên liên quan, Rủi ro & Quản trị",
+      "name": {
+        "vi": "Pháp chế & Quản lý Hợp đồng",
+        "en": "Legal & Contract Management"
+      },
+      "owningUnit": "Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thẩm định được hợp đồng thương mại phức tạp và cảnh báo rủi ro pháp lý sớm."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU31",
+      "category": "FUN",
+      "domain": "D12",
+      "domainName": "Các bên liên quan, Rủi ro & Quản trị",
+      "name": {
+        "vi": "Kiểm soát Nội bộ & Quản trị Rủi ro",
+        "en": "Internal Control & Risk Management"
+      },
+      "owningUnit": "Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết kế được chốt kiểm soát cho quy trình rủi ro cao và thực hiện điều tra nội bộ."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU32",
+      "category": "FUN",
+      "domain": "D12",
+      "domainName": "Các bên liên quan, Rủi ro & Quản trị",
+      "name": {
+        "vi": "Quan hệ Đối ngoại & Chính quyền",
+        "en": "Government & External Relations"
+      },
+      "owningUnit": "Ban TGĐ; Ban Đầu tư",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Duy trì được quan hệ với cơ quan quản lý và xử lý được thủ tục hành chính phức tạp."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU33",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "Quản trị Nhân sự & Phát triển Tổ chức",
+        "en": "HR Management & Organization Development"
+      },
+      "owningUnit": "Ban NS&QTHC",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết kế được cơ cấu tổ chức, khung năng lực và chính sách đãi ngộ gắn với chiến lược."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU34",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "Công nghệ & Dữ liệu",
+        "en": "Technology & Data Management"
+      },
+      "owningUnit": "Ban CNTT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Vận hành nền tảng ERP/PMS/POS/CRM và xây dựng được báo cáo phân tích cho nghiệp vụ."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU35",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "An toàn Thông tin",
+        "en": "Information Security"
+      },
+      "owningUnit": "Ban CNTT",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết kế và giám sát được chính sách bảo mật dữ liệu khách hàng và hệ thống."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU36",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "Mua sắm & Chuỗi cung ứng",
+        "en": "Procurement & Supply Chain"
+      },
+      "owningUnit": "Ban Cung ứng ĐT",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thực hiện độc lập quy trình mua sắm và quản lý hợp đồng nhà cung cấp."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU37",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "Hành chính & Quản trị Cơ sở vật chất",
+        "en": "Administration & Facility Services"
+      },
+      "owningUnit": "Ban NS&QTHC; Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Chuẩn hóa được dịch vụ hành chính và quản lý tài sản hành chính đa địa điểm."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU38",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "Quản trị Hợp đồng Thương mại & Khiếu nại",
+        "en": "Commercial Contract, Variation & Claims Management"
+      },
+      "owningUnit": "Ban Cung ứng ĐT; Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xử lý độc lập được hồ sơ phát sinh khối lượng và khiếu nại của nhà thầu, bảo vệ được vị thế thương mại của Tập đoàn."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU39",
+      "category": "FUN",
+      "domain": "D4",
+      "domainName": "Thiết kế & Xây dựng",
+      "name": {
+        "vi": "Đảm bảo Chất lượng Công trình",
+        "en": "Construction Quality Assurance"
+      },
+      "owningUnit": "Ban XD&QLDA",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết lập và vận hành được hệ thống kiểm tra chất lượng độc lập với đơn vị thi công, phát hiện sai lệch trước khi nghiệm thu."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU40",
+      "category": "FUN",
+      "domain": "D5",
+      "domainName": "Kinh doanh Bất động sản",
+      "name": {
+        "vi": "Liên kết Tín dụng Khách hàng",
+        "en": "Mortgage & Sales Financing Partnership"
+      },
+      "owningUnit": "Ban KD BĐS; Ban TCKT",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thiết lập và duy trì được liên kết với ngân hàng cho vay mua nhà, hỗ trợ khách hàng hoàn tất hồ sơ vay."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU41",
+      "category": "FUN",
+      "domain": "D5",
+      "domainName": "Kinh doanh Bất động sản",
+      "name": {
+        "vi": "Vận hành Chăm sóc Khách hàng & Xử lý Khiếu nại",
+        "en": "Contact Center & Complaint Management"
+      },
+      "owningUnit": "Ban KD BĐS",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Xử lý độc lập khiếu nại khách hàng theo quy trình chuẩn, ghi nhận đầy đủ vào hệ thống dữ liệu khách hàng."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU42",
+      "category": "FUN",
+      "domain": "D5",
+      "domainName": "Kinh doanh Bất động sản",
+      "name": {
+        "vi": "Quản lý Bàn giao & Bảo hành Sản phẩm",
+        "en": "Handover, Defect & Warranty Management"
+      },
+      "owningUnit": "Ban XD&QLDA; Ban KD BĐS",
+      "hasOwner": true,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Tổ chức được quy trình kiểm tra trước bàn giao, theo dõi và đóng lỗi kỹ thuật đúng hạn, xử lý bảo hành theo cam kết."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU43",
+      "category": "FUN",
+      "domain": "D11",
+      "domainName": "Quản trị Tài sản",
+      "name": {
+        "vi": "Vận hành Tòa nhà & Quản lý Cộng đồng Cư dân",
+        "en": "Property & Resident Community Management"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 4,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Vận hành được tòa nhà ở theo tiêu chuẩn, tổ chức được hội nghị cư dân và xử lý được tranh chấp trong cộng đồng."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU44",
+      "category": "FUN",
+      "domain": "D13",
+      "domainName": "Nền tảng Doanh nghiệp",
+      "name": {
+        "vi": "Bảo vệ Dữ liệu Cá nhân",
+        "en": "Data Privacy Protection"
+      },
+      "owningUnit": "Ban CNTT; Ban PC&KSNB",
+      "hasOwner": true,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Áp dụng được quy định bảo vệ dữ liệu cá nhân vào quy trình thu thập và xử lý dữ liệu khách hàng của đơn vị mình."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    },
+    {
+      "code": "FU45",
+      "category": "FUN",
+      "domain": "D12",
+      "domainName": "Các bên liên quan, Rủi ro & Quản trị",
+      "name": {
+        "vi": "Quản trị ESG & Phát triển Bền vững",
+        "en": "ESG & Sustainability Management"
+      },
+      "owningUnit": "[GAP] Chưa có đơn vị",
+      "hasOwner": false,
+      "referenceLevel": 3,
+      "behavioralIndicators": [
+        {
+          "level": 3,
+          "indicator": "Thu thập và tổng hợp được dữ liệu ESG của đơn vị, nhận diện được rủi ro môi trường và xã hội trong phạm vi công việc."
+        }
+      ],
+      "scored": true,
+      "dataGap": "Chỉ có chỉ báo Mức 3. Cần workshop chuyên gia nghiệp vụ để viết Mức 1, 2, 4, 5."
+    }
+  ],
+  "interviewQuestions": [
+    {
+      "competencyCode": "CO1",
+      "question": "Kể về một lần anh/chị phát hiện sai sót do chính mình gây ra. Anh/chị đã xử lý thế nào và kết quả ra sao?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO1",
+      "question": "Kể về một tình huống anh/chị chịu áp lực làm điều mình cho là không đúng quy định. Anh/chị đã làm gì?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO1",
+      "question": "Có khi nào việc kiên quyết tuân thủ của anh/chị gây thiệt hại cho công việc chung không? Nhìn lại, anh/chị sẽ làm khác đi thế nào?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "CO2",
+      "question": "Kể về một lần anh/chị phát hiện điều khách hàng thực sự cần khác với điều họ nói ra. Anh/chị nhận ra bằng cách nào?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO2",
+      "question": "Kể về một thay đổi trong cách làm việc của anh/chị xuất phát từ phản hồi khách hàng.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO2",
+      "question": "Có khi nào anh/chị phải từ chối một yêu cầu của khách hàng không? Anh/chị đã cân nhắc những gì?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "CO3",
+      "question": "Kể về một quyết định anh/chị đưa ra dựa trên phân tích dữ liệu. Anh/chị đã dùng dữ liệu gì và kết luận thế nào?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO3",
+      "question": "Kể về một lần dữ liệu cho kết quả trái với dự đoán ban đầu của anh/chị.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO3",
+      "question": "Có khi nào anh/chị phải quyết định khi dữ liệu chưa đầy đủ không? Anh/chị xử lý thế nào?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "CO4",
+      "question": "Kể về một lần anh/chị phát hiện rủi ro an toàn tại nơi làm việc. Anh/chị đã làm gì?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO4",
+      "question": "Kể về một tình huống anh/chị phải cân nhắc giữa tiến độ và an toàn.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO4",
+      "question": "Có khi nào quyết định dừng việc vì lý do an toàn của anh/chị bị cho là quá thận trọng không?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "CO5",
+      "question": "Kể về một công việc anh/chị phải phối hợp với đơn vị khác mà ranh giới trách nhiệm không rõ. Anh/chị xử lý thế nào?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO5",
+      "question": "Kể về một lần anh/chị bất đồng với đơn vị khác về cách làm. Kết quả ra sao?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO5",
+      "question": "Có khi nào việc cố gắng phối hợp của anh/chị làm chậm tiến độ công việc không?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "CO6",
+      "question": "Kể về một kiến thức hoặc kỹ năng mới anh/chị đã tự học trong 12 tháng qua và áp dụng vào công việc.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO6",
+      "question": "Kể về một lần anh/chị thay đổi cách làm sau khi nhận ra cách cũ không hiệu quả.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "CO6",
+      "question": "Có khi nào anh/chị áp dụng một cách làm mới nhưng không thành công? Nguyên nhân là gì?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE1",
+      "question": "Kể về một quyết định anh/chị đưa ra có lợi cho Tập đoàn nhưng bất lợi cho đơn vị mình.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE1",
+      "question": "Kể về cách anh/chị xây dựng kế hoạch năm cho đơn vị và gắn nó với chiến lược chung.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE1",
+      "question": "Có khi nào anh/chị nhận ra kế hoạch của mình không còn phù hợp giữa chừng không? Anh/chị xử lý thế nào?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE2",
+      "question": "Kể về một quyết định khó anh/chị phải đưa ra khi thông tin chưa đầy đủ.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE2",
+      "question": "Kể về một quyết định của anh/chị sau đó chứng minh là sai. Anh/chị đã xử lý thế nào?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE2",
+      "question": "Có khi nào anh/chị quyết định quá vội và phải trả giá không?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE3",
+      "question": "Kể về một kết quả chung không đạt dù phần việc của anh/chị đã hoàn thành. Anh/chị đã làm gì?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE3",
+      "question": "Kể về một lần anh/chị phải điều phối nhiều đơn vị để cứu một kết quả sắp trễ hạn.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE3",
+      "question": "Có khi nào anh/chị nhận trách nhiệm về việc mình không kiểm soát được không? Kết quả thế nào?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE4",
+      "question": "Kể về một thay đổi anh/chị đã dẫn dắt trong đơn vị. Anh/chị xử lý phản ứng của nhân viên thế nào?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE4",
+      "question": "Kể về một thay đổi không thành công. Nguyên nhân và bài học là gì?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE4",
+      "question": "Có khi nào anh/chị đẩy thay đổi quá nhanh so với khả năng tiếp nhận của đội ngũ không?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE5",
+      "question": "Kể về một nhân viên anh/chị đã phát triển. Anh/chị đã làm gì cụ thể?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE5",
+      "question": "Kể về cách anh/chị chuẩn bị người kế cận cho vị trí của mình.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE5",
+      "question": "Có khi nào anh/chị đầu tư phát triển một người nhưng không hiệu quả không? Anh/chị nhận ra điều gì?",
+      "isCounterEvidence": true
+    },
+    {
+      "competencyCode": "LE6",
+      "question": "Kể về một quan hệ đối tác anh/chị đã xây dựng và duy trì. Anh/chị đã làm gì?",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE6",
+      "question": "Kể về một lần anh/chị phải từ chối yêu cầu của đối tác quan trọng.",
+      "isCounterEvidence": false
+    },
+    {
+      "competencyCode": "LE6",
+      "question": "Có khi nào việc giữ quan hệ khiến anh/chị chấp nhận điều khoản bất lợi không?",
+      "isCounterEvidence": true
+    }
+  ],
+  "jobFamilies": [
+    {
+      "code": "JF01",
+      "jobFunction": "Đầu tư & Xây dựng",
+      "name": {
+        "vi": "Phát triển Đầu tư"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Tìm kiếm, thẩm định và bảo đảm cơ hội đầu tư; phát triển quỹ đất và hoàn tất pháp lý dự án",
+      "valueStages": "I1, I2"
+    },
+    {
+      "code": "JF02",
+      "jobFunction": "Đầu tư & Xây dựng",
+      "name": {
+        "vi": "Quy hoạch & Thiết kế"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Chuyển ý tưởng sản phẩm thành hồ sơ quy hoạch, kiến trúc, cảnh quan có thể thi công",
+      "valueStages": "I5"
+    },
+    {
+      "code": "JF03",
+      "jobFunction": "Đầu tư & Xây dựng",
+      "name": {
+        "vi": "Quản lý Dự án Xây dựng"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Điều hành thi công đạt đồng thời tiến độ, chi phí, chất lượng, an toàn",
+      "valueStages": "I5"
+    },
+    {
+      "code": "JF04",
+      "jobFunction": "Đầu tư & Xây dựng",
+      "name": {
+        "vi": "Cung ứng & Đấu thầu"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Tổ chức đấu thầu, đàm phán hợp đồng, quản trị nhà thầu và nhà cung cấp",
+      "valueStages": "I5, D"
+    },
+    {
+      "code": "JF05",
+      "jobFunction": "Kinh doanh & Vận hành",
+      "name": {
+        "vi": "Kinh doanh Bất động sản"
+      },
+      "careerStream": "Kinh doanh (S)",
+      "description": "Bán sản phẩm bất động sản qua mạng lưới kênh; bàn giao và hậu mãi",
+      "valueStages": "I6"
+    },
+    {
+      "code": "JF06",
+      "jobFunction": "Kinh doanh & Vận hành",
+      "name": {
+        "vi": "Marketing & Thương hiệu"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Định vị thương hiệu, truyền thông, quản trị danh tiếng cho cả ba mảng",
+      "valueStages": "I3, H3, T3"
+    },
+    {
+      "code": "JF07",
+      "jobFunction": "Kinh doanh & Vận hành",
+      "name": {
+        "vi": "Vận hành Dịch vụ Lưu trú"
+      },
+      "careerStream": "Vận hành (O)",
+      "description": "Cung cấp dịch vụ lưu trú, F&B, trải nghiệm tại cơ sở theo chuẩn đã ban hành",
+      "valueStages": "H4"
+    },
+    {
+      "code": "JF08",
+      "jobFunction": "Kinh doanh & Vận hành",
+      "name": {
+        "vi": "Lữ hành & Điểm đến"
+      },
+      "careerStream": "Vận hành (O)",
+      "description": "Thiết kế và điều hành sản phẩm tour, quản trị mạng lưới đối tác điểm đến",
+      "valueStages": "T2, T4"
+    },
+    {
+      "code": "JF09",
+      "jobFunction": "Kinh doanh & Vận hành",
+      "name": {
+        "vi": "Quản trị Doanh thu & Kênh"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Định giá động, phân bổ công suất, tối ưu hỗn hợp kênh phân phối",
+      "valueStages": "H5, T5"
+    },
+    {
+      "code": "JF10",
+      "jobFunction": "Quản trị & Hỗ trợ",
+      "name": {
+        "vi": "Tài chính & Kế toán"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Huy động vốn, hạch toán, kiểm soát chi phí và hiệu quả đầu tư",
+      "valueStages": "I4, Hỗ trợ B"
+    },
+    {
+      "code": "JF11",
+      "jobFunction": "Quản trị & Hỗ trợ",
+      "name": {
+        "vi": "Nhân sự & Phát triển Tổ chức"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Thiết kế tổ chức, tuyển dụng, đào tạo, đãi ngộ, quản trị hiệu suất",
+      "valueStages": "Hỗ trợ C"
+    },
+    {
+      "code": "JF12",
+      "jobFunction": "Quản trị & Hỗ trợ",
+      "name": {
+        "vi": "Pháp chế & Kiểm soát"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Bảo đảm an toàn pháp lý, kiểm soát nội bộ, quản trị rủi ro và liêm chính",
+      "valueStages": "Hỗ trợ B"
+    },
+    {
+      "code": "JF13",
+      "jobFunction": "Quản trị & Hỗ trợ",
+      "name": {
+        "vi": "Công nghệ & Dữ liệu"
+      },
+      "careerStream": "Chuyên môn (P)",
+      "description": "Vận hành nền tảng công nghệ lõi, quản trị dữ liệu và an toàn thông tin",
+      "valueStages": "Hỗ trợ B"
+    },
+    {
+      "code": "JF14",
+      "jobFunction": "Quản trị & Hỗ trợ",
+      "name": {
+        "vi": "Hành chính & Cơ sở vật chất"
+      },
+      "careerStream": "Vận hành (O)",
+      "description": "Cung cấp hạ tầng làm việc, hậu cần, an ninh và quản lý tài sản hành chính",
+      "valueStages": "Hỗ trợ D"
+    }
+  ],
+  "jobLevels": [
+    {
+      "code": "L6",
+      "name": {
+        "vi": "Lãnh đạo Tập đoàn"
+      },
+      "grade": "Ngạch 1",
+      "careerLevel": "SE — Senior Executive",
+      "contribution": "Định hình hướng đi và khẩu vị rủi ro toàn Tập đoàn",
+      "scope": "Toàn Tập đoàn",
+      "requiredBand": {
+        "core": "5",
+        "leadership": "5",
+        "functional": "3–4"
+      }
+    },
+    {
+      "code": "L5",
+      "name": {
+        "vi": "Quản lý cấp cao"
+      },
+      "grade": "Ngạch 2",
+      "careerLevel": "BUL — Business Unit Leader",
+      "contribution": "Điều hành một Khối hoặc Công ty thành viên",
+      "scope": "Khối / Đơn vị thành viên",
+      "requiredBand": {
+        "core": "4–5",
+        "leadership": "4",
+        "functional": "4"
+      }
+    },
+    {
+      "code": "L4",
+      "name": {
+        "vi": "Quản lý cấp trung"
+      },
+      "grade": "Ngạch 3",
+      "careerLevel": "MLL — Mid Level Leader",
+      "contribution": "Quản lý một đơn vị chức năng",
+      "scope": "Ban / Phòng",
+      "requiredBand": {
+        "core": "4",
+        "leadership": "3",
+        "functional": "4"
+      }
+    },
+    {
+      "code": "L3",
+      "name": {
+        "vi": "Quản lý cơ sở"
+      },
+      "grade": "Ngạch 4",
+      "careerLevel": "FLL — First Line Leader",
+      "contribution": "Quản lý trực tiếp một nhóm nghiệp vụ",
+      "scope": "Nhóm / Bộ phận",
+      "requiredBand": {
+        "core": "3",
+        "leadership": "3",
+        "functional": "3–4"
+      }
+    },
+    {
+      "code": "L2",
+      "name": {
+        "vi": "Chuyên viên"
+      },
+      "grade": "Ngạch 5",
+      "careerLevel": "Mid–Sr IC",
+      "contribution": "Thực thi chuyên môn độc lập",
+      "scope": "Gói công việc / Dự án",
+      "requiredBand": {
+        "core": "3",
+        "leadership": "—",
+        "functional": "3"
+      }
+    },
+    {
+      "code": "L1",
+      "name": {
+        "vi": "Nhân viên"
+      },
+      "grade": "Ngạch 6",
+      "careerLevel": "ELIC — Entry Level IC",
+      "contribution": "Thực hiện công việc theo hướng dẫn",
+      "scope": "Nhiệm vụ cá nhân",
+      "requiredBand": {
+        "core": "2",
+        "leadership": "—",
+        "functional": "2"
+      }
+    }
+  ],
+  "jobRoles": [
+    {
+      "code": "R01",
+      "title": {
+        "vi": "Trưởng Ban Đầu tư"
+      },
+      "jobFamily": "JF01",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Thẩm định đầu tư",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Phát triển quỹ đất",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "M&A",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R02",
+      "title": {
+        "vi": "Chuyên viên Thẩm định Đầu tư"
+      },
+      "jobFamily": "JF01",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR03",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "COR08",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Thẩm định đầu tư",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Nghiên cứu thị trường",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R03",
+      "title": {
+        "vi": "Chuyên viên Phát triển Quỹ đất"
+      },
+      "jobFamily": "JF01",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR04",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Phát triển quỹ đất & Pháp lý",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R04",
+      "title": {
+        "vi": "Trưởng Ban Quy hoạch Kiến trúc"
+      },
+      "jobFamily": "JF02",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR05",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA05",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "LEA08",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Quy hoạch & Thiết kế",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Thiết kế sản phẩm dịch vụ",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R05",
+      "title": {
+        "vi": "Kiến trúc sư Chủ trì"
+      },
+      "jobFamily": "JF02",
+      "jobLevel": "L3",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "COR05",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR01",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Quy hoạch & Thiết kế",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R06",
+      "title": {
+        "vi": "Trưởng Ban Xây dựng & QLDA"
+      },
+      "jobFamily": "JF03",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR07",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Quản lý dự án XD",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Đảm bảo chất lượng",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "An toàn",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R07",
+      "title": {
+        "vi": "Giám đốc Ban QLDA"
+      },
+      "jobFamily": "JF03",
+      "jobLevel": "L3",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA05",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Quản lý dự án XD",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "An toàn",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R08",
+      "title": {
+        "vi": "Kỹ sư Giám sát"
+      },
+      "jobFamily": "JF03",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Đảm bảo chất lượng",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "An toàn",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R09",
+      "title": {
+        "vi": "Trưởng Ban Cung ứng Đấu thầu"
+      },
+      "jobFamily": "JF04",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA04",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Đấu thầu & Nhà thầu",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Hợp đồng & Khiếu nại",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R10",
+      "title": {
+        "vi": "Chuyên viên Đấu thầu"
+      },
+      "jobFamily": "JF04",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR03",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Đấu thầu & Nhà thầu",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Mua sắm",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R11",
+      "title": {
+        "vi": "Trưởng Ban Kinh doanh BĐS"
+      },
+      "jobFamily": "JF05",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR02",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Bán hàng & Kênh",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Liên kết tín dụng",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R12",
+      "title": {
+        "vi": "Chuyên viên Kinh doanh"
+      },
+      "jobFamily": "JF05",
+      "jobLevel": "L2",
+      "careerStream": "Kinh doanh (S)",
+      "requirements": [
+        {
+          "competency": "COR02",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "COR06",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "COR01",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Bán hàng & Kênh",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R13",
+      "title": {
+        "vi": "Chuyên viên Bàn giao & Hậu mãi"
+      },
+      "jobFamily": "JF05",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "VAL03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Bàn giao & Bảo hành",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "CSKH & Khiếu nại",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R14",
+      "title": {
+        "vi": "Trưởng Ban Truyền thông & Thương hiệu"
+      },
+      "jobFamily": "JF06",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA04",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Quản trị thương hiệu",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Danh tiếng",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "CRM",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R15",
+      "title": {
+        "vi": "Chuyên viên Truyền thông"
+      },
+      "jobFamily": "JF06",
+      "jobLevel": "L2",
+      "careerStream": "Chuyên môn (P)",
+      "requirements": [
+        {
+          "competency": "COR01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR05",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Danh tiếng",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R16",
+      "title": {
+        "vi": "Trưởng Ban Kinh doanh Vận hành"
+      },
+      "jobFamily": "JF07",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR06",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR05",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA05",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Tiêu chuẩn dịch vụ",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Quản trị doanh thu",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Vận hành lưu trú",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R17",
+      "title": {
+        "vi": "Giám đốc Cơ sở Vận hành"
+      },
+      "jobFamily": "JF07",
+      "jobLevel": "L3",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA05",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "LEA06",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Vận hành lưu trú",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Vận hành F&B",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R18",
+      "title": {
+        "vi": "Trưởng bộ phận Lễ tân"
+      },
+      "jobFamily": "JF07",
+      "jobLevel": "L3",
+      "careerStream": "Vận hành (O)",
+      "requirements": [
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR01",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "LEA05",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Vận hành lưu trú",
+          "requiredLevel": 3
+        }
+      ]
+    },
+    {
+      "code": "R19",
+      "title": {
+        "vi": "Nhân viên Lễ tân"
+      },
+      "jobFamily": "JF07",
+      "jobLevel": "L1",
+      "careerStream": "Vận hành (O)",
+      "requirements": [
+        {
+          "competency": "VAL02",
+          "requiredLevel": 2
+        },
+        {
+          "competency": "COR06",
+          "requiredLevel": 2
+        },
+        {
+          "competency": "COR01",
+          "requiredLevel": 2
+        },
+        {
+          "competency": "Vận hành lưu trú",
+          "requiredLevel": 2
+        }
+      ]
+    },
+    {
+      "code": "R20",
+      "title": {
+        "vi": "Giám đốc Lữ hành"
+      },
+      "jobFamily": "JF08",
+      "jobLevel": "L5",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR06",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA04",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA07",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Thiết kế tour",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Điều hành tour",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R21",
+      "title": {
+        "vi": "Chuyên gia Quản trị Doanh thu"
+      },
+      "jobFamily": "JF09",
+      "jobLevel": "L3",
+      "careerStream": "Chuyên gia (E)",
+      "requirements": [
+        {
+          "competency": "COR08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "COR02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA07",
+          "requiredLevel": 3
+        },
+        {
+          "competency": "Quản trị doanh thu",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Quản trị kênh",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R22",
+      "title": {
+        "vi": "Trưởng Ban Tài chính Kế toán"
+      },
+      "jobFamily": "JF10",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Huy động vốn",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Kiểm soát tài chính",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Kế toán",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R23",
+      "title": {
+        "vi": "Trưởng Ban Nhân sự & QTHC"
+      },
+      "jobFamily": "JF11",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "VAL03",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR01",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA10",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "LEA02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Quản trị nhân sự & PTTC",
+          "requiredLevel": 5
+        }
+      ]
+    },
+    {
+      "code": "R24",
+      "title": {
+        "vi": "Trưởng Ban Pháp chế & Kiểm soát Nội bộ"
+      },
+      "jobFamily": "JF12",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR07",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "LEA03",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA09",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Kiểm soát nội bộ",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Pháp chế",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "Quản trị rủi ro",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R25",
+      "title": {
+        "vi": "Trưởng Ban Công nghệ Thông tin"
+      },
+      "jobFamily": "JF13",
+      "jobLevel": "L4",
+      "careerStream": "Quản lý (M)",
+      "requirements": [
+        {
+          "competency": "COR08",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR05",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA02",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Công nghệ & Dữ liệu",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "An toàn thông tin",
+          "requiredLevel": 4
+        }
+      ]
+    },
+    {
+      "code": "R26",
+      "title": {
+        "vi": "Cố vấn cao cấp (nhánh Chuyên gia)"
+      },
+      "jobFamily": "—",
+      "jobLevel": "L6",
+      "careerStream": "Chuyên gia (E)",
+      "requirements": [
+        {
+          "competency": "VAL01",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR05",
+          "requiredLevel": 5
+        },
+        {
+          "competency": "COR08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA10",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "LEA08",
+          "requiredLevel": 4
+        },
+        {
+          "competency": "Một lĩnh vực chuyên sâu",
+          "requiredLevel": 5
+        }
+      ]
+    }
+  ],
+  "governanceRules": [
+    {
+      "code": "QT01",
+      "rule": "Từ điển năng lực do Ban Nhân sự & QTHC sở hữu; mọi thay đổi phải được Ban TGĐ phê duyệt."
+    },
+    {
+      "code": "QT02",
+      "rule": "Mỗi vị trí tối đa 8 năng lực: 6 Cốt lõi bắt buộc + tối đa 2 Lãnh đạo + tối đa 4 Chuyên môn."
+    },
+    {
+      "code": "QT03",
+      "rule": "Mức yêu cầu của vị trí phải nằm trong khoảng của Ngạch tương ứng, không tự đặt cao hơn."
+    },
+    {
+      "code": "QT04",
+      "rule": "Kết quả đánh giá năng lực là quan sát thô, KHÔNG tự động quy đổi thành xếp loại hiệu suất hay mức lương."
+    },
+    {
+      "code": "QT05",
+      "rule": "Không dùng cho đánh giá chính thức cho đến khi hoàn tất chỉ báo 5 mức cho toàn bộ năng lực chuyên môn."
+    },
+    {
+      "code": "QT06",
+      "rule": "Chỉ báo hành vi phải quan sát được. Không trả lời được 'nhìn thấy gì thì biết là đạt' thì phải viết lại."
+    },
+    {
+      "code": "QT07",
+      "rule": "Rà soát toàn bộ 2 năm một lần, hoặc ngay khi cơ cấu tổ chức thay đổi đáng kể."
+    },
+    {
+      "code": "QT08",
+      "rule": "Câu hỏi phỏng vấn là câu hỏi hành vi về quá khứ; không thay bằng câu hỏi giả định."
+    }
+  ],
+  "dataWarnings": [
+    {
+      "severity": "LOW",
+      "area": "Thang thành thục",
+      "issue": "ĐÃ XỬ LÝ 14/10/2026: giao diện đã đổi toàn bộ nhãn sang FLA-5 (5 mức), khớp dữ liệu.",
+      "action": "Ban NS&QTHC xác nhận chính thức thang 5 mức (QĐ-00)."
+    },
+    {
+      "severity": "HIGH",
+      "area": "Giá trị cốt lõi",
+      "issue": "Không tìm thấy tuyên bố giá trị cốt lõi chính thức của Flamingo trong tài liệu được cung cấp.",
+      "action": "Đối chiếu với tuyên bố văn hóa do HĐQT phê duyệt trước khi nạp. Không dùng bộ tham chiếu chuẩn ngành làm giá trị chính thức."
+    },
+    {
+      "severity": "HIGH",
+      "area": "Năng lực chuyên môn",
+      "issue": "45 năng lực chuyên môn mới có chỉ báo Mức 3 đã ban hành. Mức 1, 2, 4, 5 đã có DỰ THẢO AI (QĐ-04, 14/10/2026) trong file Mau_ChiBao_ChuyenMon_Muc1-5.xlsx — chưa được chuyên gia duyệt.",
+      "action": "Đơn vị chủ quản sửa dự thảo, xoá nhãn, HR nạp bằng npm run import:indicators, rồi ban hành trên app."
+    },
+    {
+      "severity": "MEDIUM",
+      "area": "Chủ sở hữu năng lực",
+      "issue": "6 năng lực chuyên môn chưa có đơn vị chủ quản (FU02, FU16, FU23, FU29, FU43, FU45).",
+      "action": "Chốt quyết định gán chủ sở hữu ở cấp cơ cấu tổ chức trước khi đưa vào vận hành."
+    },
+    {
+      "severity": "MEDIUM",
+      "area": "Đơn vị thành viên",
+      "issue": "FTV và FRT chỉ có tên, chưa có breakdown chức năng và Phòng trực thuộc.",
+      "action": "Yêu cầu hai đơn vị cung cấp tài liệu chức năng nhiệm vụ."
+    },
+    {
+      "severity": "LOW",
+      "area": "Nhân sự",
+      "issue": "File này KHÔNG chứa dữ liệu nhân sự (Employee). Chỉ có cơ cấu và khung năng lực.",
+      "action": "Nạp riêng từ hệ thống nhân sự, có xử lý dữ liệu cá nhân theo Nghị định 13/2023."
+    }
+  ],
+  "_meta": {
+    "source": "Flamingo Competency Framework — Sổ tay + Từ điển năng lực",
+    "orgChartVersion": "CCTC_PA3 cập nhật (Ban Pháp chế và Kiểm soát nội bộ gộp)",
+    "counts": {
+      "orgUnits": 34,
+      "competencies": 60,
+      "interviewQuestions": 36,
+      "jobFamilies": 14,
+      "jobLevels": 6,
+      "jobRoles": 26
+    },
+    "language": "vi (primary), en (partial)",
+    "notForProduction": "Xem dataWarnings trước khi nạp vào hệ thống vận hành thật.",
+    "changeLog": [
+      "2026-10-14: owningUnit FU14/FU30/FU31/FU37/FU38/FU44 đổi Ban Pháp chế/Ban KSNB → Ban PC&KSNB theo CCTC cập nhật (gộp KSNB vào Pháp chế).",
+      "2026-10-14: QĐ-01 — thêm CO7 Giao tiếp, CO8 Lập kế hoạch & Tổ chức, CO9 Hướng đến kết quả ở trạng thái BẢN NHÁP (draft: true)."
+    ]
+  }
+}
