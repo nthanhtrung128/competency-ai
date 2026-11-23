@@ -1,0 +1,13 @@
+# PostgreSQL dành riêng cho kiểm thử — KHÔNG dùng cho dữ liệu thật.
+# Cổng 54329 để không đụng PostgreSQL khác trên máy; mất dữ liệu khi `down -v` là bình thường.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: competency_test
+    ports:
+      - "54329:5432"
+    tmpfs:
+      - /var/lib/postgresql/data

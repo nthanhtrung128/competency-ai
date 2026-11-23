@@ -35,6 +35,7 @@ npx prisma db push          # tạo/cập nhật bảng (dùng db push, KHÔNG d
 npm run seed:all            # quyền, vai trò, 34 đơn vị, 60 năng lực, Job Architecture
 npm run dev                 # máy chủ cổng 8080
 npm run smoke               # kiểm tra nhanh — kỳ vọng ĐẠT 19/19
+npm test                    # 2 kịch bản đầu-cuối (tests/) — cần Postgres cục bộ, xem tests/README.md
 npm run import:indicators -- <file.xlsx> [--commit]
 npm run backup
 npx tsc --noEmit            # kiểm tra kiểu
@@ -62,11 +63,11 @@ Biến môi trường: xem `1-backend/.env.example`. Production (`NODE_ENV=produ
 - Dữ liệu thật: Bảng điều khiển, Bàn duyệt, Tổ chức, Từ điển & phiên bản, Job Architecture, 360°, 9-Box, Kế thừa, IDP, Tài khoản, Nhật ký. **Còn minh họa:** Mô phỏng luân chuyển, Trợ lý AI.
 - Từ điển 60 năng lực: CO1–CO9 (CO7–CO9 là **bản nháp** theo QĐ-01), LE1–LE6, FU01–FU45. Thang FLA-5. 195 ô chỉ báo đang là **dự thảo AI** chờ chuyên gia sửa (QĐ-04).
 - Yêu cầu năng lực 26 vai trò: đối chiếu mã Sổ tay→Từ điển đang ở trạng thái **ĐỀ XUẤT** (QĐ-02).
-- Kiểm thử gần nhất trên PostgreSQL 16 thật: smoke 19/19, kịch bản 360°→IDP 46/46, Bàn duyệt→Kế thừa→Dashboard 29/29. Các script kiểm thử đầu-cuối chưa nằm trong kho — nên viết lại thành `1-backend/tests/`.
+- Kiểm thử đầu-cuối nằm trong `1-backend/tests/` (`npm test`): kịch bản 1 (tài khoản→360°→9-Box→IDP) 134/134, kịch bản 2 (Bàn duyệt→Kế thừa→Dashboard) 73/73, chạy 23/11/2026 trên PostgreSQL 18 tạm. Smoke 19/19 là lần chạy 14/10 (chưa chạy lại). Test chỉ chạy với CSDL cục bộ — xem `tests/README.md`.
 - **Chưa deploy.** Chặn trước khi nạp nhân sự thật: QĐ-10 (pháp lý dữ liệu lưu ở Singapore).
 
 ## Việc tiếp theo gợi ý
-1. Đưa bộ kiểm thử đầu-cuối vào kho (`tests/`, chạy bằng Postgres cục bộ hoặc Docker).
+1. ~~Đưa bộ kiểm thử đầu-cuối vào kho~~ — xong 23/11/2026 (`1-backend/tests/`). Còn thiếu test cho: nhập nhân sự 2 bước, nhập chỉ báo Excel, giao diện; chưa thử `tests/docker-compose.test.yml`.
 2. Triển khai theo `4-tai-lieu/TRIEN_KHAI.md`.
 3. Hỗ trợ HR dùng Bàn duyệt để chốt QĐ-02, QĐ-03; nạp chỉ báo chuyên gia đã sửa.
 4. Các quyết định còn mở: xem `4-tai-lieu/QUYET_DINH_HOAN_THIEN.md`.

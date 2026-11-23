@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 23/11/2026 — Bộ kiểm thử đầu-cuối vào kho
+
+- Thêm `1-backend/tests/`: `e2e-360-idp.ts` (134 mục), `e2e-review-succession.ts` (73 mục), `helpers.ts`, `run.ts`, `README.md`, `docker-compose.test.yml`.
+- Lệnh mới: `npm test` (tự bật máy chủ cổng 8099, chạy cả hai kịch bản), `npm run test:360`, `npm run test:review`, `npm run lint:tests`.
+- Test ghi rồi xoá dữ liệu thử và từ chối chạy khi `DATABASE_URL`/`API_URL` không phải máy cục bộ (trừ `ALLOW_REMOTE_TEST_DB=1`).
+- Đã chạy trên PostgreSQL 18 tạm: 134/134 và 73/73. Chưa chạy lại `npm run smoke`; chưa thử `docker-compose.test.yml`.
+
 ## 23/11/2026 — Đưa dự án lên GitHub
 
 - Tạo kho riêng tư `nthanhtrung128/competency-ai` gồm toàn bộ backend, frontend, dữ liệu, tài liệu, khung tổ chức.

@@ -18,7 +18,11 @@
     "import:indicators": "tsx src/import-indicators.ts",
     "seed:all": "npm run seed && npm run seed:competencies && npm run seed:job-architecture",
     "backup": "tsx src/backup.ts",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "test": "tsx tests/run.ts",
+    "test:360": "tsx tests/e2e-360-idp.ts",
+    "test:review": "tsx tests/e2e-review-succession.ts",
+    "lint:tests": "tsc -p tests/tsconfig.json"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
