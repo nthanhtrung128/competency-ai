@@ -8,7 +8,12 @@ import { assertSafeTarget } from './helpers.js';
  *  - Muốn thử trên máy chủ đã bật sẵn: đặt API_URL=http://localhost:8080 — khi đó không tự bật máy chủ.
  *  - Các kịch bản ghi rồi xoá dữ liệu thử → chỉ chạy với CSDL cục bộ (xem tests/README.md).
  */
-const SCENARIOS = ['tests/e2e-360-idp.ts', 'tests/e2e-review-succession.ts'];
+const SCENARIOS = [
+  'tests/e2e-360-idp.ts',
+  'tests/e2e-review-succession.ts',
+  'tests/e2e-import-employees.ts',
+  'tests/e2e-import-indicators.ts',
+];
 const own = !process.env.API_URL;
 const port = process.env.TEST_PORT ?? '8099';
 if (own) process.env.API_URL = `http://localhost:${port}`;
