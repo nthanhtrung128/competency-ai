@@ -78,3 +78,24 @@ Giả định của kịch bản (nếu đổi thiết kế thì sửa test cho 
 - Ban hành thật một phiên bản năng lực (không hoàn tác được) — đã có kiểm tra 422 và 409 quanh nó.
 - Nhập nhân sự 2 bước (`src/routes/import.ts`) và nhập chỉ báo từ Excel (`npm run import:indicators`).
 - Giao diện (`2-frontend`).
+
+## Kiểm thử giao diện / build (`2-frontend/`)
+
+Phần này **không cần PostgreSQL hay máy chủ** — chạy hoàn toàn trên máy, mạng được giả lập.
+Mở terminal trong thư mục `2-frontend` và chạy:
+
+```bash
+npm install
+npm run test:ui      # chỉ chạy test (vitest) — 24 mục
+npm run check:ui     # đủ bộ: tsc --noEmit  →  vite build  →  test
+```
+
+| File (`2-frontend/tests/`) | Kiểm tra gì | Số mục |
+|---|---|---|
+| `serverAdapter.test.ts` | `mapBootstrap` (id `comp-fu03` / `ver-fu03-v2` / `org-b01` + uuid thật trong `serverIds`; thang FLA-5; cha ngoài phạm vi thành gốc; mức chưa có chỉ báo ghi "[Mức n chưa có…]"), `anchorsToIndicators` (bỏ ô giữ chỗ), `mapAuditLogs` | 9 |
+| `client.test.ts` | `login` (email chữ thường, lưu phiên), `api()` (Bearer, 401 → tự refresh đúng một lần, refresh hỏng → xoá phiên, 403/428/422/500), `wakeServer`, và kết quả 360° có điểm nhóm bị ẩn được chuyển nguyên vẹn | 15 |
+
+Lưu ý phạm vi — nói thẳng để khỏi hiểu nhầm:
+- **Ẩn danh 360° do máy chủ quyết định** (`minRatersForAnonymity`, đã nằm trong kịch bản đầu-cuối 134 mục). Lớp `serverAdapter`/`client` không tự tính ẩn danh; test chỉ chứng minh giao diện **không làm lộ lại** điểm nhóm bị ẩn (giá trị `null` và `hiddenGroups` đi qua nguyên vẹn).
+- Chưa có test cho việc vẽ màn hình (`components/`), `AppContext`, hay nhập Excel.
+- Build còn cảnh báo "chunk > 500 kB" (không phải lỗi, chưa xử lý).

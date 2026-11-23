@@ -310,3 +310,9 @@ Dữ liệu
     phiên bản năng lực nào.
   - Chưa làm: chạy thử docker-compose.test.yml (máy này không có Docker); nhập nhân sự 2 bước,
     nhập chỉ báo Excel và giao diện chưa có test.
+[23/11/2026] Kiểm thử giao diện / build (nhánh test/frontend-build).
+  - tsc --noEmit và vite build chạy sạch sẵn, không phải sửa mã nguồn. Còn cảnh báo chunk > 500 kB.
+  - Thêm 2-frontend/tests/ (vitest): serverAdapter 9 mục, client 15 mục = 24/24 đạt.
+    Lệnh: npm run test:ui; npm run check:ui (tsc -> build -> test). Không cần CSDL/máy chủ.
+  - Ẩn danh 360° do máy chủ quyết định; test giao diện chỉ kiểm không làm lộ lại điểm nhóm bị ẩn.
+  - Chưa có test cho components/, AppContext, nhập Excel.
