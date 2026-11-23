@@ -7,8 +7,14 @@ Hai kịch bản chạy trên **PostgreSQL thật** qua HTTP, đúng như giao d
 | `e2e-360-idp.ts` | Cấp tài khoản + đổi mật khẩu bắt buộc → chiến dịch 360° (nhập phiếu trên app và HR nhập hộ, ẩn danh) → 9-Box → IDP (gap → mục tiêu 70-20-10 → duyệt → hoàn thành) → nhật ký | 134 |
 | `e2e-review-succession.ts` | Bàn duyệt (đối chiếu mã QĐ-02, chủ quản QĐ-03, bản nháp chỉ báo QĐ-04b) → Kế hoạch kế thừa → Bảng điều khiển theo phạm vi | 73 |
 
-Lần chạy gần nhất (23/11/2026, PostgreSQL 18 tạm trên Windows): **134/134 và 73/73**.
+Lần chạy gần nhất: 23/11/2026, PostgreSQL 18 tạm trên Windows và PostgreSQL 16 trên Linux — **134/134 và 73/73**; `npm run smoke` **19/19**.
 Kịch bản cũ 46/46 + 29/29 (14/10/2026) chưa nằm trong kho; hai file này viết lại và mở rộng nó, bám mã nguồn hiện tại.
+
+## Chạy tự động trên GitHub (CI)
+
+File `.github/workflows/backend-tests.yml` chạy mỗi khi push hoặc mở PR: dựng PostgreSQL 16 tạm → `npm ci` → `tsc --noEmit` và `npm run lint:tests` → `prisma db push` → `npm run seed:all` → `npm test` → bật máy chủ cổng 8080 → `npm run smoke` (kỳ vọng 19/19). Xem kết quả ở thẻ **Actions** trên GitHub. CSDL chỉ tồn tại trong lần chạy đó; các khoá JWT trong workflow là khoá riêng cho CI, không phải khoá thật. Không đưa dữ liệu nhân sự thật vào CI.
+
+Tình trạng kiểm chứng: các bước trên đã chạy thật trên PostgreSQL 16 cục bộ (134/134, 73/73, smoke 19/19); bản thân workflow **chưa có lần chạy nào trên GitHub**.
 
 ## An toàn dữ liệu
 
@@ -24,8 +30,10 @@ Kịch bản cũ 46/46 + 29/29 (14/10/2026) chưa nằm trong kho; hai file này
 Cách dễ nhất là Docker Desktop. Mở terminal trong thư mục `1-backend` và chạy:
 
 ```powershell
-docker compose -f tests/docker-compose.test.yml up -d
+docker compose -f tests/docker-compose.test.yml up -d --wait
 ```
+
+(File compose đã có healthcheck để `--wait` đợi CSDL sẵn sàng; **chưa thử được** vì môi trường soạn không có Docker.)
 
 (Cách khác: tự cài PostgreSQL 16 và tạo CSDL tên `competency_test`, mã hoá UTF8.)
 

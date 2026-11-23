@@ -310,3 +310,9 @@ Dữ liệu
     phiên bản năng lực nào.
   - Chưa làm: chạy thử docker-compose.test.yml (máy này không có Docker); nhập nhân sự 2 bước,
     nhập chỉ báo Excel và giao diện chưa có test.
+[23/11/2026] Thêm CI GitHub Actions (nhánh ci/github-actions-tests): .github/workflows/backend-tests.yml
+  chạy khi push/PR: Postgres 16 service, npm ci, kiểm tra kiểu, prisma db push, seed:all, npm test, smoke.
+  - Đã chạy thật từng bước tương đương trên PostgreSQL 16 cục bộ (Linux): npm test 134/134 + 73/73;
+    smoke 19/19 (đúng số cũ, không sửa script); tsc --noEmit và lint:tests sạch.
+  - Chưa kiểm chứng: workflow chạy trên GitHub thật (chưa có lần chạy nào); docker-compose.test.yml
+    (môi trường không có Docker daemon) — chỉ thêm healthcheck, chưa thử.
