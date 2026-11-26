@@ -291,7 +291,7 @@ frameworkRouter.patch(
 
 // ================================================================ JOB ARCHITECTURE
 
-frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:read'), async (_req, res) => {
+frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:read'), async (req, res) => {
   const roles = await prisma.jobRole.findMany({
     orderBy: { code: 'asc' },
     include: {
@@ -309,7 +309,7 @@ frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:re
       deXuat: all.filter((q) => q.mappingStatus === 'PROPOSED').length,
       chuaDoiChieu: all.filter((q) => q.mappingStatus === 'UNMAPPED').length,
     },
-    roles,
+    roles: roles.map(role => ({ ...role, pendingRequirements: req.user!.permissions.some(p => ['competency:author', 'competency:publish'].includes(p)) ? role.pendingRequirements : null })),
   });
 });
 
@@ -333,6 +333,7 @@ frameworkRouter.put(
   authenticate,
   requirePermission('competency:publish'),
   async (req, res) => {
+    if (currentWorkspace()) return res.status(409).json({ error: 'Hãy lưu bản nháp và duyệt tại Hồ sơ chức danh.' });
     const body = RequirementInput.safeParse(req.body);
     if (!body.success) return res.status(400).json({ error: 'Dữ liệu không hợp lệ', detail: body.error.issues });
 

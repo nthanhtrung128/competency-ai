@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { chromium } from 'playwright-core';
+import { exerciseRoleProfiles } from './role-profiles.mjs';
 
 const origin = new URL(process.env.PORTAL_TEST_URL || 'http://127.0.0.1:55439');
 const w = JSON.parse(process.env.WORKSPACES_JSON || '[]').find(x => x.code === process.env.BROWSER_TEST_COMPANY);
@@ -52,6 +53,8 @@ try {
   await label('Email công việc').fill(adminEmail);
   await label('Mật khẩu').fill(adminPassword);
   await button('Đăng nhập').click();
+  await heading(/Bảng điều khiển/).waitFor();
+  await exerciseRoleProfiles(page);
   await button('Nhập nhân sự').click();
   await page.locator('input[type=file]').setInputFiles({
     name: 'staff.csv', mimeType: 'text/csv',
@@ -78,7 +81,16 @@ try {
   await form.getByPlaceholder('Email', { exact: true }).fill(memberEmail);
   await form.getByPlaceholder('Họ tên').fill('HR thử');
   await form.getByPlaceholder(/Mã nhân sự/).fill('E01');
+  assert.deepEqual(await form.locator('input').evaluateAll(inputs => inputs.filter(input => !input.validity.valid)
+    .map(input => ({ field: input.placeholder, problem: input.validationMessage }))), []);
+  assert.deepEqual(errors, []);
+  const created = page.waitForResponse(response => response.url().endsWith('/api/users') && response.request().method() === 'POST');
   await form.getByRole('button', { name: 'Cấp tài khoản' }).click();
+  const createdResponse = await created.catch(async e => {
+    if (process.env.QA_SCREENSHOT_DIR) await page.screenshot({ path: process.env.QA_SCREENSHOT_DIR + '/account-failure.png', fullPage: true, mask: [page.locator('input, td.font-mono')] });
+    throw e;
+  });
+  assert.equal(createdResponse.status(), 201, createdResponse.ok() ? 'Created account' : await createdResponse.text());
   const row = page.locator('tr').filter({ hasText: memberEmail }).filter({ has: page.locator('td.font-mono') });
   const temporary = await row.locator('td.font-mono').innerText();
   await logout();

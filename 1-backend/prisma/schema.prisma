@@ -508,6 +508,11 @@ model JobRole {
 
   requirements JobRoleRequirement[]
 
+  // Hosted portal: draft edits do not replace the approved requirements.
+  pendingRequirements Json?     @map("pending_requirements")
+  revision            Int       @default(0)
+  approvedAt          DateTime? @map("approved_at")
+
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("job_roles")

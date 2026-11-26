@@ -3,7 +3,7 @@ import multer from 'multer';
 import Papa from 'papaparse';
 import { z } from 'zod';
 import type { Prisma, RaterRelation } from '@prisma/client';
-import { prisma } from '../db.js';
+import { currentWorkspace, prisma } from '../db.js';
 import { authenticate, requirePermission, audit, visibleEmployeeIds } from '../auth.js';
 
 /**
@@ -74,6 +74,7 @@ async function roleRequirements(jobRoleCode: string | null) {
   const role = await prisma.jobRole.findUnique({ where: { code: jobRoleCode }, include: { requirements: true } });
   const m = new Map<string, { level: number; status: string }>();
   for (const q of role?.requirements ?? []) {
+    if (currentWorkspace() && (!role?.isActive || q.mappingStatus !== 'APPROVED')) continue;
     if (!q.competencyId) continue;
     const prev = m.get(q.competencyId);
     if (!prev || q.requiredLevel > prev.level) m.set(q.competencyId, { level: q.requiredLevel, status: q.mappingStatus });
@@ -732,9 +733,12 @@ talentRouter.post('/idp/from-assessment', authenticate, requirePermission('idp:m
   const result = await computeResult(body.data.campaignId, body.data.employeeId);
   if (!result) return res.status(404).json({ error: 'Không có kết quả 360° của nhân sự này' });
   if (result.campaign.status !== 'CLOSED') return res.status(409).json({ error: 'Chỉ lập IDP từ chiến dịch đã đóng' });
+  if (currentWorkspace() && !result.competencies.some(c => c.requiredStatus === 'APPROVED')) {
+    return res.status(422).json({ error: 'Cần gắn nhân sự với chức danh có yêu cầu năng lực đã duyệt phù hợp với chiến dịch trước khi lập IDP từ kết quả.' });
+  }
 
   const candidates = result.competencies
-    .filter((c) => c.others !== null)
+    .filter((c) => c.others !== null && (!currentWorkspace() || c.requiredStatus === 'APPROVED'))
     .map((c) => {
       const target = c.required ?? 3;
       return { ...c, target, gapToTarget: Math.round((target - (c.others as number)) * 100) / 100 };

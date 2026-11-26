@@ -8,6 +8,7 @@ import { CompetencyVersionMatrix } from './components/CompetencyVersionMatrix';
 import { TalentHub } from './components/server/TalentHub';
 import { EmployeeImport } from './components/server/EmployeeImport';
 import { Employees } from './components/server/Employees';
+import { RoleProfiles } from './components/server/RoleProfiles';
 import { AuditLogViewer } from './components/AuditLogViewer';
 
 function Workspace() {
@@ -21,6 +22,7 @@ function Workspace() {
     ['employees', 'Danh sách nhân sự', can('employee:read')],
     ['competencies', 'Từ điển năng lực', can('competency:read')],
     ['scales', 'Thang năng lực', can('competency:read')],
+    ['roleProfiles', 'Hồ sơ chức danh', can('competency:read')],
     ['assessment360', 'Đánh giá và phát triển', true],
     ['dataHub', 'Nhập nhân sự', can('employee:import')],
     ['scopes', 'Quản lý tài khoản', can('user:manage')],
@@ -42,6 +44,7 @@ function Workspace() {
         {selected === 'dashboard' && <ServerDashboard onNavigate={setActive} />}
         {selected === 'hierarchy' && <OrgHierarchyTree />}
         {selected === 'employees' && <Employees />}
+        {selected === 'roleProfiles' && <RoleProfiles />}
         {selected === 'competencies' && <CompetencyVersionMatrix />}
         {selected === 'scales' && <section className="app-card space-y-3"><h1 className="text-xl font-bold">Thang năng lực</h1>
           {proficiencyScales.filter(scale => !scale.parentId).map(scale => <div key={scale.id}>

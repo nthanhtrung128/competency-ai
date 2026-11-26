@@ -18,6 +18,7 @@ import { withWorkspace, prisma } from './db.js';
 import { readWorkspaces } from './workspaces.js';
 import { registrationRouter } from './routes/registration.js';
 import { preflight } from './preflight.js';
+import { roleProfilesRouter } from './routes/role-profiles.js';
 
 const app = express();
 const workspaces = readWorkspaces();
@@ -57,6 +58,7 @@ if (hosted) {
 }
 service.use('/api', apiRouter);
 service.use('/api', frameworkRouter);
+service.use('/api', roleProfilesRouter);
 service.use('/api', talentRouter);
 service.use('/api', usersRouter);
 service.use('/api', reviewRouter);

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import Papa from 'papaparse';
 import { z } from 'zod';
-import { prisma } from '../db.js';
+import { currentWorkspace, prisma } from '../db.js';
 import { authenticate, requirePermission, audit } from '../auth.js';
 
 const upload = multer({
@@ -98,12 +98,14 @@ importRouter.post(
     });
 
     // nạp sẵn dữ liệu đối chiếu
-    const [orgUnits, existing] = await Promise.all([
+    const [orgUnits, existing, jobRoles] = await Promise.all([
       prisma.orgUnit.findMany({ select: { id: true, code: true, name: true } }),
       prisma.employee.findMany({ select: { id: true, employeeCode: true, email: true } }),
+      currentWorkspace() ? prisma.jobRole.findMany({ where: { isActive: true }, select: { code: true } }) : Promise.resolve([]),
     ]);
     const unitByCode = new Map(orgUnits.map((u) => [u.code.toUpperCase(), u]));
     const empByCode = new Map(existing.map((e) => [e.employeeCode.toUpperCase(), e]));
+    const roleCodes = new Set(jobRoles.map(role => role.code));
     const emailOwner = new Map(existing.filter((e) => e.email).map((e) => [e.email!.toLowerCase(), e.employeeCode]));
 
     const seenCodes = new Set<string>();
@@ -129,6 +131,10 @@ importRouter.post(
       const unitCode = (raw.org_unit_code ?? '').trim().toUpperCase();
       const email = (raw.email ?? '').trim().toLowerCase();
       const managerCode = (raw.manager_code ?? '').trim().toUpperCase();
+      const roleCode = (raw.job_role_code ?? '').trim();
+      if (currentWorkspace() && roleCode && !roleCodes.has(roleCode.toUpperCase())) {
+        messages.push({ level: 'ERROR', text: `Mã chức danh "${roleCode}" chưa có hoặc đã ngừng sử dụng. Tạo hồ sơ chức danh trước khi nhập.` });
+      }
 
       // trùng mã trong chính file
       if (code && seenCodes.has(code)) {
@@ -199,7 +205,7 @@ importRouter.post(
               orgUnitId: unit?.id ?? null,
               orgUnitCode: unitCode,
               jobTitle: (raw.job_title ?? '').trim() || null,
-              jobRoleCode: (raw.job_role_code ?? '').trim() || null,
+              jobRoleCode: (currentWorkspace() ? roleCode.toUpperCase() : roleCode) || null,
               jobLevelCode: (raw.job_level_code ?? '').trim() || null,
               gradeCode: (raw.grade_code ?? '').trim() || null,
               managerCode: managerCode || null,
