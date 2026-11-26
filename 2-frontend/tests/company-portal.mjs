@@ -62,6 +62,16 @@ try {
   await page.getByRole('checkbox').check();
   await button('Ghi hồ sơ nhân sự').click();
   await page.getByText('Đã tạo 1 hồ sơ và cập nhật 0 hồ sơ.').waitFor();
+  await button('Danh sách nhân sự').click();
+  await page.getByText('Test Manager', { exact: true }).waitFor();
+  await label('Họ tên hoặc mã nhân viên').fill('missing');
+  await button('Tìm kiếm').click();
+  await page.getByText('Chưa có hồ sơ phù hợp.').waitFor();
+  await label('Họ tên hoặc mã nhân viên').fill('E01');
+  await button('Tìm kiếm').click();
+  await page.getByText('Test Manager', { exact: true }).waitFor();
+  await button('Thang năng lực').click();
+  await page.getByRole('heading', { name: 'Thang năng lực', exact: true }).waitFor();
   await button('Quản lý tài khoản').click();
   const form = page.locator('form').filter({ has: button('Cấp tài khoản') });
   const memberEmail = 'browser-hr@example.test';

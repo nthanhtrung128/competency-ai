@@ -18,3 +18,11 @@ Cập nhật ngày 26/11/2026, nhánh `feature/company-portal`.
 3. Chạy thử với dữ liệu giả, thu phản hồi và bổ sung kết quả vào trang này.
 
 [Nhật ký đợt phát triển](nhat-ky/2026-11-26.md) · [Hướng dẫn triển khai](CONG_DOANH_NGHIEP.md)
+
+## Đợt tiếp theo ngày 26/11/2026
+
+- Đã tách điểm vào của bản web doanh nghiệp. Quá trình build sẽ dừng nếu kéo theo module dữ liệu demo.
+- Đã bổ sung danh sách nhân sự, tìm theo tên hoặc mã, phân trang và tải lại.
+- Đã thay danh sách đơn vị gán chủ quản bằng cơ cấu đang sử dụng.
+- Đã biên soạn [kế hoạch phát triển](KE_HOACH_PHAT_TRIEN.md). Ưu tiên tiếp theo là hồ sơ chức danh và yêu cầu năng lực.
+- Đã đạt kiểm tra kiểu, build hai chế độ, bài thử API trên PostgreSQL và Chromium trên điện thoại, máy tính. Bài thử mới xác nhận tìm kiếm hồ sơ và xử lý dữ liệu phân trang không hợp lệ. Hai bộ 207 mục nghiệp vụ là kết quả của đợt trước.

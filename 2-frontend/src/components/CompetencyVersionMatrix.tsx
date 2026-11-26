@@ -57,7 +57,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
   const [selectedVersionId, setSelectedVersionId] = useState<string>(
     competencies[0]?.currentVersionId || versions[0]?.id || ''
   );
-  const [selectedAssignUnit, setSelectedAssignUnit] = useState<string>('Ban Công nghệ thông tin & CĐS (B13)');
+  const [selectedAssignUnit, setSelectedAssignUnit] = useState<string>('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
   // Search & Filters
@@ -102,7 +102,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
 
   // Auto-sync recommended owner for unassigned competency
   useEffect(() => {
-    if (selectedComp && selectedComp.hasOwner === false) {
+    if (!COMPANY_PORTAL && selectedComp && selectedComp.hasOwner === false) {
       const recMap: Record<string, string> = {
         'FU02': 'Ban Đầu tư (B01)',
         'FU16': 'FRT — Đơn vị Dịch vụ Nghỉ dưỡng (B09)',
@@ -264,13 +264,11 @@ export const CompetencyVersionMatrix: React.FC = () => {
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-[var(--brand)]" />
             <h2 className="text-lg font-bold text-[var(--ink)]">
-              {isVi ? 'Từ điển Năng lực Flamingo (Thang 5 Mức FLA-5)' : 'Flamingo Competency Dictionary (FLA-5 Scale)'}
+              {isVi ? 'Từ điển năng lực' : 'Competency Dictionary'}
             </h2>
           </div>
           <p className="text-xs text-[var(--muted)] mt-1">
-            {isVi
-              ? 'Chuẩn hóa 57 năng lực (6 Cốt lõi, 6 Lãnh đạo, 45 Chuyên môn), 5 cấp độ thành thục và quản trị thẩm quyền sở hữu.'
-              : 'Standardized 57 competencies, 5-tier behavioral progression (FLA-5), and governance ownership.'}
+            {competencies.length} năng lực · Quản lý bản nháp, chỉ báo và phiên bản đã ban hành.
           </p>
         </div>
 
@@ -513,9 +511,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
                     <span>{isVi ? 'CẢNH BÁO QUẢN TRỊ NĂNG LỰC: CHƯA CÓ ĐƠN VỊ CHỦ QUẢN' : 'GOVERNANCE WARNING: UNASSIGNED COMPETENCY OWNER'}</span>
                   </div>
                   <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
-                    {isVi
-                      ? `Năng lực [${selectedComp.code}] ${selectedComp.name} hiện tại có hasOwner: false (Chưa gán đơn vị chủ quản). Cần Ban Nhân sự & QTHC (B11) hoặc Ban Tổng Giám đốc phê duyệt phân công đơn vị chủ sở hữu theo Quy chế Quản trị Từ điển Năng lực Tập đoàn trước khi sử dụng để đánh giá chức danh.`
-                      : `Competency [${selectedComp.code}] has no assigned owning organizational unit. Must be formally assigned by HR or Executive Board before role profiling.`}
+                    Chọn đơn vị chịu trách nhiệm rà soát nội dung và chỉ báo của năng lực này.
                   </p>
                   
                   {/* Quick Assign Dropdown & Action */}
@@ -528,16 +524,11 @@ export const CompetencyVersionMatrix: React.FC = () => {
                       onChange={(e) => setSelectedAssignUnit(e.target.value)}
                       className="input py-1 text-xs bg-[var(--surface)] text-[var(--ink)] flex-1 max-w-md"
                     >
-                      <option value="Ban Công nghệ thông tin & CĐS (B13)">Ban Công nghệ thông tin & CĐS (B13)</option>
-                      <option value="Ban Quản lý Kỹ thuật & Xây dựng (B07)">Ban Quản lý Kỹ thuật & Xây dựng (B07)</option>
-                      <option value="Ban Nhân sự & Quản trị Hành chính (B11)">Ban Nhân sự & Quản trị Hành chính (B11)</option>
-                      <option value="Ban Tài chính Kế toán (B09)">Ban Tài chính Kế toán (B09)</option>
-                      <option value="Ban Tiếp thị & Truyền thông (B05)">Ban Tiếp thị & Truyền thông (B05)</option>
-                      <option value="Ban Pháp chế & Kiểm soát Tuân thủ (B02)">Ban Pháp chế & Kiểm soát Tuân thủ (B02)</option>
-                      <option value="Khối Bất động sản (K02)">Khối Bất động sản (K02)</option>
-                      <option value="Khối Vận hành Nghỉ dưỡng (K01)">Khối Vận hành Nghỉ dưỡng (K01)</option>
+                      <option value="">Chọn đơn vị</option>
+                      {orgUnits.map(unit => <option key={unit.id} value={unit.name}>{unit.code} · {unit.name}</option>)}
                     </select>
                     <button
+                      disabled={!selectedAssignUnit || !can('competency:publish')}
                       onClick={() => assignCompetencyOwner(selectedComp.id, selectedAssignUnit)}
                       className="btn py-1 px-3 text-xs font-bold whitespace-nowrap bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition shadow-xs"
                     >
@@ -651,7 +642,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
                   </div>
                   <div className="p-2 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
                     <span className="text-[11px] text-[var(--muted)] block">{isVi ? 'Thang đo chuẩn' : 'Proficiency Scale'}</span>
-                    <span className="font-bold text-[var(--ink)]">Flamingo 5 Mức (FLA-5)</span>
+                    <span className="font-bold text-[var(--ink)]">Thang năng lực 5 mức</span>
                   </div>
                   <div className="p-2 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
                     <span className="text-[11px] text-[var(--muted)] block">{isVi ? 'Mức chuẩn tham chiếu' : 'Reference Benchmark'}</span>
@@ -668,7 +659,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Sliders className="w-4 h-4 text-amber-500" />
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
-                      {isVi ? 'Tiêu chuẩn Hành vi Thang Flamingo 5 Mức (FLA-5)' : 'Flamingo 5-Level Behavioral Anchors'}
+                      {isVi ? 'Tiêu chuẩn Hành vi Thang Thang năng lực 5 mức' : 'Five-level Behavioral Anchors'}
                     </h4>
                   </div>
                   {!isEditingAnchors && activeVersion.status !== 'DRAFT' ? (
@@ -956,7 +947,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
           <div className="app-card w-full max-w-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[var(--line)]">
               <h3 className="font-bold text-sm text-[var(--ink)]">
-                {isVi ? 'Tạo Năng Lực Mới (Thang Flamingo 5 Mức)' : 'Create New Competency (FLA-5)'}
+                {isVi ? 'Tạo năng lực mới' : 'Create New Competency'}
               </h3>
               <button
                 onClick={() => setCreateCompModal(false)}
@@ -1023,7 +1014,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
                     type="text"
                     value={newCompData.owningUnit}
                     onChange={(e) => setNewCompData({ ...newCompData, owningUnit: e.target.value })}
-                    placeholder="VD: Ban CNTT & CĐS (B13)"
+                    placeholder="Tên đơn vị chủ quản"
                     className="w-full p-2 rounded border border-[var(--line)] bg-[var(--bg)] text-[var(--ink)]"
                   />
                 </div>

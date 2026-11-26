@@ -182,9 +182,13 @@ apiRouter.patch('/org-units/:id/head', authenticate, requirePermission('org:mana
 
 apiRouter.get('/employees', authenticate, requirePermission('employee:read'), async (req, res) => {
   const scope = await resolveScope(req.user!);
-  const q = String(req.query.q ?? '').trim();
-  const take = Math.min(Number(req.query.take ?? 50), 200);
-  const skip = Number(req.query.skip ?? 0);
+  const parsed = z.object({
+    q: z.string().trim().max(200).default(''),
+    take: z.coerce.number().int().min(1).max(200).default(50),
+    skip: z.coerce.number().int().min(0).max(1000000).default(0),
+  }).safeParse(req.query);
+  if (!parsed.success) return res.status(400).json({ error: 'Thông tin tìm kiếm hoặc phân trang không hợp lệ.' });
+  const { q, take, skip } = parsed.data;
 
   const where = {
     ...(scope === null ? {} : { orgUnitId: { in: scope } }),

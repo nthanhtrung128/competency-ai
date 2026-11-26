@@ -75,6 +75,14 @@ test('Register once, provision roles, isolate companies, and revoke sessions', a
   assert.deepEqual(commits.map(r => r.status).sort(), [200, 409]);
   assert.equal((await call(a, '/dashboard', 'GET', undefined, alice.accessToken)).data.org.employees, 1);
   assert.equal((await call(b, '/dashboard', 'GET', undefined, bob.accessToken)).data.org.employees, 0);
+  const directory = await call(a, '/employees?q=TEST01&take=25&skip=0', 'GET', undefined, alice.accessToken);
+  assert.equal(directory.status, 200);
+  assert.equal(directory.data.total, 1);
+  assert.equal(directory.data.employees[0].employeeCode, 'TEST01');
+  assert.equal((await call(b, '/employees', 'GET', undefined, bob.accessToken)).data.total, 0);
+  for (const query of ['take=-1', 'take=abc', 'skip=-1', 'skip=1.5']) {
+    assert.equal((await call(a, '/employees?' + query, 'GET', undefined, alice.accessToken)).status, 400);
+  }
   const rotation = await Promise.all([1, 2].map(() => call(a, '/auth/refresh', 'POST', { refreshToken: alice.refreshToken })));
   assert.deepEqual(rotation.map(r => r.status).sort(), [200, 401]);
   const token = rotation.find(r => r.status === 200).data.refreshToken;
