@@ -32,6 +32,7 @@ docker compose -f tests/docker-compose.test.yml up -d
 ### Bước 2 · Trỏ vào CSDL thử và nạp dữ liệu mẫu (chỉ làm một lần)
 
 ```powershell
+$env:SEED_PASSWORD = "<mật khẩu riêng cho lần chạy thử>"
 $env:DATABASE_URL = "postgresql://postgres:postgres@localhost:54329/competency_test"
 npm install
 npx prisma db push
@@ -69,7 +70,7 @@ docker compose -f tests/docker-compose.test.yml down
 Dòng đỏ ghi rõ mã HTTP thực tế và phần đầu của phản hồi. Nếu kịch bản dừng giữa chừng, lần chạy sau tự dọn dữ liệu thử còn sót lại.
 
 Giả định của kịch bản (nếu đổi thiết kế thì sửa test cho khớp):
-- Tài khoản mẫu `admin@` / `hrlead@` còn mật khẩu mặc định `SEED_PASSWORD` (mặc định `Flamingo@2026`).
+- Tài khoản mẫu `admin@` / `hrlead@` còn mật khẩu mặc định `SEED_PASSWORD` đã đặt lúc seed.
 - Đơn vị `B01` tồn tại; Từ điển có ≥ 2 năng lực Cốt lõi và ≥ 2 Lãnh đạo đã ban hành và có thang điểm.
 - Quyền theo vai trò đúng như `src/seed.ts` (vd LINE_MANAGER có `idp:approve`, HRBP không có `assessment:manage`).
 
@@ -78,3 +79,9 @@ Giả định của kịch bản (nếu đổi thiết kế thì sửa test cho 
 - Ban hành thật một phiên bản năng lực (không hoàn tác được) — đã có kiểm tra 422 và 409 quanh nó.
 - Nhập nhân sự 2 bước (`src/routes/import.ts`) và nhập chỉ báo từ Excel (`npm run import:indicators`).
 - Giao diện (`2-frontend`).
+
+## Kiểm thử cổng nhiều công ty
+
+Chuẩn bị hai cơ sở dữ liệu PostgreSQL cục bộ trống dành riêng cho lần thử. Đặt `WORKSPACES_JSON` với đúng hai mục có mã kích hoạt như hướng dẫn cổng doanh nghiệp. Trong thư mục backend, chạy `npm run build`, `node dist/prepare-workspaces.js` rồi khởi động `node dist/index.js`. Trong terminal thứ hai với cùng cấu hình, đặt `PORTAL_TEST_URL` trỏ tới địa chỉ máy chủ cục bộ và chạy `node --test tests/company-portal.mjs`. Bài kiểm thử kích hoạt hai cơ sở dữ liệu, giữ dữ liệu để kiểm tra. Mỗi lần chạy lại cần một cặp cơ sở dữ liệu thử trống mới.
+
+Kiểm thử giao diện dùng một công ty cục bộ thứ ba chưa kích hoạt trên cùng dịch vụ. Đặt `BROWSER_TEST_COMPANY` bằng mã công ty đó, giữ `WORKSPACES_JSON` của máy chủ và `PORTAL_TEST_URL` trong terminal. Trong `2-frontend`, chạy `npm ci`, cài Chromium bằng `npx playwright-core install chromium` (hoặc đặt `CHROMIUM_PATH` tới trình duyệt đã cài), sau đó chạy `npm run test:portal`. Kiểm tra bao gồm nhập CSV, cấp tài khoản qua giao diện và đổi mật khẩu tạm sau khi tải lại trang.

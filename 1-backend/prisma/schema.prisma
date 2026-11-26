@@ -769,3 +769,10 @@ model AuditLog {
   @@index([timestamp])
   @@map("audit_logs")
 }
+
+// A dedicated database can be attached to exactly one company code.
+model WorkspaceIdentity {
+  id          Int     @id
+  code        String  @unique
+  activated   Boolean @default(false)
+}

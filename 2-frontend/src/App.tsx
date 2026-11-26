@@ -42,6 +42,9 @@ import { ModelExplorer } from './components/ModelExplorer';
 import { PrismaSchemaViewer } from './components/PrismaSchemaViewer';
 import { DataHubView } from './components/DataHubView';
 import { AIAssistantModal } from './components/AIAssistantModal';
+import { EmployeeImport } from './components/server/EmployeeImport';
+import { CompanyPortal } from './components/CompanyPortal';
+import { COMPANY_PORTAL } from './api/client';
 import { AppProvider, useApp } from './context/AppContext';
 import { ServerConnectButton, ServerConnectModal, NoticeToast, ServerModeBanner } from './components/ServerConnectPanel';
 import { TalentHub } from './components/server/TalentHub';
@@ -97,6 +100,8 @@ function AppContent() {
     jobFamilies,
     auditLogs,
     dataSource,
+    orgUnits,
+    can,
   } = useApp();
   const isServer = dataSource === 'SERVER';
   const [serverModalOpen, setServerModalOpen] = useState(false);
@@ -109,6 +114,8 @@ function AppContent() {
     document.body.setAttribute('data-theme', theme);
     document.body.setAttribute('data-lang', lang);
   }, [theme, lang]);
+
+  if (COMPANY_PORTAL && !isServer) return <CompanyPortal />;
 
   const t = I18N[lang];
   const isVi = lang === 'vi';
@@ -140,12 +147,12 @@ function AppContent() {
               <b className="text-sm tracking-tight text-[var(--ink)] font-bold">
                 {t.appName}
               </b>
-              <span className="hidden sm:inline text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--brand-50)] text-[var(--brand)] border border-[var(--brand-100)]">
+              {!COMPANY_PORTAL && <span className="hidden sm:inline text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--brand-50)] text-[var(--brand)] border border-[var(--brand-100)]">
                 B.8 UI Standard · GĐ0
-              </span>
+              </span>}
             </div>
             <span className="block text-[10.5px] text-[var(--muted)]">
-              {t.appSubtitle}
+              {COMPANY_PORTAL ? orgUnits.find(u => u.code === 'HQ')?.name ?? 'Quản trị năng lực doanh nghiệp' : t.appSubtitle}
             </span>
           </div>
         </div>
@@ -250,24 +257,40 @@ function AppContent() {
           </button>
 
           {/* AI Assistant Button */}
-          <button
+          {!COMPANY_PORTAL && <button
             id="ai-copilot-btn"
             onClick={() => setAiModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--brand)] hover:bg-[var(--brand-600)] text-white text-xs font-bold shadow-sm transition"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t.aiAssistant}</span>
-          </button>
+          </button>}
         </div>
       </header>
-      <ServerModeBanner />
+      {!COMPANY_PORTAL && <ServerModeBanner />}
       <ServerConnectModal open={serverModalOpen} onClose={() => setServerModalOpen(false)} />
       <NoticeToast />
 
       {/* ---------- MAIN LAYOUT SHELL ---------- */}
       <div className="flex-1 flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
         {/* ---------- SIDEBAR NAVIGATION ---------- */}
-        <aside
+        {COMPANY_PORTAL ? (
+          <nav aria-label="Chức năng doanh nghiệp" className="flex gap-1 overflow-x-auto border-b border-[var(--line)] bg-[var(--surface)] p-3 md:w-56 md:shrink-0 md:flex-col md:border-r md:p-4">
+            {([
+              ['dashboard', 'Tổng quan', true],
+              ['hierarchy', 'Cơ cấu tổ chức', can('org:read') || can('org:read_all')],
+              ['competencies', 'Từ điển năng lực', can('competency:read')],
+              ['scales', 'Thang năng lực', can('competency:read')],
+              ['assessment360', 'Đánh giá và phát triển', true],
+              ['dataHub', 'Nhập nhân sự', can('employee:import')],
+              ['scopes', 'Quản lý tài khoản', can('user:manage')],
+              ['audit', 'Nhật ký hệ thống', can('audit:read')],
+            ] as const).filter(([, , visible]) => visible).map(([key, label]) => (
+              <button key={key} onClick={() => setActiveTab(key)} aria-current={activeTab === key ? 'page' : undefined}
+                className={`whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm ${activeTab === key ? 'bg-[var(--brand-50)] font-semibold text-[var(--brand)]' : 'text-[var(--ink)]'}`}>{label}</button>
+            ))}
+          </nav>
+        ) : <aside
           id="app-sidebar"
           className="w-full md:w-64 bg-[var(--surface)] border-r border-[var(--line)] p-4 flex flex-col shrink-0 overflow-y-auto space-y-4"
         >
@@ -540,7 +563,7 @@ function AppContent() {
               </button>
             </div>
           </div>
-        </aside>
+        </aside>}
 
         {/* ---------- MAIN CONTENT ROUTER ---------- */}
         <main
@@ -609,7 +632,7 @@ function AppContent() {
 
           {activeTab === 'audit' && <AuditLogViewer logs={auditLogs} />}
 
-          {activeTab === 'dataHub' && <DataHubView />}
+          {activeTab === 'dataHub' && (COMPANY_PORTAL ? <EmployeeImport /> : <DataHubView />)}
 
           {activeTab === 'models' && <ModelExplorer />}
 

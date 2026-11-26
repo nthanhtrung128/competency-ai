@@ -300,7 +300,12 @@ importRouter.post(
     let created = 0;
     let updatedCount = 0;
 
-    await prisma.$transaction(async (tx) => {
+    const committed = await prisma.$transaction(async (tx) => {
+      // Claim the validated batch atomically. Rollback also releases the claim.
+      const claim = await tx.importBatch.updateMany({
+        where: { id: batch.id, status: 'VALIDATED' }, data: { status: 'COMMITTED' },
+      });
+      if (!claim.count) return false;
       // vòng 1: tạo/cập nhật nhân sự (chưa gán quản lý)
       for (const row of rows) {
         const n = row.normalized as Record<string, string | null>;
@@ -384,12 +389,13 @@ importRouter.post(
           updatedRows: updatedCount,
         },
       });
-    });
-
-    await audit(req, 'IMPORT', 'ImportBatch', batch.id, {
-      entityName: `Ghi thật ${batch.fileName}`,
-      newValues: { created, updated: updatedCount },
-    });
+      await tx.auditLog.create({ data: {
+        action: 'IMPORT', entityType: 'ImportBatch', entityId: batch.id, entityName: `Ghi thật ${batch.fileName}`,
+        actorId: req.user!.id, actorEmail: req.user!.email, newValues: { created, updated: updatedCount },
+      } });
+      return true;
+    }, { timeout: 60000 });
+    if (!committed) return res.status(409).json({ error: 'Lô nhập đã được xử lý.' });
 
     res.json({
       batchId: batch.id,
@@ -412,7 +418,8 @@ importRouter.post(
     if (batch.status === 'COMMITTED') {
       return res.status(409).json({ error: 'Lô đã ghi thật, không huỷ được' });
     }
-    await prisma.importBatch.update({ where: { id: batch.id }, data: { status: 'CANCELLED' } });
+    const change = await prisma.importBatch.updateMany({ where: { id: batch.id, status: { not: 'COMMITTED' } }, data: { status: 'CANCELLED' } });
+    if (!change.count) return res.status(409).json({ error: 'Lô đã ghi thật, không huỷ được' });
     res.json({ message: 'Đã huỷ lô nhập. Dữ liệu vùng đệm được giữ để tra cứu.' });
   },
 );

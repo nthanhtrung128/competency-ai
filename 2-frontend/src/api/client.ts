@@ -25,6 +25,21 @@ const LAST_URL_KEY = 'competencyai_last_api_url';
 
 export const DEFAULT_API_URL: string = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '');
 
+export const COMPANY_PORTAL = import.meta.env.VITE_COMPANY_PORTAL === 'true';
+
+export function companyApiUrl(code: string) {
+  return window.location.origin + '/w/' + encodeURIComponent(code.trim().toLowerCase());
+}
+
+export async function registerCompany(url: string, details: {
+  companyName: string; name: string; email: string; activationKey: string; password: string;
+}) {
+  const response = await fetch(url + '/api/auth/register', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(details),
+  });
+  if (!response.ok) throw new ApiError(response.status, messageOf(await readBody(response), 'Đăng ký thất bại.'));
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string, public body?: unknown) {
     super(message);
@@ -47,6 +62,12 @@ export function loadSession(): Session | null {
   const raw = safeGet(sessionStorage, SESSION_KEY);
   if (!raw) return null;
   try { session = JSON.parse(raw) as Session; } catch { session = null; }
+  if (COMPANY_PORTAL && session) {
+    try {
+      const url = new URL(session.apiUrl);
+      if (url.origin !== location.origin || !/^\/w\/[a-z0-9][a-z0-9-]{1,39}$/.test(url.pathname)) clearSession();
+    } catch { clearSession(); }
+  }
   return session;
 }
 
@@ -66,7 +87,7 @@ export function lastApiUrl(): string {
 export function normalizeUrl(url: string) {
   let u = url.trim().replace(/\/+$/, '');
   if (u && !/^https?:\/\//i.test(u)) u = `https://${u}`;
-  return u.replace(/\/api$/i, '');
+  return COMPANY_PORTAL ? u : u.replace(/\/api$/i, '');
 }
 
 // ---------------------------------------------------------------- gọi mạng
@@ -97,7 +118,8 @@ export async function wakeServer(apiUrl: string, onTick?: (seconds: number) => v
       const res = await fetch(`${apiUrl}/health`, { signal: ctrl.signal });
       clearTimeout(timer);
       const body = (await readBody(res)) as { db?: string } | null;
-      if (res.ok) return body;
+      if (res.status === 404) throw new ApiError(404, messageOf(body, 'Không tìm thấy công ty.'));
+      if (res.ok && body?.db === 'connected') return body;
       if (res.status === 503) throw new ApiError(503, 'Máy chủ chạy nhưng không kết nối được cơ sở dữ liệu (kiểm tra DATABASE_URL).');
     } catch (e) {
       if (e instanceof ApiError) throw e;
@@ -117,7 +139,7 @@ export async function login(apiUrl: string, email: string, password: string): Pr
     body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
   });
   const body = (await readBody(res)) as { accessToken: string; refreshToken: string; user: SessionUser; mustChangePassword?: boolean } | null;
-  if (!res.ok || !body) throw new ApiError(res.status, messageOf(body, 'Đăng nhập thất bại'), body);
+  if (!res.ok || !body?.accessToken || !body.refreshToken || !body.user) throw new ApiError(res.status, messageOf(body, 'Đăng nhập thất bại'), body);
   const s: Session = { apiUrl: url, accessToken: body.accessToken, refreshToken: body.refreshToken, user: body.user };
   saveSession(s);
   safeSet(localStorage, LAST_URL_KEY, url);
@@ -137,8 +159,15 @@ async function refreshTokens(): Promise<boolean> {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken: s.refreshToken }),
         });
-        if (!res.ok) { clearSession(); return false; }
+        if (!res.ok) {
+          if (res.status === 401 && session?.refreshToken === s.refreshToken) {
+            clearSession();
+            if (COMPANY_PORTAL) window.location.reload();
+          }
+          return false;
+        }
         const body = (await res.json()) as { accessToken: string; refreshToken: string };
+        if (session?.refreshToken !== s.refreshToken) return false;
         saveSession({ ...s, accessToken: body.accessToken, refreshToken: body.refreshToken });
         return true;
       } catch {

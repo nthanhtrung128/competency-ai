@@ -31,6 +31,7 @@ import {
   X,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { COMPANY_PORTAL } from '../api/client';
 import { feVersionId } from '../api/serverAdapter';
 
 export const CompetencyVersionMatrix: React.FC = () => {
@@ -41,6 +42,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
     orgUnits,
     lang,
     addCompetency,
+    can,
     updateCompetencyVersion,
     publishCompetencyVersion,
     assignCompetencyOwner,
@@ -67,17 +69,17 @@ export const CompetencyVersionMatrix: React.FC = () => {
   // Modals / Edit states
   const [createCompModal, setCreateCompModal] = useState(false);
   const [newCompData, setNewCompData] = useState({
-    code: `FU${Math.floor(10 + Math.random() * 90)}`,
+    code: COMPANY_PORTAL ? '' : `FU${Math.floor(10 + Math.random() * 90)}`,
     name: '',
     description: '',
     categoryId: categories[0]?.id || 'cat-fun',
     owningUnit: '',
     hasOwner: true,
-    level1Anchor: 'Nhận biết khái niệm cơ bản và thực hiện khi có hướng dẫn.',
-    level2Anchor: 'Áp dụng độc lập, giải quyết các tình huống nghiệp vụ thông thường.',
-    level3Anchor: 'Thành thạo chuyên môn, giải quyết các tình huống nghiệp vụ phức tạp.',
-    level4Anchor: 'Nâng cao, tối ưu hóa quy trình, thiết kế giải pháp và tư vấn cho đơn vị khác.',
-    level5Anchor: 'Chuyên gia đầu ngành, thiết kế chuẩn mực toàn hệ thống, dẫn dắt đổi mới.',
+    level1Anchor: COMPANY_PORTAL ? '' : 'Nhận biết khái niệm cơ bản và thực hiện khi có hướng dẫn.',
+    level2Anchor: COMPANY_PORTAL ? '' : 'Áp dụng độc lập, giải quyết các tình huống nghiệp vụ thông thường.',
+    level3Anchor: COMPANY_PORTAL ? '' : 'Thành thạo chuyên môn, giải quyết các tình huống nghiệp vụ phức tạp.',
+    level4Anchor: COMPANY_PORTAL ? '' : 'Nâng cao, tối ưu hóa quy trình, thiết kế giải pháp và tư vấn cho đơn vị khác.',
+    level5Anchor: COMPANY_PORTAL ? '' : 'Chuyên gia đầu ngành, thiết kế chuẩn mực toàn hệ thống, dẫn dắt đổi mới.',
   });
 
   const [isEditingAnchors, setIsEditingAnchors] = useState(false);
@@ -202,9 +204,9 @@ export const CompetencyVersionMatrix: React.FC = () => {
     setSelectedVersionId(newVerId);
   };
 
-  const handleCreateCompSubmit = (e: React.FormEvent) => {
+  const handleCreateCompSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addCompetency(
+    const created = await addCompetency(
       {
         code: newCompData.code,
         name: newCompData.name,
@@ -223,7 +225,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
         level5Anchor: newCompData.level5Anchor,
       }
     );
-    setCreateCompModal(false);
+    if (created) setCreateCompModal(false);
   };
 
   const missingOwnerCount = useMemo(() => {
@@ -288,6 +290,7 @@ export const CompetencyVersionMatrix: React.FC = () => {
           )}
 
           <button
+            disabled={!can('competency:author')}
             onClick={() => setCreateCompModal(true)}
             className="btn btn-primary text-xs font-bold flex items-center gap-1.5 shrink-0"
           >

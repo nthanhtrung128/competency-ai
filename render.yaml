@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: competencyai-portal
+    runtime: node
+    plan: free
+    buildCommand: cd 2-frontend && npm ci --include=dev && npm run build && cd ../1-backend && npm ci --include=dev && npm run build
+    startCommand: cd 1-backend && node dist/prepare-workspaces.js && node dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.18.0
+      - key: NODE_ENV
+        value: production
+      - key: VITE_COMPANY_PORTAL
+        value: "true"
+      - key: WORKSPACES_JSON
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true

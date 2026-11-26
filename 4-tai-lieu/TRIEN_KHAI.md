@@ -8,6 +8,8 @@
 
 ---
 
+Hướng dẫn dưới đây dành cho triển khai một đơn vị Flamingo. Để dùng nhiều doanh nghiệp, xem [hướng dẫn cổng doanh nghiệp](CONG_DOANH_NGHIEP.md).
+
 ## 0. Chuẩn bị (10 phút)
 
 | Việc | Ghi chú |
@@ -58,6 +60,10 @@ Kết quả mong đợi ở dòng cuối: `Job Family: 14 · Job Level: 6 · Job
 
 ---
 
+### Tạo quản trị viên riêng trước khi bật production
+
+Chạy API cục bộ ở chế độ development với cùng cơ sở dữ liệu đã seed, mở giao diện và đăng nhập bằng quản trị viên mẫu. Trong **Tài khoản**, tạo một tài khoản ADMIN riêng. Đăng xuất, đăng nhập bằng tài khoản mới và đổi mật khẩu tạm. Chạy bộ smoke cục bộ khi còn tài khoản mẫu nếu cần đối chiếu 19 mục. Cuối cùng, dùng tài khoản ADMIN mới để khoá cả bốn tài khoản mẫu. Máy chủ production sẽ từ chối khởi động khi còn tài khoản mẫu đang hoạt động.
+
 ## 3. Máy chủ API — Render (15 phút)
 
 1. Đẩy thư mục `1-backend` lên một repository GitHub **riêng tư** (private).
@@ -101,15 +107,7 @@ Kết quả mong đợi ở dòng cuối: `Job Family: 14 · Job Level: 6 · Job
 
 ## 5. Kiểm tra sau triển khai (10 phút)
 
-Trên máy bạn, thư mục `1-backend`:
-
-```bash
-SEED_PASSWORD=<mật khẩu ở bước 2> npm run smoke -- https://<tên-dịch-vụ>.onrender.com
-```
-
-Kết quả mong đợi: **`ĐẠT — 19/19`**.
-
-Sau đó mở địa chỉ giao diện → **Kết nối máy chủ** → đăng nhập `hrlead@flamingo.vn`.
+Mở địa chỉ giao diện, dùng **Kết nối máy chủ** và đăng nhập bằng tài khoản quản trị riêng đã tạo ở bước 2. Kiểm tra bảng điều khiển, phạm vi đơn vị và việc đăng xuất. Bộ smoke sử dụng tài khoản mẫu chỉ dành cho bản thử cục bộ.
 
 ---
 
@@ -118,8 +116,8 @@ Sau đó mở địa chỉ giao diện → **Kết nối máy chủ** → đăng
 | # | Việc | Cách làm |
 |---|---|---|
 | 1 | Tạo tài khoản thật cho Trưởng Ban NS | App → Chiến dịch 360° → tab **Tài khoản** → Cấp một tài khoản, vai trò HR_LEAD |
-| 2 | **Khoá 4 tài khoản mẫu** (admin@, hrlead@, hrbp@, manager@flamingo.vn) | Tab Tài khoản → **Khoá**. Giữ admin@ nếu cần, nhưng đổi mật khẩu |
-| 3 | Xác nhận log Render không còn cảnh báo `Tài khoản mẫu … còn mật khẩu mặc định` | Render → Logs |
+| 2 | **Khoá 4 tài khoản mẫu** (admin@, hrlead@, hrbp@, manager@flamingo.vn) | Thực hiện trong bước 2, bằng ADMIN riêng. |
+| 3 | Xác nhận Render khởi động thành công sau khi đã khoá tài khoản mẫu | Render → Logs |
 | 4 | Ghi rõ ai giữ quyền ADMIN | QĐ-12 trong Sổ quyết định |
 | 5 | Có xác nhận pháp lý QĐ-10 | Trước khi nạp nhân sự thật |
 

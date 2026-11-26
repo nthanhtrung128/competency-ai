@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Server, PlugZap, LogOut, RefreshCw, X, Loader2, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { lastApiUrl } from '../api/client';
+import { COMPANY_PORTAL, lastApiUrl } from '../api/client';
 
 /** Nút trên thanh tiêu đề: cho biết đang dùng dữ liệu DEMO hay MÁY CHỦ, mở hộp thoại kết nối. */
 export const ServerConnectButton: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
@@ -20,8 +20,8 @@ export const ServerConnectButton: React.FC<{ onOpen: () => void }> = ({ onOpen }
       }`}
     >
       {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Server className="w-3.5 h-3.5" />}
-      <span className="hidden md:inline">{isServer ? `Máy chủ · ${server.user?.email ?? ''}` : 'Demo · Kết nối máy chủ'}</span>
-      <span className="md:hidden">{isServer ? 'Máy chủ' : 'Demo'}</span>
+      <span className="hidden md:inline">{isServer ? `Máy chủ · ${server.user?.email ?? ''}` : 'Đăng nhập'}</span>
+      <span className="md:hidden">{isServer ? 'Máy chủ' : 'Đăng nhập'}</span>
     </button>
   );
 };
@@ -113,7 +113,7 @@ export const ServerConnectModal: React.FC<{ open: boolean; onClose: () => void }
                 <div className="text-[var(--muted)]">Tải lúc {server.loadedAt.toLocaleTimeString('vi-VN')}</div>
               )}
             </div>
-            <ScopeNote />
+            {!COMPANY_PORTAL && <ScopeNote />}
             <div className="flex gap-2">
               <button
                 onClick={() => refreshFromServer()}
@@ -126,7 +126,7 @@ export const ServerConnectModal: React.FC<{ open: boolean; onClose: () => void }
                 onClick={disconnectServer}
                 className="btn text-xs flex items-center gap-1 flex-1 justify-center bg-rose-600 hover:bg-rose-700 text-white rounded-lg"
               >
-                <LogOut className="w-3.5 h-3.5" /> Ngắt · về Demo
+                <LogOut className="w-3.5 h-3.5" /> Đăng xuất
               </button>
             </div>
           </div>
