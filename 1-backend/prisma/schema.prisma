@@ -570,6 +570,8 @@ model AssessmentParticipant {
   id         String @id @default(uuid())
   campaignId String @map("campaign_id")
   employeeId String @map("employee_id")
+  /// Immutable approved role requirements captured when collection opens or a participant joins an open campaign.
+  requirementSnapshot Json? @map("requirement_snapshot")
 
   campaign AssessmentCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   employee Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)

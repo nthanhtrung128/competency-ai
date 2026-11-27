@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { chromium } from 'playwright-core';
 import { exerciseRoleProfiles } from './role-profiles.mjs';
+import { exerciseAssessmentIdp } from './assessment-idp.mjs';
 
 const origin = new URL(process.env.PORTAL_TEST_URL || 'http://127.0.0.1:55439');
 const w = JSON.parse(process.env.WORKSPACES_JSON || '[]').find(x => x.code === process.env.BROWSER_TEST_COMPANY);
@@ -75,6 +76,7 @@ try {
   await page.getByText('Test Manager', { exact: true }).waitFor();
   await button('Thang năng lực').click();
   await page.getByRole('heading', { name: 'Thang năng lực', exact: true }).waitFor();
+  await exerciseAssessmentIdp(page);
   await button('Quản lý tài khoản').click();
   const form = page.locator('form').filter({ has: button('Cấp tài khoản') });
   const memberEmail = 'browser-hr@example.test';

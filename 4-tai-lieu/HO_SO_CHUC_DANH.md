@@ -29,7 +29,7 @@ Quyền soạn thảo và duyệt tách riêng. Hiện ADMIN hoặc HR_LEAD có 
 
 ## Giới hạn còn mở
 
-Kết quả đánh giá hiện tra bộ yêu cầu chức danh đang áp dụng tại thời điểm xem. Duyệt bộ mới có thể làm thay đổi khoảng cách trong chiến dịch cũ; IDP đã tạo giữ nguyên mục tiêu đã lưu. Bước tiếp theo là chốt chức danh và mức yêu cầu cho từng người tại thời điểm mở chiến dịch. Cần hoàn thành bước này trước khi dùng báo cáo lịch sử làm căn cứ quản trị chính thức.
+Đợt 2 ngày 27/11 đã bổ sung chốt yêu cầu cho từng người khi mở kỳ; người tham gia sau được chốt lúc bổ sung. Duyệt bộ mới hoặc đổi chức danh không làm đổi mức đối chiếu trong kỳ cũ. Nếu tại thời điểm chốt chưa có yêu cầu phù hợp, kỳ đó vẫn giữ trạng thái thiếu yêu cầu. Xem [hướng dẫn đánh giá và IDP](DANH_GIA_VA_IDP.md).
 
 Chưa có màn hình đổi mã, đổi tên hoặc ngừng sử dụng chức danh. Chưa có quy trình phê duyệt nhiều cấp. Đây là các hạng mục phát triển sau khi luồng đánh giá được ổn định.
 
@@ -41,6 +41,7 @@ Chỉ chạy các bài thử dưới đây trên cơ sở dữ liệu cục bộ
 
 1. Trong backend, chạy `node --test tests/company-portal.mjs` với `WORKSPACES_JSON` chứa hai công ty thử và `PORTAL_TEST_PASSWORD` được sinh cho lượt chạy.
 2. Chạy tiếp `node --test tests/role-profiles.mjs` với đúng cấu hình và mật khẩu trên. Hai lệnh phải chạy lần lượt vì bài thứ hai dùng tài khoản do bài thứ nhất tạo.
+   Sau đó chạy `node --test tests/assessment-snapshots.mjs` để kiểm tra tính ổn định theo kỳ, tham gia muộn và dữ liệu lịch sử thiếu bộ đã chốt.
 3. Build frontend với `VITE_COMPANY_PORTAL=true`. Chạy `node tests/company-portal.mjs` trong frontend; `WORKSPACES_JSON` chứa công ty thứ ba còn trống, `BROWSER_TEST_COMPANY` chọn công ty này và `CHROMIUM_PATH` chỉ đến Chromium đã cài. File thử tự gọi `tests/role-profiles.mjs` để kiểm tra tạo, lưu, duyệt và sửa nháp trên giao diện.
 
 Bài API kiểm tra tạo trùng đồng thời, cô lập công ty, quyền, năng lực chưa ban hành, mức sai, mã lặp, ghi bằng phiên bản cũ, duyệt đồng thời, nhập nhân sự, kết quả đánh giá và mục tiêu IDP. Bài trình duyệt kiểm tra kích thước 390 và 1280 pixel, lưu qua tải lại trang và việc sửa nháp vẫn giữ bộ đã duyệt.

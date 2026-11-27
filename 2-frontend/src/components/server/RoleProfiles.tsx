@@ -103,7 +103,7 @@ function ProfileEditor({ role, competencies, canAuthor, canApprove, reload, done
     </section>
     {(canAuthor || canApprove) && <section className="app-card space-y-3">
       <h2 className="font-semibold">Bản nháp yêu cầu năng lực</h2>
-      <p className="text-sm text-[var(--muted)]">Lưu bản nháp trước khi duyệt. Chỉ được duyệt khi mọi năng lực đã ban hành. Thay đổi có hiệu lực với kết quả được xem sau khi duyệt.</p>
+      <p className="text-sm text-[var(--muted)]">Lưu bản nháp trước khi duyệt. Chỉ được duyệt khi mọi năng lực đã ban hành. Bộ mới áp dụng cho lần chốt đánh giá tiếp theo; yêu cầu đã chốt trong kỳ cũ được giữ nguyên.</p>
       {!competencies.length && <p className="text-sm">Hãy tạo năng lực trong Từ điển năng lực trước.</p>}
       <fieldset disabled={busy || !canAuthor} className="space-y-3">
         {rows.map((row, i) => <div key={i} className="grid gap-2 rounded-lg border border-[var(--line)] p-3 sm:grid-cols-[minmax(0,1fr)_5rem_auto] sm:items-end">

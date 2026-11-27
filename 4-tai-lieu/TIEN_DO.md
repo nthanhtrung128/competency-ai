@@ -8,19 +8,20 @@ Cập nhật ngày 27/11/2026, nhánh `feature/company-portal`. PR #4 còn mở.
 | Tách không gian của từng doanh nghiệp | Đã kiểm tra bằng dữ liệu giả của hai doanh nghiệp. |
 | Tạo bản nháp năng lực và nhập CSV | Đã hoàn thiện. Người dùng xem kết quả kiểm tra trước khi xác nhận nhập. |
 | Hồ sơ chức danh | Đã có tạo, lưu nháp, duyệt, kiểm soát sửa đồng thời và kiểm tra mã khi nhập nhân sự. |
-| Liên kết chức danh → đánh giá → IDP | Đã thử bằng API với dữ liệu giả. Chỉ dùng mức yêu cầu đã duyệt; còn cần chốt yêu cầu theo chiến dịch. |
-| Kiểm thử nghiệp vụ | Đợt 27/11: bài cổng doanh nghiệp và 6 nhóm kiểm thử chức danh đạt. Hai bộ 134/134 và 73/73 là kết quả đợt trước. |
+| Liên kết chức danh → đánh giá → IDP | Đã chốt yêu cầu theo từng người/kỳ và thử hết vòng IDP trên giao diện bằng dữ liệu giả. |
+| Giữ ổn định lịch sử | Đổi chức danh hoặc duyệt mức mới không đổi bộ yêu cầu của kỳ cũ. Dữ liệu cũ chưa chốt được đánh dấu rõ. |
+| Kiểm thử nghiệp vụ | Đợt 2 ngày 27/11: bài cổng doanh nghiệp, 6 nhóm chức danh, 5 nhóm chốt yêu cầu đều đạt; đã chạy lại hai bộ 134/134 và 73/73. |
 | Kiểm thử giao diện | Đã đạt ở kích thước điện thoại và máy tính. |
 | Phát hành bản thí điểm | Đã có cấu hình. Chưa có URL công khai. |
 
 ## Công việc tiếp theo
 
 1. Kiểm tra thay đổi mới nhất trên nhánh hoặc pull request.
-2. Chốt yêu cầu chức danh theo từng chiến dịch để báo cáo lịch sử không thay đổi khi duyệt bộ yêu cầu mới.
-3. Thử đầy đủ vòng IDP trên giao diện và thử khôi phục bản sao dữ liệu.
+2. Củng cố quy tắc chỉnh sửa sau gửi/duyệt IDP, phê duyệt đồng thời và lưu vết thay đổi.
+3. Thử khôi phục bản sao dữ liệu riêng từng công ty và kiểm tra với số lượng nhân sự lớn hơn.
 4. Khi có tài khoản hosting, triển khai bản thí điểm và kiểm tra qua URL thật.
 
-[Nhật ký đợt phát triển](nhat-ky/2026-11-26.md) · [Hướng dẫn triển khai](CONG_DOANH_NGHIEP.md)
+[Danh mục nhật ký](nhat-ky/README.md) · [Hướng dẫn triển khai](CONG_DOANH_NGHIEP.md)
 
 ## Đợt tiếp theo ngày 26/11/2026
 
@@ -37,3 +38,11 @@ Cập nhật ngày 27/11/2026, nhánh `feature/company-portal`. PR #4 còn mở.
 - Kiểm tra kiểu backend/frontend, build hai chế độ, bài API trên PostgreSQL và bài Chromium trên điện thoại/máy tính đều đạt. Chức danh mới cũng xuất hiện trong phần kế thừa mà không cần đăng nhập lại.
 - Đã cập nhật giới hạn hosting từ tài liệu Render và Neon, cùng ưu tiên chốt yêu cầu theo chiến dịch. Chưa triển khai URL công khai.
 - [Nhật ký ngày 27/11](nhat-ky/2026-11-27.md) · [Hướng dẫn hồ sơ chức danh](HO_SO_CHUC_DANH.md)
+
+## Đợt 2 ngày 27/11/2026 — chốt yêu cầu và kiểm thử IDP
+
+- Đã lưu bộ yêu cầu riêng theo người/kỳ; mở, thêm người và đóng kỳ được xử lý trong giao dịch nhất quán. Báo cáo ghi thời điểm, chức danh và tình trạng dữ liệu đã chốt.
+- Đã bổ sung chọn năng lực khi tạo kỳ, không phụ thuộc bộ năng lực mẫu. IDP lấy mục tiêu từ bộ đã chốt.
+- Đã đạt kiểm tra kiểu, build hai chế độ, các bài API mới, hai bộ nghiệp vụ cũ (207 mục) và vòng IDP trên Chromium. Kết quả này thuộc đợt hiện tại.
+- Chưa triển khai URL thật; còn việc về kiểm soát sửa/duyệt IDP, sao lưu/khôi phục và tải lớn.
+- [Nhật ký đợt 2](nhat-ky/2026-11-27-dot-2.md) · [Hướng dẫn đánh giá và IDP](DANH_GIA_VA_IDP.md)

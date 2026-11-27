@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Plus, Play, Lock, Upload, ChevronLeft, Users, BarChart3 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { COMPANY_PORTAL } from '../../api/client';
 import {
   useServerData, useAction, uploadFile, Loading, ErrorBox, Empty, Pill, RELATION_VI, CAMPAIGN_STATUS, inputCls,
 } from './shared';
@@ -33,7 +34,7 @@ export const Campaigns: React.FC<{ onViewResult: (campaignId: string, employeeId
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-[var(--muted)]">
-          Mặc định đánh giá 12 năng lực Cốt lõi + Lãnh đạo <b>đã ban hành</b> (đủ 5 mức). Năng lực còn là bản nháp, như CO7–CO9, không đưa vào được.
+          Chọn năng lực đã ban hành cho từng kỳ. Khi mở thu phiếu, hệ thống chốt nội dung chỉ báo{COMPANY_PORTAL ? ' và yêu cầu chức danh của từng người' : ''}.
         </p>
         {can('assessment:manage') && (
           <button onClick={() => setCreating((v) => !v)} className="btn btn-primary text-xs flex items-center gap-1 shrink-0">
@@ -70,12 +71,16 @@ export const Campaigns: React.FC<{ onViewResult: (campaignId: string, employeeId
 
 const CreateCampaign: React.FC<{ onDone: (id?: string) => void }> = ({ onDone }) => {
   const { run, busy } = useAction();
+  const { competencies } = useApp();
+  const available = competencies.filter(c => c.scored !== false && c.currentVersionId);
+  const [selected, setSelected] = useState<string[]>(() => available.map(c => c.code));
   const year = new Date().getFullYear();
   const [f, setF] = useState({ code: `360-QL-${year}`, name: `Đánh giá 360° cấp quản lý ${year}`, endDate: '', minRaters: 3 });
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const r = await run<{ id: string }>('POST', '/campaigns', {
       code: f.code, name: f.name, endDate: f.endDate || undefined, minRatersForAnonymity: f.minRaters,
+      competencyCodes: selected,
     }, 'Đã tạo chiến dịch');
     if (r) onDone(r.id);
   };
@@ -89,8 +94,16 @@ const CreateCampaign: React.FC<{ onDone: (id?: string) => void }> = ({ onDone })
         <input type="date" className={inputCls} value={f.endDate} onChange={(e) => setF({ ...f, endDate: e.target.value })} /></label>
       <label className="space-y-1"><span className="font-semibold">Số người tối thiểu để hiện điểm nhóm (ẩn danh)</span>
         <input type="number" min={1} max={10} className={inputCls} value={f.minRaters} onChange={(e) => setF({ ...f, minRaters: Number(e.target.value) })} /></label>
+      <fieldset className="sm:col-span-2 space-y-2" disabled={busy}>
+        <legend className="font-semibold">Năng lực đánh giá</legend>
+        {!available.length && <p>Chưa có năng lực đã ban hành. Hãy hoàn thiện Từ điển năng lực trước.</p>}
+        <div className="grid gap-2 sm:grid-cols-2">{available.map(c => <label key={c.code} className="flex items-start gap-2">
+          <input type="checkbox" checked={selected.includes(c.code)} onChange={e => setSelected(e.target.checked ? [...selected, c.code] : selected.filter(code => code !== c.code))} />
+          <span>{c.code} · {c.name}</span>
+        </label>)}</div>
+      </fieldset>
       <div className="sm:col-span-2 flex gap-2">
-        <button disabled={busy} className="btn btn-primary text-xs">Tạo</button>
+        <button disabled={busy || !selected.length} className="btn btn-primary text-xs">Tạo</button>
         <button type="button" onClick={() => onDone()} className="btn btn-secondary text-xs">Huỷ</button>
       </div>
     </form>
@@ -154,6 +167,7 @@ const CampaignDetail: React.FC<{ id: string; onBack: () => void; onViewResult: (
         <div className="text-[11px] text-[var(--muted)]">
           Năng lực: {c.competencyCodes.join(', ')} · Ẩn danh khi nhóm dưới {c.minRatersForAnonymity} người · {totals.done}/{totals.all} phiếu đã nộp
         </div>
+        {COMPANY_PORTAL && <p className="text-xs text-[var(--muted)]">Hoàn thiện chức danh và duyệt mức yêu cầu trước khi mở thu phiếu. Người bổ sung sau sẽ được chốt theo bộ yêu cầu tại lúc tham gia. Nếu thiếu yêu cầu, vẫn thu được điểm nhưng không tự lập IDP từ khoảng cách.</p>}
         {manage && (
           <div className="flex flex-wrap gap-2 pt-1">
             {c.status === 'DRAFT' && (

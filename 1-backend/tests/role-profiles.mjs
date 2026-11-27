@@ -100,6 +100,17 @@ test('Company role profiles, approvals and assessment targets', async t => {
     assert.equal((await request(path + '/approve', 'POST', { revision: 2 })).status, 409);
   });
   await t.test('approved target feeds results and IDP while edits remain pending', async () => {
+    // The first cycle captured no approved target; later approval must not rewrite its history.
+    const old = (await request(`/campaigns/${campaignId}/results/${employeeId}`)).data;
+    assert.equal(old.competencies[0].required, null);
+    assert.equal(old.requirementBasis.status, 'FROZEN');
+    assert.equal((await request('/idp/from-assessment', 'POST', { employeeId, campaignId, cycle: '2099' })).status, 422);
+    campaignId = (await request('/campaigns', 'POST', { code: 'QA-ROLE-AFTER', name: 'Cycle after approval', competencyCodes: ['QA-PROFILE'] })).data.id;
+    assert.equal((await request(`/campaigns/${campaignId}/participants`, 'POST', { employeeCodes: ['PROFILE01'] })).status, 200);
+    assert.equal((await request(`/campaigns/${campaignId}/open`, 'POST', {})).status, 200);
+    const manager = (await request(`/campaigns/${campaignId}`)).data.participants[0].raters.find(r => r.relation === 'MANAGER');
+    assert.equal((await request('/rater-tasks/' + manager.id, 'PUT', { scores: [{ code: 'QA-PROFILE', level: 2 }], submit: true })).status, 200);
+    assert.equal((await request(`/campaigns/${campaignId}/close`, 'POST', {})).status, 200);
     const result = (await request(`/campaigns/${campaignId}/results/${employeeId}`)).data;
     assert.equal(result.competencies[0].required, 3);
     assert.equal(result.competencies[0].requiredStatus, 'APPROVED');

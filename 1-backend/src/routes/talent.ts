@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type { Prisma, RaterRelation } from '@prisma/client';
 import { currentWorkspace, prisma } from '../db.js';
 import { authenticate, requirePermission, audit, visibleEmployeeIds } from '../auth.js';
+import { captureRequirements, readRequirementSnapshot, campaignTransaction, CampaignError } from '../assessment-snapshots.js';
 
 /**
  * QĐ-06 — Đánh giá 360°, 9-Box, IDP trên dữ liệu thật, liên thông với nhau:
@@ -51,8 +52,8 @@ async function defaultCompetencyCodes() {
 }
 
 /** Chốt phiên bản đang hiệu lực của từng năng lực khi mở chiến dịch */
-async function buildSnapshot(codes: string[]) {
-  const comps = await prisma.competency.findMany({
+async function buildSnapshot(codes: string[], db: Prisma.TransactionClient = prisma) {
+  const comps = await db.competency.findMany({
     where: { code: { in: codes } },
     include: { category: { select: { code: true } } },
   });
@@ -61,6 +62,7 @@ async function buildSnapshot(codes: string[]) {
   for (const code of codes) {
     const c = comps.find((x) => x.code === code);
     if (!c) { problems.push(`${code}: không có trong Từ điển`); continue; }
+    if (!c.isActive) { problems.push(`${code}: đã ngừng sử dụng`); continue; }
     if (!c.currentVersionId) { problems.push(`${code}: chưa có phiên bản ban hành`); continue; }
     if (!c.scaleId) { problems.push(`${code}: thuộc nhóm không chấm điểm`); continue; }
     snap.push({ code, name: c.name, competencyId: c.id, versionId: c.currentVersionId, category: c.category.code });
@@ -96,7 +98,11 @@ export async function computeResult(campaignId: string, employeeId: string) {
   if (!participant) return null;
   const snap = (campaign.snapshot ?? []) as Snap;
   const minN = campaign.minRatersForAnonymity;
-  const req = await roleRequirements(participant.employee.jobRoleCode);
+  const frozen = readRequirementSnapshot(participant.requirementSnapshot);
+  const hosted = !!currentWorkspace();
+  const req = hosted
+    ? new Map((frozen?.requirements ?? []).map(q => [q.competencyId, { level: q.requiredLevel, status: 'APPROVED' }]))
+    : await roleRequirements(participant.employee.jobRoleCode);
   const submitted = participant.raters.filter((r) => r.status === 'SUBMITTED');
   const countBy = (rel: RaterRelation) => submitted.filter((r) => r.relation === rel).length;
   const hidden = {
@@ -135,6 +141,15 @@ export async function computeResult(campaignId: string, employeeId: string) {
   return {
     campaign: { id: campaign.id, code: campaign.code, name: campaign.name, status: campaign.status, minRatersForAnonymity: minN },
     employee: participant.employee,
+    requirementBasis: {
+      status: hosted ? (frozen ? 'FROZEN' : 'MISSING') : 'LIVE',
+      capturedAt: hosted ? frozen?.capturedAt ?? null : null,
+      jobRoleCode: hosted ? frozen?.jobRoleCode ?? null : participant.employee.jobRoleCode,
+      roleTitle: hosted ? frozen?.roleTitle ?? null : null,
+      roleRevision: hosted ? frozen?.roleRevision ?? null : null,
+      approvedAt: hosted ? frozen?.approvedAt ?? null : null,
+      requirementsCount: competencies.filter(c => c.required !== null).length,
+    },
     raters: {
       total: participant.raters.length,
       submitted: submitted.length,
@@ -192,6 +207,7 @@ talentRouter.post('/campaigns', authenticate, requirePermission('assessment:mana
   const body = CampaignInput.safeParse(req.body);
   if (!body.success) return res.status(400).json({ error: 'Dữ liệu không hợp lệ', detail: body.error.issues });
   const codes = body.data.competencyCodes?.length ? body.data.competencyCodes : await defaultCompetencyCodes();
+  if (!codes.length) return res.status(400).json({ error: 'Chọn ít nhất một năng lực đã ban hành để tạo chiến dịch.' });
   const { problems } = await buildSnapshot(codes);
   if (problems.length) return res.status(400).json({ error: `Không dùng được: ${problems.join('; ')}` });
   const exists = await prisma.assessmentCampaign.findUnique({ where: { code: body.data.code } });
@@ -296,15 +312,18 @@ talentRouter.post('/campaigns/:id/participants', authenticate, requirePermission
   if (!targets.length) return res.status(400).json({ error: 'Không có nhân sự nào khớp điều kiện' });
 
   const maxPeers = body.data.maxPeers ?? 4;
-  let addedParticipants = 0;
-  let addedRaters = 0;
-  await prisma.$transaction(async (tx) => {
+  const added = await campaignTransaction(c.id, async (tx, locked) => {
+    if (locked.status === 'CLOSED') throw new CampaignError(409, 'Chiến dịch đã đóng');
+    let addedParticipants = 0;
+    let addedRaters = 0;
+    const frozen = currentWorkspace() && locked.status === 'OPEN' ? await captureRequirements(tx, targets.map(e => e.id), new Date()) : null;
     for (const e of targets) {
       const existing = await tx.assessmentParticipant.findUnique({
         where: { campaignId_employeeId: { campaignId: c.id, employeeId: e.id } },
       });
       if (existing) continue;
-      const p = await tx.assessmentParticipant.create({ data: { campaignId: c.id, employeeId: e.id } });
+      const p = await tx.assessmentParticipant.create({ data: { campaignId: c.id, employeeId: e.id,
+        ...(frozen ? { requirementSnapshot: frozen.get(e.id)! } : {}) } });
       addedParticipants++;
       const raters: Prisma.AssessmentRaterCreateManyInput[] = [{ participantId: p.id, raterEmployeeId: e.id, relation: 'SELF' }];
       if (e.managerId) raters.push({ participantId: p.id, raterEmployeeId: e.managerId, relation: 'MANAGER' });
@@ -314,12 +333,12 @@ talentRouter.post('/campaigns/:id/participants', authenticate, requirePermission
       await tx.assessmentRater.createMany({ data: raters });
       addedRaters += raters.length;
     }
+    await tx.auditLog.create({ data: { action: 'UPDATE', entityType: 'AssessmentCampaign', entityId: c.id, entityName: c.code,
+      actorId: req.user!.id, actorEmail: req.user!.email, newValues: { addedParticipants, addedRaters } } });
+    return { addedParticipants, addedRaters, skipped: targets.length - addedParticipants };
   });
-  await audit(req, 'UPDATE', 'AssessmentCampaign', c.id, {
-    entityName: c.code,
-    newValues: { addedParticipants, addedRaters },
-  });
-  res.json({ addedParticipants, addedRaters, skipped: targets.length - addedParticipants });
+  if (added.error) return res.status(added.error.status).json({ error: added.error.message });
+  res.json(added.data);
 });
 
 talentRouter.post('/campaigns/:id/raters', authenticate, requirePermission('assessment:manage'), async (req, res) => {
@@ -346,33 +365,37 @@ talentRouter.delete('/raters/:id', authenticate, requirePermission('assessment:m
 });
 
 talentRouter.post('/campaigns/:id/open', authenticate, requirePermission('assessment:manage'), async (req, res) => {
-  const c = await prisma.assessmentCampaign.findUnique({
-    where: { id: req.params.id },
-    include: { _count: { select: { participants: true } } },
+  const opened = await campaignTransaction(req.params.id, async (tx, c) => {
+    if (c.status !== 'DRAFT') throw new CampaignError(409, `Chiến dịch đang ${c.status}`);
+    const participants = await tx.assessmentParticipant.findMany({ where: { campaignId: c.id }, select: { id: true, employeeId: true } });
+    if (!participants.length) throw new CampaignError(400, 'Chưa có người được đánh giá');
+    const { snap, problems } = await buildSnapshot(c.competencyCodes as string[], tx);
+    if (problems.length) throw new CampaignError(400, `Không mở được: ${problems.join('; ')}`);
+    const at = new Date();
+    if (currentWorkspace()) {
+      const frozen = await captureRequirements(tx, participants.map(p => p.employeeId), at);
+      for (const p of participants) await tx.assessmentParticipant.update({ where: { id: p.id }, data: { requirementSnapshot: frozen.get(p.employeeId)! } });
+    }
+    const after = await tx.assessmentCampaign.update({ where: { id: c.id }, data: { status: 'OPEN', snapshot: snap, startDate: c.startDate ?? at } });
+    await tx.auditLog.create({ data: { action: 'UPDATE', entityType: 'AssessmentCampaign', entityId: c.id, entityName: c.code,
+      actorId: req.user!.id, actorEmail: req.user!.email,
+      newValues: { status: 'OPEN', competencies: snap.length, requirementsCaptured: !!currentWorkspace(), participants: participants.length } } });
+    return after;
   });
-  if (!c) return res.status(404).json({ error: 'Không tìm thấy chiến dịch' });
-  if (c.status !== 'DRAFT') return res.status(409).json({ error: `Chiến dịch đang ${c.status}` });
-  if (c._count.participants === 0) return res.status(400).json({ error: 'Chưa có người được đánh giá' });
-  const { snap, problems } = await buildSnapshot(c.competencyCodes as string[]);
-  if (problems.length) return res.status(400).json({ error: `Không mở được: ${problems.join('; ')}` });
-  const after = await prisma.assessmentCampaign.update({
-    where: { id: c.id },
-    data: { status: 'OPEN', snapshot: snap as never, startDate: c.startDate ?? new Date() },
-  });
-  await audit(req, 'UPDATE', 'AssessmentCampaign', c.id, { entityName: c.code, newValues: { status: 'OPEN', competencies: snap.length } });
-  res.json(after);
+  if (opened.error) return res.status(opened.error.status).json({ error: opened.error.message });
+  res.json(opened.data);
 });
 
 talentRouter.post('/campaigns/:id/close', authenticate, requirePermission('assessment:manage'), async (req, res) => {
-  const c = await prisma.assessmentCampaign.findUnique({ where: { id: req.params.id } });
-  if (!c) return res.status(404).json({ error: 'Không tìm thấy chiến dịch' });
-  if (c.status !== 'OPEN') return res.status(409).json({ error: `Chiến dịch đang ${c.status}` });
-  const after = await prisma.assessmentCampaign.update({
-    where: { id: c.id },
-    data: { status: 'CLOSED', endDate: c.endDate ?? new Date() },
+  const closed = await campaignTransaction(req.params.id, async (tx, c) => {
+    if (c.status !== 'OPEN') throw new CampaignError(409, `Chiến dịch đang ${c.status}`);
+    const after = await tx.assessmentCampaign.update({ where: { id: c.id }, data: { status: 'CLOSED', endDate: c.endDate ?? new Date() } });
+    await tx.auditLog.create({ data: { action: 'UPDATE', entityType: 'AssessmentCampaign', entityId: c.id, entityName: c.code,
+      actorId: req.user!.id, actorEmail: req.user!.email, newValues: { status: 'CLOSED' } } });
+    return after;
   });
-  await audit(req, 'UPDATE', 'AssessmentCampaign', c.id, { entityName: c.code, newValues: { status: 'CLOSED' } });
-  res.json(after);
+  if (closed.error) return res.status(closed.error.status).json({ error: closed.error.message });
+  res.json(closed.data);
 });
 
 // ================================================================ PHIẾU CỦA TÔI
@@ -594,6 +617,7 @@ talentRouter.get('/campaigns/:id/summary', authenticate, requirePermission('asse
       leadership: r.summary.leadership,
       suggestedPotential: suggestPotential(r.summary.leadership),
       gaps: r.competencies.filter((c) => (c.gap ?? 0) > 0).length,
+      requirementBasis: r.requirementBasis,
     });
   }
   res.json({ participants: out });
@@ -734,7 +758,7 @@ talentRouter.post('/idp/from-assessment', authenticate, requirePermission('idp:m
   if (!result) return res.status(404).json({ error: 'Không có kết quả 360° của nhân sự này' });
   if (result.campaign.status !== 'CLOSED') return res.status(409).json({ error: 'Chỉ lập IDP từ chiến dịch đã đóng' });
   if (currentWorkspace() && !result.competencies.some(c => c.requiredStatus === 'APPROVED')) {
-    return res.status(422).json({ error: 'Cần gắn nhân sự với chức danh có yêu cầu năng lực đã duyệt phù hợp với chiến dịch trước khi lập IDP từ kết quả.' });
+    return res.status(422).json({ error: 'Kỳ đánh giá chưa có yêu cầu năng lực đã chốt phù hợp nên chưa thể tự lập IDP. Hoàn thiện hồ sơ chức danh trước khi mở kỳ đánh giá mới.' });
   }
 
   const candidates = result.competencies
@@ -753,7 +777,7 @@ talentRouter.post('/idp/from-assessment', authenticate, requirePermission('idp:m
       employeeId: body.data.employeeId,
       cycle: body.data.cycle,
       sourceCampaignId: body.data.campaignId,
-      targetRoleCode: result.employee.jobRoleCode,
+      targetRoleCode: currentWorkspace() ? result.requirementBasis.jobRoleCode : result.employee.jobRoleCode,
       createdByEmail: req.user!.email,
       notes: candidates.length ? null : 'Không có năng lực nào dưới mức yêu cầu — cân nhắc mục tiêu phát triển cho vai trò kế tiếp.',
       goals: {

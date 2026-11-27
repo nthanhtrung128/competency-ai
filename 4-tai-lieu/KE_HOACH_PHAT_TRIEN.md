@@ -13,12 +13,12 @@ Cập nhật ngày 27/11/2026. Ưu tiên hoàn thành một vòng sử dụng t�
 
 ## Phạm vi đợt hiện tại
 
-Đã triển khai ưu tiên 1 và phần hồ sơ chức danh của ưu tiên 2. Xem [hướng dẫn hồ sơ chức danh](HO_SO_CHUC_DANH.md) và [tiến độ kiểm thử](TIEN_DO.md). Việc thêm doanh nghiệp hiện cần người vận hành chuẩn bị mã và cơ sở dữ liệu trước khi gửi mã kích hoạt.
+Đã triển khai ưu tiên 1, hồ sơ chức danh của ưu tiên 2, chốt yêu cầu theo kỳ và thử một vòng IDP của ưu tiên 3. Xem [hướng dẫn đánh giá và IDP](DANH_GIA_VA_IDP.md) và [tiến độ kiểm thử](TIEN_DO.md). Việc thêm doanh nghiệp hiện cần người vận hành chuẩn bị mã và cơ sở dữ liệu trước khi gửi mã kích hoạt.
 
 ## Đề xuất sau khi rà soát luồng đánh giá
 
-1. **Chốt yêu cầu theo chiến dịch.** Hiện nội dung chỉ báo đã được chốt khi mở chiến dịch, nhưng mức yêu cầu chức danh vẫn được tra lúc xem kết quả. Cần lưu mã chức danh, phiên bản hồ sơ và mức yêu cầu cho từng người lúc mở chiến dịch. Bài kiểm tra phải chứng minh sửa chức danh sau đó không đổi báo cáo cũ. Đây là ưu tiên kế tiếp.
-2. **Hoàn thành IDP.** Thử luồng gợi ý mục tiêu → hành động 70–20–10 → gửi duyệt → duyệt → ghi nhận tiến độ. Hiện đã nối yêu cầu chức danh đã duyệt với việc tạo mục tiêu; cần kiểm thử cả vòng trên giao diện doanh nghiệp.
+1. **Chốt yêu cầu theo chiến dịch — đã hoàn thành đợt 2.** Đã lưu mã chức danh, phiên bản hồ sơ và mức yêu cầu theo người, có bài thử chứng minh đổi chức danh hoặc duyệt bộ mới không làm đổi kỳ cũ. Người tham gia muộn được chốt lúc bổ sung; dữ liệu cũ thiếu bộ đã chốt được đánh dấu rõ.
+2. **Củng cố IDP — ưu tiên kế tiếp.** Vòng tạo → hành động → gửi duyệt → phê duyệt → tiến độ → hoàn thành đã đạt trên trình duyệt. Tiếp tục quy định việc sửa sau gửi/duyệt, kiểm soát phê duyệt đồng thời và nhật ký điều chỉnh. Cần phân biệt hoàn thành hành động với việc đã đạt mức năng lực mục tiêu.
 3. **Khôi phục và vận hành.** Chuẩn bị bản sao riêng cho từng công ty, phục hồi trên cơ sở dữ liệu khác rồi đối chiếu. Đo thời gian mở ứng dụng sau khi hosting ngủ và kiểm tra phiên đăng nhập sau khi dịch vụ khởi động lại.
 4. **Mời tài khoản qua email.** Dùng API gửi mail qua HTTPS, thêm liên kết dùng một lần và giới hạn thử lại. Cần chọn nhà cung cấp trước khi tích hợp.
 5. **AI hỗ trợ soạn nội dung.** Đặt sau các bước trên; ưu tiên tạo nháp chỉ báo và gợi ý hành động IDP với người duyệt và hạn mức chi phí riêng cho công ty.
@@ -36,4 +36,4 @@ Khôi phục dữ liệu cần được thử thực tế trong giới hạn l�
 
 ## Công việc cho phiên tiếp theo
 
-Đọc bảng tiến độ, kiểm tra trạng thái PR #4 và các PR kiểm thử đang mở. Tiếp tục chốt yêu cầu chức danh theo chiến dịch rồi hoàn thiện vòng IDP. Khi có quyền truy cập hosting, triển khai bản dùng thử rồi ghi URL cùng kết quả kiểm tra vào bảng tiến độ.
+Đọc [nhật ký mới nhất](nhat-ky/README.md), bảng tiến độ, kiểm tra trạng thái PR #4 và các PR kiểm thử đang mở. Tiếp tục kiểm soát chỉnh sửa/phê duyệt IDP, sau đó thử sao lưu/khôi phục và tải dữ liệu lớn hơn. Khi có quyền truy cập hosting, triển khai bản dùng thử rồi ghi URL cùng kết quả kiểm tra vào bảng tiến độ.
