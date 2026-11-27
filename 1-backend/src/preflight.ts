@@ -1,12 +1,11 @@
 import { prisma } from './db.js';
-import { verifyPassword } from './auth.js';
 
 /**
  * Kiểm tra cấu hình trước khi nhận yêu cầu. Ở môi trường production (NODE_ENV=production):
  *   - DỪNG khởi động nếu khoá JWT còn mặc định / quá ngắn, hoặc CORS_ORIGINS để trống / "*".
- *   - CẢNH BÁO nếu tài khoản mẫu vẫn đăng nhập được bằng mật khẩu mặc định.
+ *   - DỪNG khởi động nếu còn tài khoản mẫu đang hoạt động.
  */
-export async function preflight() {
+export async function preflight(sameOrigin = false) {
   const prod = process.env.NODE_ENV === 'production';
   const problems: string[] = [];
   const warnings: string[] = [];
@@ -19,15 +18,15 @@ export async function preflight() {
     problems.push('JWT_ACCESS_SECRET và JWT_REFRESH_SECRET phải khác nhau');
   }
   const cors = (process.env.CORS_ORIGINS ?? '').trim();
-  if (!cors || cors.split(',').map((s) => s.trim()).includes('*')) problems.push('CORS_ORIGINS phải ghi rõ địa chỉ giao diện, không để trống hoặc "*"');
+  if ((!cors && !sameOrigin) || cors.split(',').map((s) => s.trim()).includes('*')) problems.push('CORS_ORIGINS phải ghi rõ địa chỉ giao diện, không để trống hoặc "*"');
 
   try {
     const demo = await prisma.user.findMany({
       where: { email: { in: ['admin@flamingo.vn', 'hrlead@flamingo.vn', 'hrbp@flamingo.vn', 'manager@flamingo.vn'] }, status: 'ACTIVE' },
-      select: { email: true, passwordHash: true },
+      select: { email: true },
     });
-    for (const u of demo) {
-      if (await verifyPassword('Flamingo@2026', u.passwordHash)) warnings.push(`Tài khoản mẫu ${u.email} còn mật khẩu mặc định — đổi mật khẩu hoặc khoá tài khoản`);
+    if (demo.length) {
+      problems.push('Còn tài khoản mẫu hoạt động. Tạo quản trị viên riêng và khoá các tài khoản mẫu trước khi triển khai production.');
     }
   } catch {
     warnings.push('Chưa đọc được bảng tài khoản (cơ sở dữ liệu chưa sẵn sàng?)');

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Send, CheckCircle2, ChevronLeft, MessageSquare, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { COMPANY_PORTAL } from '../../api/client';
 import { useServerData, useAction, Loading, ErrorBox, Empty, Pill, IDP_STATUS, fmt, inputCls } from './shared';
 
 type Action = { id: string; type: 'EXPERIENCE_70' | 'EXPOSURE_20' | 'EDUCATION_10'; title: string; dueDate: string | null; status: string; evidence: string | null };
@@ -30,7 +31,7 @@ export const IdpView: React.FC = () => {
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-[var(--muted)]">
-          IDP lập từ khoảng cách 360°: tối đa 3 năng lực dưới mức yêu cầu của vai trò (chưa có vai trò thì lấy mức 3). Mỗi mục tiêu cần ít nhất một hành động học qua công việc (70).
+          IDP lập từ khoảng cách 360°: tối đa 3 năng lực dưới mức yêu cầu {COMPANY_PORTAL ? 'đã chốt trong kỳ đánh giá' : 'của vai trò (chưa có vai trò thì lấy mức 3)'}. Mỗi mục tiêu nên có hành động học qua công việc (70).
         </p>
         {can('idp:manage') && (
           <button onClick={() => setCreating((v) => !v)} className="btn btn-primary text-xs flex items-center gap-1 shrink-0"><Sparkles className="w-3.5 h-3.5" /> Lập IDP từ 360°</button>
@@ -76,11 +77,11 @@ const CreateFromAssessment: React.FC<{ onDone: (id?: string) => void }> = ({ onD
   return (
     <div className="app-card grid sm:grid-cols-4 gap-2 text-xs items-end">
       <label className="space-y-1"><span className="font-semibold">Chiến dịch</span>
-        <select className={inputCls} value={cid} onChange={(e) => { setCampaignId(e.target.value); setEmployeeId(''); }}>
+        <select aria-label="Chiến dịch" className={inputCls} value={cid} onChange={(e) => { setCampaignId(e.target.value); setEmployeeId(''); }}>
           {closed.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select></label>
       <label className="space-y-1"><span className="font-semibold">Nhân sự</span>
-        <select className={inputCls} value={employeeId} onChange={(e) => setEmployeeId(e.target.value)}>
+        <select aria-label="Nhân sự" className={inputCls} value={employeeId} onChange={(e) => setEmployeeId(e.target.value)}>
           <option value="">— chọn —</option>
           {people.data?.participants.map((p) => <option key={p.employee.id} value={p.employee.id}>{p.employee.fullName} ({p.gaps} khoảng cách)</option>)}
         </select></label>
@@ -165,12 +166,12 @@ const PlanDetail: React.FC<{ id: string; onBack: () => void }> = ({ id, onBack }
             })}
             {editable && (
               <div className="grid sm:grid-cols-[180px_1fr_140px_auto] gap-2 pt-1">
-                <select className={inputCls} value={na.type} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, type: e.target.value as Action['type'] } })}>
+                <select aria-label="Loại hành động" className={inputCls} value={na.type} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, type: e.target.value as Action['type'] } })}>
                   {(Object.keys(TYPE) as Action['type'][]).map((t) => <option key={t} value={t}>{TYPE[t][0]}</option>)}
                 </select>
-                <input className={inputCls} placeholder={TYPE[na.type][1]} value={na.title} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, title: e.target.value } })} />
-                <input type="date" className={inputCls} value={na.dueDate} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, dueDate: e.target.value } })} />
-                <button disabled={busy || na.title.trim().length < 5} className="btn btn-secondary text-xs flex items-center gap-1"
+                <input aria-label="Hành động phát triển" className={inputCls} placeholder={TYPE[na.type][1]} value={na.title} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, title: e.target.value } })} />
+                <input aria-label="Hạn hoàn thành" type="date" className={inputCls} value={na.dueDate} onChange={(e) => setNewAction({ ...newAction, [g.id]: { ...na, dueDate: e.target.value } })} />
+                <button aria-label="Thêm hành động" disabled={busy || na.title.trim().length < 5} className="btn btn-secondary text-xs flex items-center gap-1"
                   onClick={async () => {
                     if (await run('POST', `/idp-goals/${g.id}/actions`, { type: na.type, title: na.title, dueDate: na.dueDate || undefined }, 'Đã thêm hành động')) {
                       setNewAction({ ...newAction, [g.id]: { type: na.type, title: '', dueDate: '' } });

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../db.js';
+import { currentWorkspace, prisma } from '../db.js';
 import {
   authenticate,
   requirePermission,
@@ -9,6 +9,7 @@ import {
   signAccessToken,
   issueRefreshToken,
   rotateRefreshToken,
+  revokeRefreshToken,
   verifyPassword,
   hashPassword,
   passwordProblem,
@@ -50,6 +51,12 @@ apiRouter.post('/auth/refresh', async (req, res) => {
   const result = await rotateRefreshToken(token);
   if (!result) return res.status(401).json({ error: 'Refresh token hết hạn hoặc đã dùng' });
   res.json({ accessToken: signAccessToken(result.userId), refreshToken: result.refreshToken });
+});
+
+apiRouter.post('/auth/logout', async (req, res) => {
+  const token = req.body?.refreshToken;
+  if (typeof token === 'string' && token.length === 80) await revokeRefreshToken(token);
+  res.sendStatus(204);
 });
 
 apiRouter.post('/auth/change-password', authenticate, async (req, res) => {
@@ -175,9 +182,13 @@ apiRouter.patch('/org-units/:id/head', authenticate, requirePermission('org:mana
 
 apiRouter.get('/employees', authenticate, requirePermission('employee:read'), async (req, res) => {
   const scope = await resolveScope(req.user!);
-  const q = String(req.query.q ?? '').trim();
-  const take = Math.min(Number(req.query.take ?? 50), 200);
-  const skip = Number(req.query.skip ?? 0);
+  const parsed = z.object({
+    q: z.string().trim().max(200).default(''),
+    take: z.coerce.number().int().min(1).max(200).default(50),
+    skip: z.coerce.number().int().min(0).max(1000000).default(0),
+  }).safeParse(req.query);
+  if (!parsed.success) return res.status(400).json({ error: 'Thông tin tìm kiếm hoặc phân trang không hợp lệ.' });
+  const { q, take, skip } = parsed.data;
 
   const where = {
     ...(scope === null ? {} : { orgUnitId: { in: scope } }),
@@ -263,6 +274,9 @@ apiRouter.post(
     // QĐ-04: không ban hành nội dung còn nhãn dự thảo AI / giữ chỗ
     const inds = ((version.levels ?? {}) as { behavioralIndicators?: Array<{ level: number; indicator: string }> })
       .behavioralIndicators ?? [];
+    if (currentWorkspace() && [1, 2, 3, 4, 5].some(level => !inds.some(i => i.level === level && i.indicator.trim()))) {
+      return res.status(422).json({ error: 'Cần bổ sung đầy đủ chỉ báo cho cả 5 mức trước khi ban hành.' });
+    }
     const tagged = inds.filter((b) => /\[DỰ THẢO (AI|TỰ SINH)|\[Mức \d chưa có/i.test(b.indicator)).map((b) => b.level);
     if (tagged.length) {
       return res.status(422).json({

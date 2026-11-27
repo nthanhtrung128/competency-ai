@@ -1,6 +1,7 @@
+import { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../db.js';
+import { currentWorkspace, prisma } from '../db.js';
 import { authenticate, requirePermission, resolveScope, audit } from '../auth.js';
 
 /**
@@ -34,6 +35,35 @@ function completeness(levels: LevelsJson) {
 }
 
 // ================================================================ BOOTSTRAP
+
+frameworkRouter.post('/competencies', authenticate, requirePermission('competency:author'), async (req, res) => {
+  if (!currentWorkspace()) return res.status(403).json({ error: 'Từ điển thí điểm đang được quản lý theo QĐ-01.' });
+  const parsed = z.object({
+    code: z.string().trim().regex(/^[a-zA-Z0-9_-]{1,40}$/).transform(code => code.toUpperCase()),
+    name: z.string().trim().min(1).max(200), definition: z.string().trim().max(5000),
+    categoryCode: z.string(), owningUnit: z.string().trim().max(200).nullable(),
+    levels: LevelsSchema,
+  }).safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Kiểm tra tên, nhóm và mã năng lực (chữ, số, gạch nối hoặc gạch dưới).' });
+  const { code, name, definition, categoryCode, owningUnit, levels } = parsed.data;
+  const category = await prisma.competencyCategory.findUnique({ where: { code: categoryCode } });
+  if (!category) return res.status(400).json({ error: 'Nhóm năng lực không tồn tại.' });
+  const scale = await prisma.proficiencyScale.findFirstOrThrow({ where: { isDefault: true } });
+  try {
+    const competency = await prisma.$transaction(async tx => {
+      const created = await tx.competency.create({ data: {
+        code, name, definition, categoryId: category.id, scaleId: scale.id, owningUnit, hasOwner: !!owningUnit,
+        versions: { create: { title: name, definition, levels: { behavioralIndicators: levels.behavioralIndicators ?? [] } } },
+      } });
+      await tx.auditLog.create({ data: { action: 'CREATE', entityType: 'Competency', entityId: created.id, entityName: name, actorId: req.user!.id, actorEmail: req.user!.email } });
+      return created;
+    });
+    return res.status(201).json({ id: competency.id });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') return res.status(409).json({ error: 'Mã năng lực đã tồn tại.' });
+    throw error;
+  }
+});
 
 frameworkRouter.get('/bootstrap', authenticate, requirePermission('competency:read'), async (req, res) => {
   const user = req.user!;
@@ -261,7 +291,7 @@ frameworkRouter.patch(
 
 // ================================================================ JOB ARCHITECTURE
 
-frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:read'), async (_req, res) => {
+frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:read'), async (req, res) => {
   const roles = await prisma.jobRole.findMany({
     orderBy: { code: 'asc' },
     include: {
@@ -279,7 +309,7 @@ frameworkRouter.get('/job-roles', authenticate, requirePermission('competency:re
       deXuat: all.filter((q) => q.mappingStatus === 'PROPOSED').length,
       chuaDoiChieu: all.filter((q) => q.mappingStatus === 'UNMAPPED').length,
     },
-    roles,
+    roles: roles.map(role => ({ ...role, pendingRequirements: req.user!.permissions.some(p => ['competency:author', 'competency:publish'].includes(p)) ? role.pendingRequirements : null })),
   });
 });
 
@@ -303,6 +333,7 @@ frameworkRouter.put(
   authenticate,
   requirePermission('competency:publish'),
   async (req, res) => {
+    if (currentWorkspace()) return res.status(409).json({ error: 'Hãy lưu bản nháp và duyệt tại Hồ sơ chức danh.' });
     const body = RequirementInput.safeParse(req.body);
     if (!body.success) return res.status(400).json({ error: 'Dữ liệu không hợp lệ', detail: body.error.issues });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { COMPANY_PORTAL } from '../../api/client';
 import { RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useServerData, Loading, ErrorBox } from './shared';
 
@@ -70,7 +71,7 @@ export const ServerDashboard: React.FC<{ onNavigate?: (tab: string) => void }> =
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Tile label="Năng lực đã ban hành" value={`${f.published}/${f.competencies}`} note={f.draftOnly ? `${f.draftOnly} năng lực mới đang là bản nháp` : 'không có năng lực chờ'} />
           <Tile label="Đủ 5 mức chỉ báo" value={`${f.fullFiveLevels}/${f.scored}`} note="năng lực có chấm điểm" warn={f.fullFiveLevels < f.scored} />
-          <Tile label="Bản nháp chờ duyệt" value={f.pendingDrafts} note={<button className="underline" onClick={() => onNavigate?.('review')}>mở Bàn duyệt</button>} warn={f.pendingDrafts > 0} />
+          <Tile label="Bản nháp chờ duyệt" value={f.pendingDrafts} note={<button className="underline" onClick={() => onNavigate?.(COMPANY_PORTAL ? 'competencies' : 'review')}>{COMPANY_PORTAL ? 'mở Từ điển' : 'mở Bàn duyệt'}</button>} warn={f.pendingDrafts > 0} />
           <Tile label="Chưa có đơn vị chủ quản" value={f.ownersMissing} note={f.ownersMissing ? 'QĐ-03 chưa xong' : 'đã đủ'} warn={f.ownersMissing > 0} />
         </div>
         <div className="app-card grid md:grid-cols-2 gap-x-8 gap-y-3">

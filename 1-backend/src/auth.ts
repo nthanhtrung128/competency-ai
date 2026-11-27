@@ -2,10 +2,10 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
-import { prisma } from './db.js';
+import { currentWorkspace, prisma } from './db.js';
 
-const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev-access-secret-doi-truoc-khi-deploy';
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-doi-truoc-khi-deploy';
+// Local development gets an ephemeral signing key. Production requires a configured key at preflight.
+const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || crypto.randomBytes(48).toString('base64url');
 const ACCESS_TTL = '15m';
 const REFRESH_TTL_DAYS = 7;
 
@@ -32,24 +32,39 @@ declare global {
 // ---------------------------------------------------------------- token
 
 export function signAccessToken(userId: string) {
-  return jwt.sign({ sub: userId }, ACCESS_SECRET, { expiresIn: ACCESS_TTL });
+  return jwt.sign({ sub: userId, workspace: currentWorkspace()?.code }, ACCESS_SECRET, { expiresIn: ACCESS_TTL });
+}
+
+function refreshHash(raw: string) {
+  const company = currentWorkspace();
+  return crypto.createHash('sha256').update(company ? company.code + ':' + raw : raw).digest('hex');
+}
+
+export async function revokeRefreshToken(raw: string) {
+  await prisma.refreshToken.updateMany({ where: { tokenHash: refreshHash(raw), revokedAt: null }, data: { revokedAt: new Date() } });
 }
 
 export async function issueRefreshToken(userId: string) {
   const raw = crypto.randomBytes(40).toString('hex');
-  const tokenHash = crypto.createHash('sha256').update(raw).digest('hex');
+  const tokenHash = refreshHash(raw);
   const expiresAt = new Date(Date.now() + REFRESH_TTL_DAYS * 864e5);
   await prisma.refreshToken.create({ data: { userId, tokenHash, expiresAt } });
   return raw;
 }
 
 export async function rotateRefreshToken(raw: string) {
-  const tokenHash = crypto.createHash('sha256').update(raw).digest('hex');
-  const found = await prisma.refreshToken.findUnique({ where: { tokenHash } });
-  if (!found || found.revokedAt || found.expiresAt < new Date()) return null;
-  await prisma.refreshToken.update({ where: { id: found.id }, data: { revokedAt: new Date() } });
-  const next = await issueRefreshToken(found.userId);
-  return { userId: found.userId, refreshToken: next };
+  const tokenHash = refreshHash(raw);
+  return prisma.$transaction(async tx => {
+    const claimed = await tx.refreshToken.updateMany({
+      where: { tokenHash, revokedAt: null, expiresAt: { gt: new Date() }, user: { status: 'ACTIVE' } },
+      data: { revokedAt: new Date() },
+    });
+    if (!claimed.count) return null;
+    const { userId } = await tx.refreshToken.findUniqueOrThrow({ where: { tokenHash } });
+    const next = crypto.randomBytes(40).toString('hex');
+    await tx.refreshToken.create({ data: { userId, tokenHash: refreshHash(next), expiresAt: new Date(Date.now() + REFRESH_TTL_DAYS * 864e5) } });
+    return { userId, refreshToken: next };
+  });
 }
 
 export const hashPassword = (p: string) => bcrypt.hash(p, 10);
@@ -93,6 +108,7 @@ export function tempPassword() {
 
 /** Chính sách mật khẩu tối thiểu */
 export function passwordProblem(p: string): string | null {
+  if (Buffer.byteLength(p, 'utf8') > 72) return 'Mật khẩu vượt giới hạn 72 byte';
   if (p.length < 10) return 'Mật khẩu tối thiểu 10 ký tự';
   if (!/[a-zA-Z]/.test(p) || !/\d/.test(p)) return 'Mật khẩu phải có cả chữ và số';
   return null;
@@ -125,9 +141,10 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
   if (!header?.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Thiếu access token' });
   }
-  let payload: { sub: string };
+  let payload: { sub: string; workspace?: string };
   try {
-    payload = jwt.verify(header.slice(7), ACCESS_SECRET) as { sub: string };
+    payload = jwt.verify(header.slice(7), ACCESS_SECRET) as typeof payload;
+    if (payload.workspace !== currentWorkspace()?.code) throw new Error('Sai công ty');
   } catch {
     return res.status(401).json({ error: 'Access token hết hạn hoặc không hợp lệ' });
   }

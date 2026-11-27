@@ -22,18 +22,14 @@ import {
 } from '../../packages/db/src/types';
 import {
   SEED_ORG_UNITS,
-  SEED_USERS,
   SEED_ROLES,
   SEED_PERMISSIONS,
   SEED_ROLE_PERMISSIONS,
-  SEED_USER_ROLES,
-  SEED_USER_SCOPES,
   SEED_PROFICIENCY_SCALES,
   SEED_JOB_FAMILIES,
   SEED_CATEGORIES,
   SEED_COMPETENCIES,
   SEED_VERSIONS,
-  SEED_AUDIT_LOGS,
   SEED_INTERVIEW_QUESTIONS,
   SEED_JOB_LEVELS,
   SEED_JOB_ROLES,
@@ -41,7 +37,7 @@ import {
   SEED_DATA_WARNINGS,
 } from '../data/seedData';
 import { Language, PERSONAS, PersonaOption } from '../data/i18n';
-import { api, apiSend, clearSession, loadSession, login, normalizeUrl, wakeServer, ApiError } from '../api/client';
+import { COMPANY_PORTAL, api, apiSend, clearSession, loadSession, login, normalizeUrl, wakeServer, ApiError } from '../api/client';
 import {
   BootstrapPayload,
   ServerIdMaps,
@@ -139,53 +135,6 @@ export interface IDPPlan {
   careerAspiration?: CareerAspirationRecord;
 }
 
-// Initial 9-Box Seed Data
-const INITIAL_9BOX: Talent9BoxRecord[] = [
-  { id: '9b-1', userId: 'usr-cto', performance: 3, potential: 3, boxLabel: 'Star (High/High)', updatedAt: '2025-06-01' },
-  { id: '9b-2', userId: 'usr-dev-lead', performance: 2, potential: 3, boxLabel: 'High Potential (Med/High)', updatedAt: '2025-06-01' },
-  { id: '9b-3', userId: 'usr-head-eng', performance: 3, potential: 2, boxLabel: 'Core Performer (High/Med)', updatedAt: '2025-06-01' },
-  { id: '9b-4', userId: 'usr-swe-1', performance: 2, potential: 2, boxLabel: 'Key Contributor (Med/Med)', updatedAt: '2025-06-01' },
-  { id: '9b-5', userId: 'usr-hr-lead', performance: 2, potential: 3, boxLabel: 'High Potential (Med/High)', updatedAt: '2025-06-01' },
-];
-
-// Initial Succession Plans
-const INITIAL_SUCCESSION: SuccessionPlan[] = [
-  {
-    id: 'succ-1',
-    keyRoleTitle: 'Trưởng Ban Công nghệ thông tin & CĐS',
-    orgUnitId: 'org-b13',
-    currentHolderId: 'usr-cto',
-    criticality: 'CRITICAL',
-    successors: [
-      { userId: 'usr-dev-lead', readiness: 'READY_NOW', riskOfLeaving: 'LOW', notes: 'Năng lực chuyên môn hạ tầng & an toàn thông tin xuất sắc.' },
-      { userId: 'usr-head-eng', readiness: 'READY_1_YEAR', riskOfLeaving: 'MEDIUM', notes: 'Dẫn dắt các dự án ứng dụng doanh nghiệp & CĐS toàn Tập đoàn.' }
-    ]
-  },
-  {
-    id: 'succ-2',
-    keyRoleTitle: 'Trưởng Phòng Ứng dụng doanh nghiệp & CĐS',
-    orgUnitId: 'org-b13-p2',
-    currentHolderId: 'usr-head-eng',
-    criticality: 'HIGH',
-    successors: [
-      { userId: 'usr-swe-1', readiness: 'READY_1_YEAR', riskOfLeaving: 'LOW', notes: 'Đang mở rộng năng lực quản lý dự án và kiến trúc giải pháp.' }
-    ]
-  }
-];
-
-// Initial Assessment Scores (1 to 5 scale)
-const INITIAL_SCORES: AssessmentRaterScore[] = [
-  { id: 'sc-1', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-swe-1', evaluatorRole: 'SELF', competencyId: 'comp-co1', scoreLevel: 3, comment: 'Đạt chuẩn tinh thần trách nhiệm và làm chủ công việc', updatedAt: '2025-06-15' },
-  { id: 'sc-2', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-dev-lead', evaluatorRole: 'MANAGER', competencyId: 'comp-co1', scoreLevel: 4, comment: 'Chủ động vượt yêu cầu công việc được giao', updatedAt: '2025-06-16' },
-  { id: 'sc-3', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-head-eng', evaluatorRole: 'PEER', competencyId: 'comp-co1', scoreLevel: 4, comment: 'Hợp tác hiệu quả trong các dự án liên phòng ban', updatedAt: '2025-06-17' },
-
-  { id: 'sc-4', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-swe-1', evaluatorRole: 'SELF', competencyId: 'comp-fu39', scoreLevel: 3, comment: 'Thiết kế kiến trúc hệ thống độc lập', updatedAt: '2025-06-15' },
-  { id: 'sc-5', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-dev-lead', evaluatorRole: 'MANAGER', competencyId: 'comp-fu39', scoreLevel: 3, comment: 'Đạt yêu cầu Mức 3; cần rèn luyện thiết kế toàn tập đoàn cho Mức 4', updatedAt: '2025-06-16' },
-
-  { id: 'sc-6', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-swe-1', evaluatorRole: 'SELF', competencyId: 'comp-co3', scoreLevel: 3, comment: 'Hợp tác hiệu quả', updatedAt: '2025-06-15' },
-  { id: 'sc-7', campaignId: 'camp-2025-h1', evaluateeId: 'usr-swe-1', evaluatorId: 'usr-dev-lead', evaluatorRole: 'MANAGER', competencyId: 'comp-co3', scoreLevel: 3, comment: 'Đóng góp tích cực vào mục tiêu chung của Ban', updatedAt: '2025-06-16' },
-];
-
 interface AppContextType {
   // Nguồn dữ liệu: DEMO (trình duyệt) hoặc SERVER (máy chủ thật)
   dataSource: DataSource;
@@ -241,7 +190,7 @@ interface AppContextType {
   deleteOrgUnit: (id: string) => { success: boolean; error?: string };
   addUserScope: (scope: Omit<UserScopeModel, 'id' | 'createdAt' | 'updatedAt'>) => void;
   deleteUserScope: (id: string) => void;
-  addCompetency: (comp: Partial<CompetencyModel>, version: Partial<CompetencyVersionModel>) => void;
+  addCompetency: (comp: Partial<CompetencyModel>, version: Partial<CompetencyVersionModel>) => Promise<boolean>;
   updateCompetencyVersion: (versionId: string, updates: Partial<CompetencyVersionModel>) => void;
   publishCompetencyVersion: (versionId: string) => void;
   recordAssessmentScore: (score: Omit<AssessmentRaterScore, 'id' | 'updatedAt'>) => void;
@@ -290,7 +239,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /** Ghi localStorage CHỈ ở chế độ Demo — dữ liệu máy chủ không bao giờ ghi đè dữ liệu Demo. */
   const persist = (key: string, value: string) => {
-    if (dataSourceRef.current === 'SERVER') return;
+    if (COMPANY_PORTAL || dataSourceRef.current === 'SERVER') return;
     try {
       localStorage.setItem(key, value);
     } catch {
@@ -300,66 +249,78 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Core Entity State
   const [orgUnits, setOrgUnits] = useState<OrgUnitModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_orgUnits`);
     return saved ? JSON.parse(saved) : SEED_ORG_UNITS;
   });
 
   const [users, setUsers] = useState<UserModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_users`);
-    return saved ? JSON.parse(saved) : SEED_USERS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [roles] = useState<RoleModel[]>(SEED_ROLES);
   const [permissions] = useState<PermissionModel[]>(SEED_PERMISSIONS);
   const [rolePermissions] = useState<RolePermissionModel[]>(SEED_ROLE_PERMISSIONS);
-  const [userRoles] = useState<UserRoleModel[]>(SEED_USER_ROLES);
+  const [userRoles] = useState<UserRoleModel[]>([]);
 
   const [userScopes, setUserScopes] = useState<UserScopeModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_userScopes`);
-    return saved ? JSON.parse(saved) : SEED_USER_SCOPES;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [proficiencyScales, setProficiencyScales] = useState<ProficiencyScaleModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_scales`);
     return saved ? JSON.parse(saved) : SEED_PROFICIENCY_SCALES;
   });
 
   const [jobFamilies, setJobFamilies] = useState<JobFamilyModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_jobFamilies`);
     return saved ? JSON.parse(saved) : SEED_JOB_FAMILIES;
   });
 
   const [categories, setCategories] = useState<CompetencyCategoryModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_categories`);
     return saved ? JSON.parse(saved) : SEED_CATEGORIES;
   });
 
   const [competencies, setCompetencies] = useState<CompetencyModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_competencies`);
     return saved ? JSON.parse(saved) : SEED_COMPETENCIES;
   });
 
   const [versions, setVersions] = useState<CompetencyVersionModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_versions`);
     return saved ? JSON.parse(saved) : SEED_VERSIONS;
   });
 
   const [auditLogs, setAuditLogs] = useState<AuditLogModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_auditLogs`);
-    return saved ? JSON.parse(saved) : SEED_AUDIT_LOGS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [interviewQuestions, setInterviewQuestions] = useState<InterviewQuestionModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_interviewQuestions`);
     return saved ? JSON.parse(saved) : SEED_INTERVIEW_QUESTIONS;
   });
 
   const [jobLevels, setJobLevels] = useState<JobLevelModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_jobLevels`);
     return saved ? JSON.parse(saved) : SEED_JOB_LEVELS;
   });
 
   const [jobRoles, setJobRoles] = useState<JobRoleModel[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_jobRoles`);
     return saved ? JSON.parse(saved) : SEED_JOB_ROLES;
   });
@@ -368,116 +329,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [dataWarnings] = useState<DataWarningModel[]>(SEED_DATA_WARNINGS);
 
   const [assessmentScores, setAssessmentScores] = useState<AssessmentRaterScore[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_scores`);
-    return saved ? JSON.parse(saved) : INITIAL_SCORES;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [nineBoxTalents, setNineBoxTalents] = useState<Talent9BoxRecord[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_9box`);
-    return saved ? JSON.parse(saved) : INITIAL_9BOX;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [successionPlans, setSuccessionPlans] = useState<SuccessionPlan[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_succession`);
-    return saved ? JSON.parse(saved) : INITIAL_SUCCESSION;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [idpPlans, setIdpPlans] = useState<IDPPlan[]>(() => {
+    if (COMPANY_PORTAL) return [];
     const saved = localStorage.getItem(`${STORAGE_KEY}_idp`);
-    return saved
-      ? JSON.parse(saved)
-      : [
-          {
-            id: 'idp-1',
-            userId: 'usr-swe-1',
-            targetCompetencyCode: 'FU39',
-            currentTier: 3,
-            targetTier: 4,
-            experiential70: [
-              'Chủ trì thiết kế kiến trúc hệ thống dữ liệu phân tán cho Ban CNTT & CĐS.',
-              'Tham gia hiệu chuẩn hạ tầng và kiểm thử tải cho giải pháp CĐS cấp Tập đoàn.',
-            ],
-            exposure20: [
-              'Shadowing trực tiếp với Trưởng phòng Ứng dụng & CĐS trong các phiên phản biện kiến trúc.',
-              'Tham gia tổ thẩm định kỹ thuật công nghệ thông tin cùng Ban Tổng Giám đốc.',
-            ],
-            education10: [
-              'Hoàn thành chứng chỉ Kiến trúc sư Hệ thống Đám mây / Cloud Solutions Architect.',
-              'Đọc tài liệu chuẩn hóa Kiến trúc TOGAF và Khung quản trị dữ liệu DAMA-DMBOK.',
-            ],
-            timeline: 'Q3-Q4 / 2025',
-            status: 'IN_PROGRESS',
-            generatedByAI: true,
-            completedTasks: [
-              'Chủ trì thiết kế kiến trúc hệ thống dữ liệu phân tán cho Ban CNTT & CĐS.',
-              'Hoàn thành chứng chỉ Kiến trúc sư Hệ thống Đám mây / Cloud Solutions Architect.',
-            ],
-            checkInNotes: [
-              {
-                id: 'note-1',
-                date: '2025-05-10',
-                authorName: 'David Kim',
-                authorRole: 'EMPLOYEE',
-                content: 'Đã hoàn tất chứng chỉ Cloud Solutions Architect và đang tổng hợp tài liệu kiến trúc cho Ban.',
-              },
-              {
-                id: 'note-2',
-                date: '2025-05-20',
-                authorName: 'Marcus Vance',
-                authorRole: 'MANAGER',
-                content: 'Ghi nhận nỗ lực xuất sắc. Đề xuất tham gia tổ thẩm định kỹ thuật trong quý tiếp theo để đạt mức 4.',
-              },
-            ],
-            careerAspiration: {
-              targetRoleCode: 'R14',
-              targetRoleTitle: 'Phó Ban Công nghệ thông tin & CĐS',
-              submittedAt: '2025-05-01',
-              status: 'HR_REVIEWED',
-              notes: 'Mục tiêu phấn đấu lên cấp Quản lý trong 12-18 tháng tới.',
-            },
-          },
-          {
-            id: 'idp-2',
-            userId: 'usr-dev-lead',
-            targetCompetencyCode: 'LD03',
-            currentTier: 3,
-            targetTier: 4,
-            experiential70: [
-              'Chủ trì điều phối dự án liên phòng ban về an ninh mạng và chuyển đổi số toàn diện.',
-              'Thiết lập chỉ số SLA vận hành và huấn luyện đội ngũ kỹ sư trực ca 24/7.',
-            ],
-            exposure20: [
-              'Tham gia các phiên họp chiến lược điều hành cùng Ban Tổng Giám đốc và Trưởng Ban CNTT.',
-              'Kèm cặp 2 kỹ sư cấp phó nâng cao kỹ năng phản ứng sự cố.',
-            ],
-            education10: [
-              'Tham gia khóa đào tạo Quản trị Lãnh đạo cấp Trung — Mini MBA Flamingo.',
-              'Cập nhật tiêu chuẩn ISO 27001:2022 Lead Implementer.',
-            ],
-            timeline: 'Q3/2025 - Q1/2026',
-            status: 'IN_PROGRESS',
-            generatedByAI: true,
-            completedTasks: [
-              'Tham gia khóa đào tạo Quản trị Lãnh đạo cấp Trung — Mini MBA Flamingo.',
-            ],
-            checkInNotes: [
-              {
-                id: 'note-201',
-                date: '2025-05-15',
-                authorName: 'Elena Rostova',
-                authorRole: 'EMPLOYEE',
-                content: 'Đã hoàn thành module Mini MBA và đang áp dụng vào việc xây dựng SLA phòng ban.',
-              },
-            ],
-            careerAspiration: {
-              targetRoleCode: 'R10',
-              targetRoleTitle: 'Trưởng Ban Công nghệ thông tin & CĐS',
-              submittedAt: '2025-04-20',
-              status: 'APPROVED',
-              notes: 'Nhân sự quy hoạch kế thừa Trưởng Ban CNTT & CĐS theo kế hoạch Kế thừa 2025-2026.',
-            },
-          },
-        ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Sync to localStorage
@@ -559,9 +431,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       entityType,
       entityId,
       actorId: activePersona.id,
-      actorEmail: `${activePersona.id}@flamingo.vn`,
-      actorIp: '10.0.1.5',
-      userAgent: 'Flamingo Enterprise WebApp',
+      actorEmail: `${activePersona.id}@example.invalid`,
+      actorIp: null,
+      userAgent: 'CompetencyAI Demo',
       diff: diff || null,
       metadata: metadata || null,
       status: 'SUCCESS',
@@ -673,6 +545,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const disconnectServer = () => {
+    const session = loadSession();
+    if (session) void fetch(session.apiUrl + '/api/auth/logout', {
+      method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: session.refreshToken }),
+    }).catch(() => {});
     clearSession();
     dataSourceRef.current = 'DEMO';
     // Tải lại trang để khôi phục nguyên trạng dữ liệu Demo đã lưu trong trình duyệt
@@ -685,6 +562,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!s) return;
     setServer({ status: 'loading', apiUrl: s.apiUrl });
     loadFromServer().catch((e) => {
+      if (e instanceof ApiError && e.status === 428) {
+        setServer({ status: 'needsPasswordChange', apiUrl: s.apiUrl, message: 'Hãy đổi mật khẩu tạm để tiếp tục.' });
+        return;
+      }
       clearSession();
       setServer({ status: 'error', apiUrl: s.apiUrl, message: `Không tự kết nối lại được: ${errText(e)}` });
     });
@@ -820,11 +701,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Mutator: Add Competency
-  const addCompetency = (
+  const addCompetency = async (
     compData: Partial<CompetencyModel>,
     versionData: Partial<CompetencyVersionModel>
   ) => {
-    if (dataSourceRef.current === 'SERVER') return blockOnServer('Thêm năng lực mới (cần quyết định QĐ-01 về cấu trúc Từ điển)');
+    if (dataSourceRef.current === 'SERVER') {
+      if (!COMPANY_PORTAL) {
+        blockOnServer('Thêm năng lực mới (cần quyết định QĐ-01 về cấu trúc Từ điển)');
+        return false;
+      }
+      return runOnServer('Tạo bản nháp năng lực', () => apiSend('POST', '/competencies', {
+        code: compData.code, name: compData.name, definition: compData.description ?? '',
+        categoryCode: categories.find(c => c.id === compData.categoryId)?.code,
+        owningUnit: compData.hasOwner ? compData.owningUnit || null : null, levels: levelsPayload(versionData),
+      }));
+    }
     const compId = `comp-${Date.now()}`;
     const versionId = `ver-${compId}-v1`;
 
@@ -870,6 +761,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setVersions((prev) => [newVersion, ...prev]);
 
     addAuditLog('CREATE', 'Competency', compId, { competency: newComp, version: newVersion });
+    return true;
   };
 
   // Mutator: Update Competency Version
@@ -1376,6 +1268,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Data Hub: Export Enterprise Dataset
   const exportEnterpriseDataset = (): string => {
+    if (COMPANY_PORTAL || dataSourceRef.current === 'SERVER') {
+      throw new Error('Xuất bản sao trình duyệt chỉ áp dụng cho dữ liệu demo.');
+    }
     const fullSnapshot = {
       version: '3.0.0-flamingo',
       exportedAt: new Date().toISOString(),
@@ -1409,42 +1304,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProficiencyScales(SEED_PROFICIENCY_SCALES);
     setCategories(SEED_CATEGORIES);
     setOrgUnits(SEED_ORG_UNITS);
-    setUsers(SEED_USERS);
-    setUserScopes(SEED_USER_SCOPES);
+    setUsers([]);
+    setUserScopes([]);
     setCompetencies(SEED_COMPETENCIES);
     setVersions(SEED_VERSIONS);
     setInterviewQuestions(SEED_INTERVIEW_QUESTIONS);
     setJobFamilies(SEED_JOB_FAMILIES);
     setJobLevels(SEED_JOB_LEVELS);
     setJobRoles(SEED_JOB_ROLES);
-    setAuditLogs(SEED_AUDIT_LOGS);
-    setAssessmentScores(INITIAL_SCORES);
-    setNineBoxTalents(INITIAL_9BOX);
-    setSuccessionPlans(INITIAL_SUCCESSION);
-    setIdpPlans([
-      {
-        id: 'idp-1',
-        userId: 'usr-swe-1',
-        targetCompetencyCode: 'FU39',
-        currentTier: 3,
-        targetTier: 4,
-        experiential70: [
-          'Chủ trì thiết kế kiến trúc hệ thống dữ liệu phân tán cho Ban CNTT & CĐS.',
-          'Tham gia hiệu chuẩn hạ tầng và kiểm thử tải cho giải pháp CĐS cấp Tập đoàn.'
-        ],
-        exposure20: [
-          'Shadowing trực tiếp với Trưởng phòng Ứng dụng & CĐS trong các phiên phản biện kiến trúc.',
-          'Tham gia tổ thẩm định kỹ thuật công nghệ thông tin cùng Ban Tổng Giám đốc.'
-        ],
-        education10: [
-          'Hoàn thành chứng chỉ Kiến trúc sư Hệ thống Đám mây / Cloud Solutions Architect.',
-          'Đọc tài liệu chuẩn hóa Kiến trúc TOGAF và Khung quản trị dữ liệu DAMA-DMBOK.'
-        ],
-        timeline: 'Q3-Q4 / 2025',
-        status: 'IN_PROGRESS',
-        generatedByAI: true,
-      }
-    ]);
+    setAuditLogs([]);
+    setAssessmentScores([]);
+    setNineBoxTalents([]);
+    setSuccessionPlans([]);
+    setIdpPlans([]);
   };
 
   const value = useMemo(

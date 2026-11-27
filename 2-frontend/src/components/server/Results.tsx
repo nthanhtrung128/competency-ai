@@ -6,10 +6,12 @@ type CampaignRow = { id: string; code: string; name: string; status: string };
 type SummaryRow = {
   employee: { id: string; employeeCode: string; fullName: string; jobTitle: string | null };
   submitted: number; total: number; core: number | null; leadership: number | null; suggestedPotential: number | null; gaps: number;
+  requirementBasis?: { status: string; requirementsCount: number };
 };
 type Result = {
   campaign: { name: string; status: string; minRatersForAnonymity: number };
   employee: { employeeCode: string; fullName: string; jobTitle: string | null; jobRoleCode: string | null };
+  requirementBasis?: { status: string; capturedAt: string | null; jobRoleCode: string | null; roleTitle: string | null; roleRevision: number | null; requirementsCount: number };
   raters: { total: number; submitted: number; byRelation: Array<{ relation: string; invited: number; submitted: number }>; hiddenGroups: string[] };
   summary: { core: number | null; leadership: number | null };
   competencies: Array<{
@@ -60,7 +62,7 @@ export const Results: React.FC<{ initial?: { campaignId: string; employeeId: str
                     <td className="pr-2">{fmt(p.core)}</td>
                     <td className="pr-2">{fmt(p.leadership)}</td>
                     <td className="pr-2">{p.suggestedPotential ? POT[p.suggestedPotential] : '—'}</td>
-                    <td className="pr-2">{p.gaps > 0 ? <Pill tone="amber">{p.gaps}</Pill> : '0'}</td>
+                    <td className="pr-2">{p.requirementBasis && !p.requirementBasis.requirementsCount ? '—' : p.gaps > 0 ? <Pill tone="amber">{p.gaps}</Pill> : '0'}</td>
                     <td><button onClick={() => setEmployeeId(p.employee.id)} className="text-[var(--brand)] font-bold">Chi tiết</button></td>
                   </tr>
                 ))}
@@ -68,6 +70,7 @@ export const Results: React.FC<{ initial?: { campaignId: string; employeeId: str
             </table>
             <p className="text-[10.5px] text-[var(--muted)] mt-2">
               Điểm = trung bình của người khác đánh giá (không tính tự đánh giá). Gợi ý tiềm năng [PROPOSAL]: nhóm Lãnh đạo ≥ 3,5 → Cao; ≥ 2,5 → Trung bình.
+              {' '}Dấu — ở cột năng lực dưới yêu cầu nghĩa là chưa có mức yêu cầu để đối chiếu.
             </p>
           </div>
         )
@@ -90,6 +93,13 @@ const PersonResult: React.FC<{ campaignId: string; employeeId: string; onBack: (
       <button onClick={onBack} className="text-xs text-[var(--brand)] font-bold">← Tổng hợp chiến dịch</button>
       <div className="app-card space-y-1.5">
         <h3 className="text-sm font-bold text-[var(--ink)]">{d.employee.fullName} <span className="text-xs text-[var(--muted)]">· {d.employee.employeeCode} · {d.employee.jobTitle} · vai trò {d.employee.jobRoleCode ?? '—'}</span></h3>
+        {d.requirementBasis?.status === 'FROZEN' && <p className="text-xs text-[var(--muted)]">
+          Yêu cầu đã chốt ngày {d.requirementBasis.capturedAt ? new Date(d.requirementBasis.capturedAt).toLocaleString('vi-VN') : '—'}
+          {' '}· chức danh {d.requirementBasis.jobRoleCode ?? 'chưa gán'}{d.requirementBasis.roleTitle ? ` · ${d.requirementBasis.roleTitle}` : ''}.
+          {' '}Thay đổi chức danh hoặc bộ yêu cầu sau đó không làm đổi mức đối chiếu của kỳ này.
+          {!d.requirementBasis.requirementsCount && ' Tại thời điểm chốt chưa có yêu cầu đã duyệt phù hợp với các năng lực trong kỳ.'}
+        </p>}
+        {d.requirementBasis?.status === 'MISSING' && <p className="text-xs text-amber-700 dark:text-amber-300">Kỳ này chưa lưu yêu cầu chức danh tại thời điểm đánh giá. Hệ thống giữ điểm và để trống khoảng cách; không dùng bộ yêu cầu hiện tại để suy ngược.</p>}
         <div className="flex flex-wrap gap-2 text-[11px]">
           {d.raters.byRelation.filter((x) => x.invited).map((x) => <Pill key={x.relation}>{RELATION_VI[x.relation]} {x.submitted}/{x.invited}</Pill>)}
           <Pill tone="blue">Cốt lõi {fmt(d.summary.core)}</Pill><Pill tone="blue">Lãnh đạo {fmt(d.summary.leadership)}</Pill>
@@ -124,7 +134,8 @@ const PersonResult: React.FC<{ campaignId: string; employeeId: string; onBack: (
           </tbody>
         </table>
         <p className="text-[10.5px] text-[var(--muted)] mt-2">
-          * Mức yêu cầu lấy từ vai trò của nhân sự, đang là đối chiếu <b>đề xuất</b> chờ duyệt (QĐ-02). Điểm mù: chênh lệch tự đánh giá và người khác từ 1 điểm trở lên.
+          {d.competencies.some(c => c.requiredStatus === 'PROPOSED') && <>* Mức yêu cầu có dấu sao còn là đề xuất chờ duyệt. </>}
+          Điểm mù: chênh lệch tự đánh giá và người khác từ 1 điểm trở lên.
         </p>
       </div>
     </div>

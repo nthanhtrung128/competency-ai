@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import Papa from 'papaparse';
 import { z } from 'zod';
-import { prisma } from '../db.js';
+import { currentWorkspace, prisma } from '../db.js';
 import { authenticate, requirePermission, audit } from '../auth.js';
 
 const upload = multer({
@@ -98,12 +98,14 @@ importRouter.post(
     });
 
     // nạp sẵn dữ liệu đối chiếu
-    const [orgUnits, existing] = await Promise.all([
+    const [orgUnits, existing, jobRoles] = await Promise.all([
       prisma.orgUnit.findMany({ select: { id: true, code: true, name: true } }),
       prisma.employee.findMany({ select: { id: true, employeeCode: true, email: true } }),
+      currentWorkspace() ? prisma.jobRole.findMany({ where: { isActive: true }, select: { code: true } }) : Promise.resolve([]),
     ]);
     const unitByCode = new Map(orgUnits.map((u) => [u.code.toUpperCase(), u]));
     const empByCode = new Map(existing.map((e) => [e.employeeCode.toUpperCase(), e]));
+    const roleCodes = new Set(jobRoles.map(role => role.code));
     const emailOwner = new Map(existing.filter((e) => e.email).map((e) => [e.email!.toLowerCase(), e.employeeCode]));
 
     const seenCodes = new Set<string>();
@@ -129,6 +131,10 @@ importRouter.post(
       const unitCode = (raw.org_unit_code ?? '').trim().toUpperCase();
       const email = (raw.email ?? '').trim().toLowerCase();
       const managerCode = (raw.manager_code ?? '').trim().toUpperCase();
+      const roleCode = (raw.job_role_code ?? '').trim();
+      if (currentWorkspace() && roleCode && !roleCodes.has(roleCode.toUpperCase())) {
+        messages.push({ level: 'ERROR', text: `Mã chức danh "${roleCode}" chưa có hoặc đã ngừng sử dụng. Tạo hồ sơ chức danh trước khi nhập.` });
+      }
 
       // trùng mã trong chính file
       if (code && seenCodes.has(code)) {
@@ -199,7 +205,7 @@ importRouter.post(
               orgUnitId: unit?.id ?? null,
               orgUnitCode: unitCode,
               jobTitle: (raw.job_title ?? '').trim() || null,
-              jobRoleCode: (raw.job_role_code ?? '').trim() || null,
+              jobRoleCode: (currentWorkspace() ? roleCode.toUpperCase() : roleCode) || null,
               jobLevelCode: (raw.job_level_code ?? '').trim() || null,
               gradeCode: (raw.grade_code ?? '').trim() || null,
               managerCode: managerCode || null,
@@ -300,7 +306,12 @@ importRouter.post(
     let created = 0;
     let updatedCount = 0;
 
-    await prisma.$transaction(async (tx) => {
+    const committed = await prisma.$transaction(async (tx) => {
+      // Claim the validated batch atomically. Rollback also releases the claim.
+      const claim = await tx.importBatch.updateMany({
+        where: { id: batch.id, status: 'VALIDATED' }, data: { status: 'COMMITTED' },
+      });
+      if (!claim.count) return false;
       // vòng 1: tạo/cập nhật nhân sự (chưa gán quản lý)
       for (const row of rows) {
         const n = row.normalized as Record<string, string | null>;
@@ -384,12 +395,13 @@ importRouter.post(
           updatedRows: updatedCount,
         },
       });
-    });
-
-    await audit(req, 'IMPORT', 'ImportBatch', batch.id, {
-      entityName: `Ghi thật ${batch.fileName}`,
-      newValues: { created, updated: updatedCount },
-    });
+      await tx.auditLog.create({ data: {
+        action: 'IMPORT', entityType: 'ImportBatch', entityId: batch.id, entityName: `Ghi thật ${batch.fileName}`,
+        actorId: req.user!.id, actorEmail: req.user!.email, newValues: { created, updated: updatedCount },
+      } });
+      return true;
+    }, { timeout: 60000 });
+    if (!committed) return res.status(409).json({ error: 'Lô nhập đã được xử lý.' });
 
     res.json({
       batchId: batch.id,
@@ -412,7 +424,8 @@ importRouter.post(
     if (batch.status === 'COMMITTED') {
       return res.status(409).json({ error: 'Lô đã ghi thật, không huỷ được' });
     }
-    await prisma.importBatch.update({ where: { id: batch.id }, data: { status: 'CANCELLED' } });
+    const change = await prisma.importBatch.updateMany({ where: { id: batch.id, status: { not: 'COMMITTED' } }, data: { status: 'CANCELLED' } });
+    if (!change.count) return res.status(409).json({ error: 'Lô đã ghi thật, không huỷ được' });
     res.json({ message: 'Đã huỷ lô nhập. Dữ liệu vùng đệm được giữ để tra cứu.' });
   },
 );
